@@ -3,7 +3,7 @@
 import Foundation
 
 /// Singleton dependency injection container.
-public final class DependencyInjectionContainer {
+public class DependencyInjectionContainer {
 
   public typealias Factory<T> = () -> T
 
