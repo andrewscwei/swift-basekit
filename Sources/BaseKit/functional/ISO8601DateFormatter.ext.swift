@@ -9,7 +9,7 @@ extension ISO8601DateFormatter {
   /// - Parameters:
   ///   - formatOptions: Format options.
   ///   - timeZone: Time zone.
-  convenience public init(_ formatOptions: Options, timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!) {
+  convenience init(_ formatOptions: Options, timeZone: TimeZone = TimeZone(secondsFromGMT: 0)!) {
     self.init()
     self.formatOptions = formatOptions
     self.timeZone = timeZone

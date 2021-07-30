@@ -8,12 +8,17 @@ extension String {
   ///
   /// - Returns: The date in ISO 8601 format.
   public func toFormattedDate() -> Date? {
-    let formatter = DateFormatter()
-    formatter.calendar = Calendar(identifier: .iso8601)
-    formatter.locale = Locale(identifier: "en_US_POSIX")
-    formatter.timeZone = TimeZone(secondsFromGMT: 0)
-    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+    if #available(iOS 11.0, *) {
+      return Formatter.iso8601.date(from: self)
+    }
+    else {
+      let formatter = DateFormatter()
+      formatter.calendar = Calendar(identifier: .iso8601)
+      formatter.locale = Locale(identifier: "en_US_POSIX")
+      formatter.timeZone = TimeZone(secondsFromGMT: 0)
+      formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
 
-    return formatter.date(from: self)
+      return formatter.date(from: self)
+    }
   }
 }

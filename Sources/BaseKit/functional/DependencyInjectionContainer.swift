@@ -47,8 +47,11 @@ public class DependencyInjectionContainer {
 
   /// Resolves a dependency and returns an instance of the dependency depndending on how it was registered. If it was registered as a singleton, the same instance of the dependency will always be returned. If the it was registered as a factory, a new instance of the dependency will be returned. Note that this function expects that the dependency is already registered with the container, if not the app will terminate immediately.
   ///
+  /// - Parameters:
+  ///   - type: The type of the dependency.
+  ///
   /// - Returns: An instance of the dependency.
-  public func resolve<T>() -> T {
+  public func resolve<T>(_ type: T.Type = T.self) -> T {
     let key = "\(T.self)"
     var component: T?
 
