@@ -12,5 +12,5 @@ public protocol StateMachineDelegate: AnyObject {
   ///
   /// - Parameters:
   ///   - check: A `DirtyStateChecker` instance containing the dirty states/state types of the `StateMachine` in the current update     cycle.
-  func update(check: DirtyStateChecker)
+  func update(check: StateValidator)
 }

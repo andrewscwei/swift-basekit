@@ -1,7 +1,7 @@
 import XCTest
 @testable import BaseKit
 
-class ISODateTests: XCTestCase {
+class ISO8601DateTests: XCTestCase {
 
   func testISO8601Formatter() {
     let formatter = Formatter.iso8601

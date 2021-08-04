@@ -19,7 +19,7 @@ public class StateMachine {
   private var dirtyStateTypes: StateType = .all
 
   /// A set of key paths (with respect to the linked property of the `StateMachineDelegate`, in string format) of managed states that are currently dirty. A `nil` value indicates that every managed state is dirty, whereas an empty set indicates that no states are dirty.
-  private var dirtyStateKeyPaths: Set<String>?
+  private var dirtyStateKeyPaths: Set<AnyKeyPath>?
 
   public init(_ delegate: StateMachineDelegate) {
     self.delegate = delegate
@@ -82,7 +82,7 @@ public class StateMachine {
     guard !isInTransaction else { return }
     guard isRunning else { return }
 
-    let checker = DirtyStateChecker.init(keyPaths: dirtyStateKeyPaths, stateTypes: dirtyStateTypes)
+    let checker = StateValidator.init(keyPaths: dirtyStateKeyPaths, stateTypes: dirtyStateTypes)
 
     clean()
     delegate?.update(check: checker)
@@ -98,7 +98,7 @@ public class StateMachine {
   ///
   /// - Parameter keyPath: The state key path.
   private func setDirty(_ keyPath: AnyKeyPath) {
-    dirtyStateKeyPaths?.insert("\(keyPath)")
+    dirtyStateKeyPaths?.insert(keyPath)
   }
 
   /// Marks a state type as dirty.

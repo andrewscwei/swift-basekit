@@ -3,12 +3,12 @@
 import Foundation
 
 /// A helper object that checks if any of the states or state types managed by a `StateMachine` is dirty.
-public struct DirtyStateChecker {
+public struct StateValidator {
 
-  private let dirtyStateKeyPaths: Set<String>?
+  private let dirtyStateKeyPaths: Set<AnyKeyPath>?
   private let dirtyStateTypes: StateType
 
-  public init(keyPaths: Set<String>? = nil, stateTypes: StateType = .all) {
+  public init(keyPaths: Set<AnyKeyPath>? = nil, stateTypes: StateType = .all) {
     dirtyStateKeyPaths = keyPaths
     dirtyStateTypes = stateTypes
   }
@@ -21,7 +21,7 @@ public struct DirtyStateChecker {
     guard let dirtyStateKeyPaths = dirtyStateKeyPaths else { return true }
 
     for keyPath in keyPaths {
-      if dirtyStateKeyPaths.contains("\(keyPath)") == true {
+      if dirtyStateKeyPaths.contains(keyPath) == true {
         return true
       }
     }

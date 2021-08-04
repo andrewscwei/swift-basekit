@@ -1,7 +1,17 @@
 import XCTest
 @testable import BaseKit
 
-class ObjectTests: XCTestCase {
+class FunctionalTests: XCTestCase {
+
+  func testAnyOptional() {
+    var someOptional: String? = nil
+
+    XCTAssertTrue(someOptional.isNil)
+
+    someOptional = "foo"
+
+    XCTAssertFalse(someOptional.isNil)
+  }
 
   func testClassName() {
     class Foo: NSObject {}
@@ -19,15 +29,5 @@ class ObjectTests: XCTestCase {
     }
 
     XCTAssertNoThrow(try Foo().asError())
-  }
-
-  func testAnyOptional() {
-    var foo: String? = nil
-
-    XCTAssertTrue(foo.isNil)
-
-    foo = "foo"
-
-    XCTAssertFalse(foo.isNil)
   }
 }
