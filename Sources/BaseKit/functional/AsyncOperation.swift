@@ -2,15 +2,17 @@
 
 import Foundation
 
+/// An abstract class that represents the code and data associated with a single asynchronous task. To use an `AsyncOperation` instance, you must add it to a `OperationQueue` or manually invoke `start()` on it.
 public class AsyncOperation: Operation {
-
-  private let lockQueue: DispatchQueue
 
   public override var isAsynchronous: Bool { true }
 
+  private let lockQueue: DispatchQueue
+
   private var mutableIsExecuting: Bool = false
 
-  public override private(set) var isExecuting: Bool {
+  /// Indicates if the async operation is in progress.
+  public private(set) override var isExecuting: Bool {
     get {
       lockQueue.sync { () -> Bool in
         mutableIsExecuting
@@ -27,7 +29,8 @@ public class AsyncOperation: Operation {
 
   private var mutableIsFinished: Bool = false
 
-  public override private(set) var isFinished: Bool {
+  /// Inidicates if the async operation is complete.
+  public private(set) override var isFinished: Bool {
     get {
       lockQueue.sync { () -> Bool in
         mutableIsFinished
@@ -42,10 +45,14 @@ public class AsyncOperation: Operation {
     }
   }
 
-  public init(lockQueue: DispatchQueue) {
+  /// Creates a new `AsyncOperation` instance.
+  ///
+  /// - Parameter lockQueue: A `DispatchQueue` used for thread-safe read and write access.
+  public init(lockQueue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
     self.lockQueue = lockQueue
   }
 
+  /// Starts the async operation manually. Note that if this operation is added to an `OperationQueue`, `start()` will be invoked automatically.
   public override func start() {
     guard !isCancelled else {
       finish()
@@ -57,10 +64,17 @@ public class AsyncOperation: Operation {
     main()
   }
 
+  /// This is the main executing block representing the async operation and must be overridden by subclasses of `AsyncOperation`.
   public override func main() {
-    fatalError("main() is not implemented by subclass")
+    fatalError("Subclass must override `main()` without calling `super`, and call `finish()` when done")
   }
 
+  /// Override this to define what happens when the operation cancels.
+  public override func cancel() {
+    super.cancel()
+  }
+
+  /// Signifies the the async operation as complete.
   public func finish() {
     isExecuting = false
     isFinished = true
