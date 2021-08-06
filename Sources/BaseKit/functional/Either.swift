@@ -3,7 +3,7 @@
 import Foundation
 
 /// A disjoint union holding a value of one of two types, `L` or `R`.
-enum Either<L, R> {
+public enum Either<L, R> {
 
   /// An `Either` holding a value of type `L`.
   case left(L)
@@ -12,7 +12,7 @@ enum Either<L, R> {
   case right(R)
 
   /// Indicates if this is a `.left`.
-  var isLeft: Bool {
+  public var isLeft: Bool {
     switch self {
     case .left: return true
     case .right: return false
@@ -20,7 +20,7 @@ enum Either<L, R> {
   }
 
   /// Indicates if this is a `.right`.
-  var isRight: Bool {
+  public var isRight: Bool {
     switch self {
     case .left: return false
     case .right: return true
@@ -28,7 +28,7 @@ enum Either<L, R> {
   }
 
   /// Returns the value if this is a `.left`, `nil` otherwise.
-  var leftValue: L? {
+  public var leftValue: L? {
     switch self {
     case .left(let value): return value
     case .right: return nil
@@ -36,7 +36,7 @@ enum Either<L, R> {
   }
 
   /// Returns the value if this is a `.right`, `nil` otherwise.
-  var rightValue: R? {
+  public var rightValue: R? {
     switch self {
     case .left: return nil
     case .right(let value): return value
@@ -49,7 +49,7 @@ enum Either<L, R> {
   /// - Parameter execute: The block to execute with the left value as its argument.
   ///
   /// - Returns: This `Either` instance.
-  func ifLeft(execute: (L) -> Void) -> Either<L, R> {
+  public func ifLeft(execute: (L) -> Void) -> Either<L, R> {
     switch self {
     case .left(let value): execute(value)
     case .right: break
@@ -64,7 +64,7 @@ enum Either<L, R> {
   /// - Parameter execute: The block to execute with the right value as its argument.
   ///
   /// - Returns: This `Either` instance.
-  func ifRight(execute: (R) -> Void) -> Either<L, R> {
+  public func ifRight(execute: (R) -> Void) -> Either<L, R> {
     switch self {
     case .left: break
     case .right(let value): execute(value)
@@ -81,7 +81,7 @@ enum Either<L, R> {
   ///   - executeR: The block to execute with the right value if this is a `.right`.
   ///
   /// - Returns: The return value of the executed block.
-  func fold(executeL: (L) -> Any, executeR: (R) -> Any) -> Any {
+  public func fold(executeL: (L) -> Any, executeR: (R) -> Any) -> Any {
     switch self {
     case .left(let value): return executeL(value)
     case .right(let value): return executeR(value)
@@ -97,7 +97,7 @@ extension Either: Codable where L: Codable, R: Codable {
     case right
   }
 
-  func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     switch self {
@@ -108,7 +108,7 @@ extension Either: Codable where L: Codable, R: Codable {
     }
   }
 
-  init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
 
     do {
