@@ -2,7 +2,8 @@
 
 import Foundation
 
-/// An abstract class that represents the code and data associated with a single asynchronous task. To use an `AsyncOperation` instance, you must add it to a `OperationQueue` or manually invoke `start()` on it.
+/// An abstract class that represents the code and data associated with a single asynchronous task. To use an
+/// `AsyncOperation`, you must either add it to a `OperationQueue` or manually invoke `start()` on it.
 public class AsyncOperation: Operation {
 
   public override var isAsynchronous: Bool { true }
@@ -52,7 +53,8 @@ public class AsyncOperation: Operation {
     self.lockQueue = lockQueue
   }
 
-  /// Starts the async operation manually. Note that if this operation is added to an `OperationQueue`, `start()` will be invoked automatically.
+  /// Starts the async operation manually. Note that if this operation is added to an `OperationQueue`, `start()` will
+  /// be invoked automatically.
   public override func start() {
     guard !isCancelled else {
       finish()
@@ -64,7 +66,7 @@ public class AsyncOperation: Operation {
     main()
   }
 
-  /// This is the main executing block representing the async operation and must be overridden by subclasses of `AsyncOperation`.
+  /// This is the main executing block representing the async operation and must be overridden by subclasses.
   public override func main() {
     fatalError("Subclass must override `main()` without calling `super`, and call `finish()` when done")
   }
@@ -74,7 +76,7 @@ public class AsyncOperation: Operation {
     super.cancel()
   }
 
-  /// Signifies the the async operation as complete.
+  /// Signifies that the async operation as complete.
   public func finish() {
     isExecuting = false
     isFinished = true

@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Injects the dependency into the associated property.
+/// Injects the dependency into the wrapped property.
 @propertyWrapper
 public struct Inject<T> {
 

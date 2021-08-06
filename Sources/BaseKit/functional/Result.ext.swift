@@ -4,6 +4,9 @@ import Foundation
 
 extension Result {
 
+  /// A successful `Result` with `Void` as its success value.
+  public static var success: Result<Void, Failure> { .success(()) }
+
   /// Indicates if the current `Result` is a success.
   public var isSuccess: Bool {
     switch self {
@@ -38,7 +41,7 @@ extension Result {
 
   /// Executes a block if this is a success, then returns the current `Result` for chainability.
   ///
-  /// - Parameter execute: The block to execute if this is a success.
+  /// - Parameter execute: The block to execute if this is a success, with the success value as its argument.
   ///
   /// - Returns: The current `Result`.
   public func ifSuccess(execute: (Success) -> Void) -> Result<Success, Failure> {
@@ -52,7 +55,7 @@ extension Result {
 
   /// Executes a block if this is a failure, then returns the current `Result` for chainability.
   ///
-  /// - Parameter execute: The block to execute if this is a failure.
+  /// - Parameter execute: The block to execute if this is a failure, with the error as its argument.
   ///
   /// - Returns: The current `Result`.
   public func ifFailure(execute: (Failure) -> Void) -> Result<Success, Failure> {
@@ -64,9 +67,10 @@ extension Result {
     return self
   }
 
-  /// Executes a block if this is a success where a new type of `Result` can be derived from the current `Result`. If this is a failure, the current `Result` is returned immediately.
+  /// Executes a block if this is a success with the current success value as its argument, then returns the new
+  /// `Result` of the executed block. If this is a failure, the current result is returned immediately.
   ///
-  /// - Parameter execute: The block to execute if this is a success.
+  /// - Parameter execute: The block to execute if this is a success, with the current success value as its argument.
   ///
   /// - Returns: The new `Result`.
   public func then<R>(execute: (Success) -> Result<R, Failure>) -> Result<R, Failure> {
@@ -76,7 +80,8 @@ extension Result {
     }
   }
 
-  /// Executes a block if this is a failure where a new type of `Result` can be derived from the current `Result`. If this is a success, the current `Result` is returned immediately.
+  /// Executes a block if this is a failure with the current error as its argument, then returns the new `Result` of the
+  /// executed block. If this is a success, the current result is returned immediately.
   ///
   /// - Parameter execute: The block to execute if this is a failure.
   ///
@@ -85,6 +90,48 @@ extension Result {
     switch self {
     case .failure(let error): return execute(error)
     case .success(let value): return .success(value)
+    }
+  }
+
+  /// Returns a copy of the current result removing the success value.
+  ///
+  /// - Returns: The new `Result`.
+  public func withOmittedValue() -> Result<Void, Failure> {
+    switch self {
+    case .success(_): return .success
+    case .failure(let error): return .failure(error)
+    }
+  }
+
+  /// Returns a copy of the current result replacing the success value with `nil`.
+  ///
+  /// - Returns: The new `Result`.
+  public func withNilValue<T>() -> Result<T?, Failure> {
+    switch self {
+    case .success(_): return .success(nil)
+    case .failure(let error): return .failure(error)
+    }
+  }
+
+  /// Returns a copy of the current result replacing the success value with a new value.
+  ///
+  /// - Parameter newValue: The new value.
+  ///
+  /// - Returns: The new `Result`.
+  public func withReplacedValue<T>(_ newValue: T) -> Result<T, Failure> {
+    switch self {
+    case .success(_): return .success(newValue)
+    case .failure(let error): return .failure(error)
+    }
+  }
+
+  /// Returns a copy of the current result chaning the success value type to optional.
+  ///
+  /// - Returns: The new `Result`.
+  public func withOptionalValue() -> Result<Success?, Failure> {
+    switch self {
+    case .success(let value): return .success(value as Success?)
+    case .failure(let error): return .failure(error)
     }
   }
 }

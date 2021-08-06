@@ -1,19 +1,26 @@
 // © Sybl
 
-/// A wrapper object that stores another object as a weak reference.
-public struct WeakReference<T: AnyObject> {
+/// A wrapper object that weakly references another object. Note that while value types can be wrapped in a
+/// `WeakReference`, there is little meaning to it because it gets passed around as a value regardless.
+public struct WeakReference<T> {
 
-  public weak var object: T?
+  private let provider: () -> T?
 
-  /// Creates a new `WeakReference` instnace.
+  /// Creates a new `WeakReference` instance.
   ///
-  /// - Parameter object: The target object to store as a weak reference.
+  /// - Parameter object: The target object to store as a weak reference. Note that while value types can be
+  ///   wrapped in a `WeakReference`, there is little meaning to it because it gets passed around as a value regardless.
   public init(_ object: T) {
-    self.object = object
+    let reference = object as AnyObject
+
+    provider = { [weak reference] in
+      reference as? T
+    }
   }
 
-  /// Unwraps and returns the wrapped object. Since the object is weakly referenced, there is no guarantee that the object still exists in memory when invoking this method.
+  /// Unwraps and returns the wrapped object. Since the object is weakly referenced, there is no guarantee that the
+  /// object still exists in memory when invoking this method (this will not apply if a value type is wrapped).
   ///
   /// - Returns: The wrapped object if it still exists.
-  public func get() -> T? { self.object }
+  public func get() -> T? { provider() }
 }

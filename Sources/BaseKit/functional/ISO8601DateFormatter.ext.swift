@@ -4,7 +4,7 @@ import Foundation
 
 extension ISO8601DateFormatter {
 
-  /// Initializes an `ISO8601DateFormatter` with specified format options and time zone.
+  /// Initializes an `ISO8601DateFormatter` with the specified format options and time zone.
   ///
   /// - Parameters:
   ///   - formatOptions: Format options.

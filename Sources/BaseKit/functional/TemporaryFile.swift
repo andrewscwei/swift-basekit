@@ -2,7 +2,8 @@
 
 import Foundation
 
-/// A `TemperaryFile` object creates a file in the device filesystem on `init` and destroys the same file on `deinit`, thus enforcing a temporary life cycle of the file. Use `keepAlive()` to delay `TemporaryFile` being garbage collected.
+/// A `TemperaryFile` binds its in-memory lifecycle to a new file in the device filesystem, creating the file on `init`
+/// and destroying it on `deinit`. Use `keepAlive()` to delay `TemporaryFile` from being garbage collected.
 public class TemporaryFile {
 
   /// URL of the associated file in the device filesystem.
@@ -34,7 +35,8 @@ public class TemporaryFile {
     }
   }
 
-  /// No-op function that can be called just to keep the object from being dereferenced.
+  /// No-op function that can be called just to keep the object from being dereferenced (which would otherwise cause the
+  /// associated file to be deleted from the device filesystem).
   ///
   /// - SeeAlso: https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
   public func keepAlive() {}
