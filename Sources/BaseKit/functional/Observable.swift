@@ -35,7 +35,7 @@ extension Observable {
   }
 
   public func addObserver(_ observer: Observer) {
-    for o in observers  {
+    for o in observers {
       guard o.get() !== observer else { return }
     }
 
