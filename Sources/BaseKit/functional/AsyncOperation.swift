@@ -4,7 +4,7 @@ import Foundation
 
 /// An abstract class that represents the code and data associated with a single asynchronous task. To use an
 /// `AsyncOperation`, you must either add it to a `OperationQueue` or manually invoke `start()` on it.
-public class AsyncOperation: Operation {
+open class AsyncOperation: Operation {
 
   public override var isAsynchronous: Bool { true }
 
