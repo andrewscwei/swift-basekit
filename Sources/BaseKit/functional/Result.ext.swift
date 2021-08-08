@@ -125,13 +125,23 @@ extension Result {
     }
   }
 
-  /// Returns a copy of the current result chaning the success value type to optional.
+  /// Returns a copy of the current result changing the success value type to optional.
   ///
   /// - Returns: The new `Result`.
   public func withOptionalValue() -> Result<Success?, Failure> {
     switch self {
     case .success(let value): return .success(value as Success?)
     case .failure(let error): return .failure(error)
+    }
+  }
+
+  /// Returns a copy of the current result with the failure value upcasted to generic `Error` type.
+  ///
+  /// - Returns: The new `Result`.
+  public func withUpcastedFailure() -> Result<Success, Error> {
+    switch self {
+    case .success(let value): return .success(value)
+    case .failure(let error): return .failure(error as Error)
     }
   }
 }
