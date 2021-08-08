@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Convenience method for returning a localized string from the main bundle. Providing a comment is optional, and is
+/// Convenience method for fetching a localized string from the main bundle. Providing a comment is optional and is
 /// otherwise automatically set to the same value as the key.
 ///
 /// - Parameters:

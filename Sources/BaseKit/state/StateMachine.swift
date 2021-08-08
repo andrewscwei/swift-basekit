@@ -5,8 +5,8 @@
 /// `StateMachineDelegate`.
 ///
 /// `StateMachine` manages a set of stateful properties, or *states* for short, as specified by the delegate via the
-/// property wrapper `Stateful`. When the value of a state changes, the delegate will be notified and can handle the
-/// entire update cycle inside its `update(check:)` handler. Note that multiple states can be simultaneously "dirty"
+/// `Stateful` property wrapper. When the value of a state changes, the delegate will be notified, which can then handle
+/// the entire update cycle inside its `update(check:)` method. Note that multiple states can be simultaneously "dirty"
 /// in the same update cycle.
 ///
 /// The delegate must explicitly invoke `start()` on its `StateMachine` instance before it can begin monitoring state
@@ -45,21 +45,21 @@ public class StateMachine {
     isRunning = false
     isInTransaction = false
 
-    // Whenever `StateMachine` stops, mark every state as dirty so on the next invocation of `start()` it will
-    // invalidate all states.
+    // Whenever `StateMachine` stops, mark every state as dirty so that all states will be invalidated upon calling the
+    // next `start()`.
     setDirty()
   }
 
-  /// Initiates a new update transaction. A transaction allows you to modify multiple states before triggering an update
-  /// cycle. Until the transaction is explicitly committed by invoking `commit()`, changes to states will not trigger an
-  /// update cycle.
+  /// Initiates a new update *transaction*. A *transaction* allows you to modify multiple states before triggering an
+  /// update cycle. Until the *transaction* is explicitly committed by invoking `commit()`, changes to states will not
+  /// trigger an update cycle.
   public func beginTransaction() {
     guard !isInTransaction else { return }
     isInTransaction = true
   }
 
-  /// Commits the current transaction, if it exists, consequently triggering an update cycle. All modified states up to
-  /// this point will be marked as dirty in this update cycle.
+  /// Commits the current *transaction*, if it exists, consequently triggering an update cycle. All modified states up
+  /// to this point will be marked as dirty in this update cycle.
   public func commit() {
     guard isInTransaction else { return }
     isInTransaction = false
@@ -68,8 +68,7 @@ public class StateMachine {
 
   /// Marks the specified key path(s) as dirty, consequently triggering an update cycle.
   ///
-  /// - Parameter keyPaths: The key path(s) (with respect to the linked property of the `StateMachineDelegate` to mark
-  ///                       as dirty.
+  /// - Parameter keyPaths: The key path(s) (relative to the property owner) to mark as dirty.
   public func invalidate(_ keyPaths: AnyKeyPath...) {
     for keyPath in keyPaths {
       setDirty(keyPath)

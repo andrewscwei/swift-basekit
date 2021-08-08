@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// A disjoint union holding a value of one of two types, `L` or `R`.
+/// A disjoint union enum holding a value of one of two types, `L` or `R`.
 public enum Either<L, R> {
 
   /// An `Either` holding a value of type `L`.
@@ -43,13 +43,13 @@ public enum Either<L, R> {
     }
   }
 
-  /// Executes the provided block with the left value as its argument if this is a `.left`, and finally returns this
-  /// `Either` instance.
+  /// Executes a block with the left value as its argument (if this is a `.left`) and returns the current `Either` to
+  /// allow for method chaining. If this is a `.right`, the block will not be executed.
   ///
   /// - Parameter execute: The block to execute with the left value as its argument.
   ///
-  /// - Returns: This `Either` instance.
-  public func ifLeft(execute: (L) -> Void) -> Either<L, R> {
+  /// - Returns: The current `Either`.
+  @discardableResult public func ifLeft(execute: (L) -> Void) -> Either<L, R> {
     switch self {
     case .left(let value): execute(value)
     case .right: break
@@ -58,13 +58,13 @@ public enum Either<L, R> {
     return self
   }
 
-  /// Executes the provided block with the right value as its argument if this is a `.right`, and finally returns this
-  /// `Either` instance.
+  /// Executes a block with the right value as its argument (if this is a `.right`) and returns the current `Either` to
+  /// allow for function chaining. If this is a `.left`, the block will not be executed.
   ///
   /// - Parameter execute: The block to execute with the right value as its argument.
   ///
-  /// - Returns: This `Either` instance.
-  public func ifRight(execute: (R) -> Void) -> Either<L, R> {
+  /// - Returns: The current `Either`.
+  @discardableResult public func ifRight(execute: (R) -> Void) -> Either<L, R> {
     switch self {
     case .left: break
     case .right(let value): execute(value)
@@ -74,14 +74,14 @@ public enum Either<L, R> {
   }
 
   /// Executes the first block if this is a `.left` or the second block if this is a `right`, each passing the
-  /// corresponding containing value.
+  /// associated contained value.
   ///
   /// - Parameters:
   ///   - executeL: The block to execute with the left value if this is a `.left`.
   ///   - executeR: The block to execute with the right value if this is a `.right`.
   ///
   /// - Returns: The return value of the executed block.
-  public func fold(executeL: (L) -> Any, executeR: (R) -> Any) -> Any {
+  @discardableResult public func fold(executeL: (L) -> Any, executeR: (R) -> Any) -> Any {
     switch self {
     case .left(let value): return executeL(value)
     case .right(let value): return executeR(value)
@@ -89,7 +89,7 @@ public enum Either<L, R> {
   }
 }
 
-/// Extension to handle codable left and right values.
+/// Extension to handle codable `L` and `R` values.
 extension Either: Codable where L: Codable, R: Codable {
 
   enum CodingKeys: CodingKey {

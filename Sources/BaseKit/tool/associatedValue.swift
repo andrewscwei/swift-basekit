@@ -16,15 +16,15 @@ public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer
 }
 
 /// Returns the typed value associated with a given object for a given key with the option to provide a default value.
-/// The default value is only returned if a value does not exist or it cannot be typecast to `T`. When the default value
-/// is returned, it automatically gets stored as the new associated value.
+/// The default value is only returned if the associated value does not exist or it cannot be typecast to `T`. When the
+/// default value is returned, it automatically gets stored as the new associated value.
 ///
 /// - Parameters:
 ///   - object: The object of which the value is associated with.
 ///   - key: The key through which the value is associated with the object.
-///   - defaultValue: Closure that returns the default value.
+///   - defaultValue: Block that returns the default value.
 ///
-/// - Returns: The associated value if it exists and can be typecast to `T`, or the default value otherwise.
+/// - Returns: The associated value if it exists and can be typecast to `T`, otherwise the default value.
 public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer<UInt8>, defaultValue: () -> T) -> T {
   if let value = objc_getAssociatedObject(object, key) as? T {
     return value

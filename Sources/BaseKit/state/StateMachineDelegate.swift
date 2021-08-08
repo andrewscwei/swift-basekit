@@ -11,10 +11,12 @@ public protocol StateMachineDelegate: AnyObject {
 
   /// The centralized handler of a `StateMachine` update cycle, invoked whenever a state managed by the `StateMachine`
   /// is modified or when a state type is marked as dirty by the `StateMachine`. This method is also invoked upon
-  /// starting the `StateMachine`.
+  /// starting the `StateMachine`. If any states are modified during this update cycle, consequently triggering another
+  /// update sycle, the new update cycle will be resolved first (handling changes for the states responsible for the new
+  /// update cycle only) before returning to the current update cycle.
   ///
   /// - Parameters:
-  ///   - check: A `DirtyStateChecker` instance containing the dirty states/state types of the `StateMachine` in the
-  ///            current update cycle.
+  ///   - check: A `DirtyStateChecker` instance containing the dirty state key paths/state types of the `StateMachine`
+  ///            in the current update cycle.
   func update(check: StateValidator)
 }

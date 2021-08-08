@@ -30,7 +30,7 @@ open class AsyncOperation: Operation {
 
   private var mutableIsFinished: Bool = false
 
-  /// Inidicates if the async operation is complete.
+  /// Indicates if the async operation is complete.
   public private(set) override var isFinished: Bool {
     get {
       lockQueue.sync { () -> Bool in
@@ -66,7 +66,7 @@ open class AsyncOperation: Operation {
     main()
   }
 
-  /// This is the main executing block representing the async operation and must be overridden by subclasses.
+  /// The main executing block running the async operation that must be overridden by subclasses.
   public override func main() {
     fatalError("Subclass must override `main()` without calling `super`, and call `finish()` when done")
   }
@@ -76,7 +76,7 @@ open class AsyncOperation: Operation {
     super.cancel()
   }
 
-  /// Signifies that the async operation as complete.
+  /// Notifies that the async operation as complete.
   public func finish() {
     isExecuting = false
     isFinished = true

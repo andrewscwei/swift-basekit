@@ -18,8 +18,8 @@ public class MutableReference<T>: Reference<T> {
 
   /// Updates the wrapped value.
   ///
-  /// - Parameter execute: A block that takes the old value as its argument. The returned value of this block becomes
-  ///                      the new wrapped value.
+  /// - Parameter execute: A block that takes the current value as its argument. The returned value of this block
+  ///                      becomes the new wrapped value.
   public func update(execute: (T) -> T) {
     let oldValue = value
     value = execute(oldValue)

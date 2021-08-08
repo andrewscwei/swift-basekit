@@ -2,22 +2,23 @@
 
 import Foundation
 
-/// Associated value for storing weakly referenced observers for the type conforming to `Observable`.
+/// Associated value for storing weakly referenced observers.
 private var ptr_observers: UInt8 = 0
 
-/// A protocol that makes the conforming type observable by observers. Subsequently, its observers must conform to its
-/// associated type `Observer` in order complete the observable-observer relationship.
+/// A type conforming to the `Observable` protocol maintains weak references of its `Observer`'s so it can notify them
+/// when certain events happen. It is up to the conforming type and its associated `Observer` type when to and what to
+/// notify
 public protocol Observable: AnyObject {
 
   /// A type must conform to this associated type to become an eligible observer of this `Observable`.
   associatedtype Observer
 
-  /// Adds a weakly referenced observer to this `Observable`.
+  /// Adds a weakly referenced observer.
   ///
   /// - Parameter observer: The observer to add.
   func addObserver(_ observer: Observer)
 
-  /// Removes an existing observer from this `Observable`.
+  /// Removes an existing observer.
   ///
   /// - Parameter observer: The observer to remove.
   func removeObserver(_ observer: Observer)

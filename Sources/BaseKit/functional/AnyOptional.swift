@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Protocol for checking if the value of an `Optional` type is `nil`.
+/// Protocol exposing a property for a `ExpressibleByNilLiteral` value that checks if the value is `nil`.
 public protocol AnyOptional: ExpressibleByNilLiteral {
 
   /// Indicates if the value is `nil`.

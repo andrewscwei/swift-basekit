@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Executes a block after the specified number of seconds, but returns immediately.
+/// Executes a block after the specified number of seconds, returns immediately.
 ///
 /// - Parameters:
 ///   - queue: The dispatch queue to execute the block on.

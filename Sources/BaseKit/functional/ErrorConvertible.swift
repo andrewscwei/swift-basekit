@@ -2,10 +2,10 @@
 
 import Foundation
 
-/// Types that conform to the `ErrorConvertible` protocol can be used to construct an `Error`.
+/// A type conforming to the `ErrorConvertible` protocol can construct an `Error` from itself.
 public protocol ErrorConvertible {
 
-  /// Constructs an `Error` from the conforming instance.
+  /// Constructs an `Error`.
   ///
   /// - Throws: When there is an error (ironically) constructing the error.
   ///

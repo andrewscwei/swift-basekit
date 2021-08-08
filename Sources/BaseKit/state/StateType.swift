@@ -3,8 +3,8 @@
 /// `StateMachine` state type.
 ///
 /// This struct is meant to be extended to define application-specific state types. Use the `factory()` method to
-/// generate unique `StateType` values in runtime. Note that when applied to static constants, the order of declaration
-/// of these constants does not guarantee the order of `StateType` generation:
+/// generate unique `StateType` values at runtime. Note that when applied to static constants, their order of
+/// declaration does not guarantee the order of `StateType` generation:
 ///
 /// ```
 /// extension StateType {
