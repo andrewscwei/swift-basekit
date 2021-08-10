@@ -11,8 +11,8 @@ class ISO8601DateTests: XCTestCase {
   }
 
   func testTransformISO8601StringToDate() {
-    XCTAssertNil("foo".toFormattedDate())
-    XCTAssertNil("2020-07-17T02:42:06".toFormattedDate())
-    XCTAssertNotNil("2020-07-17T02:42:06.054Z".toFormattedDate())
+    XCTAssertNil("foo".toISO8601Date())
+    XCTAssertNil("2020-07-17T02:42:06".toISO8601Date())
+    XCTAssertNotNil("2020-07-17T02:42:06.054Z".toISO8601Date())
   }
 }

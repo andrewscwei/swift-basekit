@@ -4,10 +4,11 @@ import Foundation
 
 extension String {
 
-  /// Converts this string to a `Date` object in ISO 8601 format.
+  /// Converts this string to a `Date` object in ISO 8601 format, assuming the string represents the date with
+  /// fractional seconds in `yyyy-MM-dd HH:mm:ss.SSSZ` format.
   ///
   /// - Returns: The `Date` in ISO 8601 format.
-  public func toFormattedDate() -> Date? {
+  public func toISO8601Date() -> Date? {
     if #available(iOS 11.0, *) {
       return Formatter.iso8601.date(from: self)
     }
