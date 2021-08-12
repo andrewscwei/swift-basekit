@@ -5,12 +5,13 @@ import Foundation
 /// Associated value for storing weakly referenced observers.
 private var ptr_observers: UInt8 = 0
 
-/// A type conforming to the `Observable` protocol maintains weak references of its `Observer`'s so it can notify them
-/// when certain events happen. It is up to the conforming type and its associated `Observer` type when to and what to
-/// notify
+/// A type conforming to the `Observable` protocol maintains weak references of its `Observer`'s so
+/// it can notify them when certain events happen. It is up to the conforming type and its
+/// associated `Observer` type when to and what to notify
 public protocol Observable: AnyObject {
 
-  /// A type must conform to this associated type to become an eligible observer of this `Observable`.
+  /// A type must conform to this associated type to become an eligible observer of this
+  /// `Observable`.
   associatedtype Observer
 
   /// Adds a weakly referenced observer.

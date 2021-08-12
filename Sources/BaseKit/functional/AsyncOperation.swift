@@ -2,8 +2,9 @@
 
 import Foundation
 
-/// An abstract class that represents the code and data associated with a single asynchronous task. To use an
-/// `AsyncOperation`, you must either add it to a `OperationQueue` or manually invoke `start()` on it.
+/// An abstract class that represents the code and data associated with a single asynchronous task.
+/// To use an `AsyncOperation`, you must either add it to a `OperationQueue` or manually invoke
+/// `start()` on it.
 open class AsyncOperation: Operation {
 
   public override var isAsynchronous: Bool { true }
@@ -53,8 +54,8 @@ open class AsyncOperation: Operation {
     self.lockQueue = lockQueue
   }
 
-  /// Starts the async operation manually. Note that if this operation is added to an `OperationQueue`, `start()` will
-  /// be invoked automatically.
+  /// Starts the async operation manually. Note that if this operation is added to an
+  /// `OperationQueue`, `start()` will be invoked automatically.
   public override func start() {
     guard !isCancelled else {
       finish()

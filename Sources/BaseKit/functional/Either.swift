@@ -43,8 +43,9 @@ public enum Either<L, R> {
     }
   }
 
-  /// Executes a block with the left value as its argument (if this is a `.left`) and returns the current `Either` to
-  /// allow for method chaining. If this is a `.right`, the block will not be executed.
+  /// Executes a block with the left value as its argument (if this is a `.left`) and returns the
+  /// current `Either` to allow for method chaining. If this is a `.right`, the block will not be
+  /// executed.
   ///
   /// - Parameter execute: The block to execute with the left value as its argument.
   ///
@@ -58,8 +59,9 @@ public enum Either<L, R> {
     return self
   }
 
-  /// Executes a block with the right value as its argument (if this is a `.right`) and returns the current `Either` to
-  /// allow for function chaining. If this is a `.left`, the block will not be executed.
+  /// Executes a block with the right value as its argument (if this is a `.right`) and returns the
+  /// current `Either` to allow for function chaining. If this is a `.left`, the block will not be
+  /// executed.
   ///
   /// - Parameter execute: The block to execute with the right value as its argument.
   ///
@@ -73,8 +75,8 @@ public enum Either<L, R> {
     return self
   }
 
-  /// Executes the first block if this is a `.left` or the second block if this is a `right`, each passing the
-  /// associated contained value.
+  /// Executes the first block if this is a `.left` or the second block if this is a `right`, each
+  /// passing the associated contained value.
   ///
   /// - Parameters:
   ///   - executeL: The block to execute with the left value if this is a `.left`.

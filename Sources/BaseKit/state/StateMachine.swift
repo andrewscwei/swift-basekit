@@ -1,16 +1,17 @@
 // © Sybl
 
-/// A state container that manages stateful properties for an object and emits an event to the object whenever those
-/// properties are modified. The object assumes the role of the delegate and must conform to the protocol
-/// `StateMachineDelegate`.
+/// A state container that manages stateful properties for an object and emits an event to the
+/// object whenever those properties are modified. The object assumes the role of the delegate and
+/// must conform to the protocol `StateMachineDelegate`.
 ///
-/// `StateMachine` manages a set of stateful properties, or *states* for short, as specified by the delegate via the
-/// `Stateful` property wrapper. When the value of a state changes, the delegate will be notified, which can then handle
-/// the entire update cycle inside its `update(check:)` method. Note that multiple states can be simultaneously "dirty"
-/// in the same update cycle.
+/// `StateMachine` manages a set of stateful properties, or *states* for short, as specified by the
+/// delegate via the `Stateful` property wrapper. When the value of a state changes, the delegate
+/// will be notified, which can then handle the entire update cycle inside its `update(check:)`
+/// method. Note that multiple states can be simultaneously "dirty" in the same update cycle.
 ///
-/// The delegate must explicitly invoke `start()` on its `StateMachine` instance before it can begin monitoring state
-/// changes. Likewise, the delegate must invoke `stop()` to pause or stop the `StateMachine`.
+/// The delegate must explicitly invoke `start()` on its `StateMachine` instance before it can begin
+/// monitoring state changes. Likewise, the delegate must invoke `stop()` to pause or stop the
+/// `StateMachine`.
 public class StateMachine {
 
   private weak var delegate: StateMachineDelegate?
@@ -24,9 +25,9 @@ public class StateMachine {
   /// State types that are currently dirty.
   private var dirtyStateTypes: StateType = .all
 
-  /// A set of key paths (with respect to the linked property of the `StateMachineDelegate`) of managed states that are
-  /// currently dirty. A `nil` value indicates that every managed state is dirty, whereas an empty set indicates that no
-  /// states are dirty.
+  /// A set of key paths (with respect to the linked property of the `StateMachineDelegate`) of
+  /// managed states that are currently dirty. A `nil` value indicates that every managed state is
+  /// dirty, whereas an empty set indicates that no states are dirty.
   private var dirtyStateKeyPaths: Set<AnyKeyPath>?
 
   public init(_ delegate: StateMachineDelegate) {
@@ -45,21 +46,21 @@ public class StateMachine {
     isRunning = false
     isInTransaction = false
 
-    // Whenever `StateMachine` stops, mark every state as dirty so that all states will be invalidated upon calling the
-    // next `start()`.
+    // Whenever `StateMachine` stops, mark every state as dirty so that all states will be
+    // invalidated upon calling the next `start()`.
     setDirty()
   }
 
-  /// Initiates a new update *transaction*. A *transaction* allows you to modify multiple states before triggering an
-  /// update cycle. Until the *transaction* is explicitly committed by invoking `commit()`, changes to states will not
-  /// trigger an update cycle.
+  /// Initiates a new update *transaction*. A *transaction* allows you to modify multiple states
+  /// before triggering an update cycle. Until the *transaction* is explicitly committed by invoking
+  /// `commit()`, changes to states will not trigger an update cycle.
   public func beginTransaction() {
     guard !isInTransaction else { return }
     isInTransaction = true
   }
 
-  /// Commits the current *transaction*, if it exists, consequently triggering an update cycle. All modified states up
-  /// to this point will be marked as dirty in this update cycle.
+  /// Commits the current *transaction*, if it exists, consequently triggering an update cycle. All
+  /// modified states up to this point will be marked as dirty in this update cycle.
   public func commit() {
     guard isInTransaction else { return }
     isInTransaction = false
@@ -89,8 +90,9 @@ public class StateMachine {
     notifyStateUpdate()
   }
 
-  /// Notifies the delegate that state updates are available. If other states are modified in the middle of this update
-  /// cycle, a nested update cycle will take place to resolve those changes before the parent update cycle can continue.
+  /// Notifies the delegate that state updates are available. If other states are modified in the
+  /// middle of this update cycle, a nested update cycle will take place to resolve those changes
+  /// before the parent update cycle can continue.
   private func notifyStateUpdate() {
     guard !isInTransaction else { return }
     guard isRunning else { return }

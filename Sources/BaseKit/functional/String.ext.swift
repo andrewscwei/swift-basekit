@@ -4,8 +4,8 @@ import Foundation
 
 extension String {
 
-  /// Converts this string to a `Date` object in ISO 8601 format, assuming the string represents the date with
-  /// fractional seconds in `yyyy-MM-dd HH:mm:ss.SSSZ` format.
+  /// Converts this string to a `Date` object in ISO 8601 format, assuming the string represents the
+  /// date with fractional seconds in `yyyy-MM-dd HH:mm:ss.SSSZ` format.
   ///
   /// - Returns: The `Date` in ISO 8601 format.
   public func toISO8601Date() -> Date? {

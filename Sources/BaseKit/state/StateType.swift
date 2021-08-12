@@ -2,9 +2,10 @@
 
 /// `StateMachine` state type.
 ///
-/// This struct is meant to be extended to define application-specific state types. Use the `factory()` method to
-/// generate unique `StateType` values at runtime. Note that when applied to static constants, their order of
-/// declaration does not guarantee the order of `StateType` generation:
+/// This struct is meant to be extended to define application-specific state types. Use the
+/// `factory()` method to generate unique `StateType` values at runtime. Note that when applied to
+/// static constants, their order of declaration does not guarantee the order of `StateType`
+/// generation:
 ///
 /// ```
 /// extension StateType {
@@ -44,7 +45,8 @@ public struct StateType: OptionSet {
   ///
   /// - Parameter types: `StateType` values.
   ///
-  /// - Returns: `true` if any one of the provided `StateType` values is included, `false` if none are included.
+  /// - Returns: `true` if any one of the provided `StateType` values is included, `false` if none
+  ///             are included.
   public func has(_ types: StateType...) -> Bool {
     guard types.count > 0 else {
       return self != .none
