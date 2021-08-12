@@ -5,7 +5,7 @@ import Foundation
 /// Abstract class for all use cases/interactors with an input parameter of type `Input` and output
 /// value of type `Output` wrapped in a `Result`. By convention, the underlying job of the `UseCase`
 /// should be suspended and executed in a dispatch queue.
-protocol UseCase {
+public protocol UseCase {
 
   associatedtype Input
   associatedtype Output
