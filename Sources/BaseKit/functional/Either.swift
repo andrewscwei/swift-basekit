@@ -49,10 +49,12 @@ public enum Either<L, R> {
   ///
   /// - Parameter execute: The block to execute with the left value as its argument.
   ///
+  /// - Throws: Error thrown by the block.
+  ///
   /// - Returns: The current `Either`.
-  @discardableResult public func ifLeft(execute: (L) -> Void) -> Either<L, R> {
+  @discardableResult public func ifLeft(execute: (L) throws -> Void) rethrows -> Either<L, R> {
     switch self {
-    case .left(let value): execute(value)
+    case .left(let value): try execute(value)
     case .right: break
     }
 
@@ -65,14 +67,44 @@ public enum Either<L, R> {
   ///
   /// - Parameter execute: The block to execute with the right value as its argument.
   ///
+  /// - Throws: Error thrown by the block.
+  ///
   /// - Returns: The current `Either`.
-  @discardableResult public func ifRight(execute: (R) -> Void) -> Either<L, R> {
+  @discardableResult public func ifRight(execute: (R) throws -> Void) rethrows -> Either<L, R> {
     switch self {
     case .left: break
-    case .right(let value): execute(value)
+    case .right(let value): try execute(value)
     }
 
     return self
+  }
+
+  /// Returns a new `Either` with a new `L` value transformed by the given closure.
+  ///
+  /// - Parameter transform: The block to execute to transform the current `L` value.
+  ///
+  /// - Throws: Error thrown by the transform closure.
+  ///
+  /// - Returns: The new `Either` with the transformed `L` value.
+  public func mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
+    switch self {
+    case .left(let value): return .left(try transform(value))
+    case .right(let value): return .right(value)
+    }
+  }
+
+  /// Returns a new `Either` with a new `R` value transformed by the given closure.
+  ///
+  /// - Parameter transform: The block to execute to transform the current `R` value.
+  ///
+  /// - Throws: Error thrown by the transform closure.
+  ///
+  /// - Returns: The new `Either` with the transformed `R` value.
+  public func mapRight<T>(transform: (R) throws -> T) rethrows -> Either<L, T> {
+    switch self {
+    case .left(let value): return .left(value)
+    case .right(let value): return .right(try transform(value))
+    }
   }
 
   /// Executes the first block if this is a `.left` or the second block if this is a `right`, each
@@ -82,16 +114,19 @@ public enum Either<L, R> {
   ///   - executeL: The block to execute with the left value if this is a `.left`.
   ///   - executeR: The block to execute with the right value if this is a `.right`.
   ///
+  /// - Throws: Error thrown by either block.
+  ///
   /// - Returns: The return value of the executed block.
-  @discardableResult public func fold(executeL: (L) -> Any, executeR: (R) -> Any) -> Any {
+  @discardableResult public func fold(left: (L) throws -> Any, right: (R) throws -> Any) rethrows -> Any {
     switch self {
-    case .left(let value): return executeL(value)
-    case .right(let value): return executeR(value)
+    case .left(let value): return try left(value)
+    case .right(let value): return try right(value)
     }
   }
 }
 
-/// Extension to handle codable `L` and `R` values.
+/// Extension to handle codable `L` and `R` values, which will be encoded/decoded into a single
+/// value.
 extension Either: Codable where L: Codable, R: Codable {
 
   enum CodingKeys: CodingKey {
@@ -100,26 +135,26 @@ extension Either: Codable where L: Codable, R: Codable {
   }
 
   public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
+    var container = encoder.singleValueContainer()
 
     switch self {
     case .left(let value):
-      try container.encode(value, forKey: .left)
+      try container.encode(value)
     case .right(let value):
-      try container.encode(value, forKey: .right)
+      try container.encode(value)
     }
   }
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let container = try decoder.singleValueContainer()
 
     do {
-      let leftValue = try container.decode(L.self, forKey: .left)
-      self = .left(leftValue)
+      let value = try container.decode(L.self)
+      self = .left(value)
     }
     catch {
-      let rightValue = try container.decode(R.self, forKey: .right)
-      self = .right(rightValue)
+      let value = try container.decode(R.self)
+      self = .right(value)
     }
   }
 }

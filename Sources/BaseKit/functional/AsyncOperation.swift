@@ -9,20 +9,20 @@ open class AsyncOperation: Operation {
 
   public override var isAsynchronous: Bool { true }
 
-  private let lockQueue: DispatchQueue
+  private let queue: DispatchQueue
 
   private var mutableIsExecuting: Bool = false
 
   /// Indicates if the async operation is in progress.
   public private(set) override var isExecuting: Bool {
     get {
-      lockQueue.sync { () -> Bool in
+      queue.sync { () -> Bool in
         mutableIsExecuting
       }
     }
     set {
       willChangeValue(for: \.isExecuting)
-      lockQueue.sync(flags: [.barrier]) {
+      queue.sync(flags: [.barrier]) {
         mutableIsExecuting = newValue
       }
       didChangeValue(for: \.isExecuting)
@@ -34,13 +34,13 @@ open class AsyncOperation: Operation {
   /// Indicates if the async operation is complete.
   public private(set) override var isFinished: Bool {
     get {
-      lockQueue.sync { () -> Bool in
+      queue.sync { () -> Bool in
         mutableIsFinished
       }
     }
     set {
       willChangeValue(for: \.isFinished)
-      lockQueue.sync(flags: [.barrier]) {
+      queue.sync(flags: [.barrier]) {
         mutableIsFinished = newValue
       }
       didChangeValue(for: \.isFinished)
@@ -49,9 +49,9 @@ open class AsyncOperation: Operation {
 
   /// Creates a new `AsyncOperation` instance.
   ///
-  /// - Parameter lockQueue: A `DispatchQueue` used for thread-safe read and write access.
-  public init(lockQueue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
-    self.lockQueue = lockQueue
+  /// - Parameter queue: A `DispatchQueue` used for thread-safe read and write access.
+  public init(queue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
+    self.queue = queue
   }
 
   /// Starts the async operation manually. Note that if this operation is added to an
