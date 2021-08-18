@@ -27,22 +27,6 @@ public enum Either<L, R> {
     }
   }
 
-  /// Returns the value if this is a `.left`, `nil` otherwise.
-  public var leftValue: L? {
-    switch self {
-    case .left(let value): return value
-    case .right: return nil
-    }
-  }
-
-  /// Returns the value if this is a `.right`, `nil` otherwise.
-  public var rightValue: R? {
-    switch self {
-    case .left: return nil
-    case .right(let value): return value
-    }
-  }
-
   /// Executes a block with the left value as its argument (if this is a `.left`) and returns the
   /// current `Either` to allow for method chaining. If this is a `.right`, the block will not be
   /// executed.
