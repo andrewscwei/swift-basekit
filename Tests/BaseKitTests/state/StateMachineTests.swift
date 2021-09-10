@@ -42,7 +42,7 @@ class StateMachineTests: XCTestCase {
 
   func testStateMachineDelegate() {
     class Foo: StateMachineDelegate {
-      lazy var stateMachine = { StateMachine(self) }()
+      lazy var stateMachine = StateMachine(self)
 
       func update(check: StateValidator) {}
     }
@@ -59,7 +59,7 @@ class StateMachineTests: XCTestCase {
     expectation2.expectedFulfillmentCount = 3
 
     class Foo: StateMachineDelegate {
-      lazy var stateMachine = { StateMachine(self) }()
+      lazy var stateMachine = StateMachine(self)
 
       private var expectation1: XCTestExpectation
       private var expectation2: XCTestExpectation
