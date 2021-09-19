@@ -69,7 +69,7 @@ open class AsyncOperation: Operation {
 
   /// The main executing block running the async operation that must be overridden by subclasses.
   public override func main() {
-    fatalError("Subclass must override `main()` without calling `super`, and call `finish()` when done")
+    fatalError("Subclass <\(Self.self)> must override `main()` without calling `super`, and call `finish()` when done")
   }
 
   /// Override this to define what happens when the operation cancels.
