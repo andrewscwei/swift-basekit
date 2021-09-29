@@ -65,7 +65,9 @@ class StateMachineTests: XCTestCase {
       private var expectation2: XCTestExpectation
 
       @Stateful var foo: String = "foo"
-      @Stateful var bar: String?
+
+      @Stateful
+      var bar: String?
 
       init(expectation1: XCTestExpectation, expectation2: XCTestExpectation) {
         self.expectation1 = expectation1

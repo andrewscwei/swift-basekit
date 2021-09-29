@@ -28,7 +28,8 @@ import Foundation
 /// `isDirty` flag:
 ///
 /// ```
-/// @Stateful var foo: String = "foo" {
+/// @Stateful
+/// var foo: String = "foo" {
 ///   didSet {
 ///     if $foo.isDirty {
 ///       // Do something when the value has changed
