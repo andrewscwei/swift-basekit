@@ -3,6 +3,10 @@
 import os.log
 import Foundation
 
+/// Specifies whether zen mode is enabled for logging. In zen mode, logs are simplified to improve
+/// readability but unified logging is disabled.
+public var kZenLogging: Bool = false
+
 /// Logs a message to the unified logging system.
 ///
 /// - Parameters:
@@ -23,11 +27,33 @@ public func log(_ level: OSLogType = .info, isPublic: Bool = true, isEnabled: Bo
   let subsystem = Bundle.main.bundleIdentifier ?? "app"
   let category = "\(fileName ?? "???"):\(lineNumber)"
 
-  if isPublic {
-    os_log("%{public}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
+  if kZenLogging {
+    guard level != .default else { return }
+    print(getZenSymbol(for: level), "[\(category)]", message())
   }
   else {
-    os_log("%{private}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
+    if isPublic {
+      os_log("%{public}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
+    }
+    else {
+      os_log("%{private}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
+    }
   }
+
   #endif
+}
+
+/// Returns the logging symbol (in zen mode) of the specified log level.
+///
+/// - Parameter level: The log level.
+///
+/// - Returns: The log symbol.
+private func getZenSymbol(for level: OSLogType) -> String {
+  switch level {
+  case .fault: return "💀"
+  case .error: return "⚠️"
+  case .debug: return "👾"
+  case .info: return "🤖"
+  default: return ""
+  }
 }
