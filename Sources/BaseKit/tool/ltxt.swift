@@ -7,12 +7,11 @@ import Foundation
 ///
 /// - Parameters:
 ///   - key: Localization key.
-///   - default: Optional default value for this localization, defaults to the value of the
-///              localization key.
+///   - defaultKey: Optional fallback key for this localization.
 ///   - comment: Optional comment for this localization, defaults to the value of the localization
 ///              key.
 ///
 /// - Returns: The localized string.
-public func ltxt(_ key: String, default defaultValue: String? = nil, comment: String? = nil) -> String {
-  return NSLocalizedString(key, tableName: nil, bundle: Bundle.main, value: defaultValue ?? key, comment: comment ?? key)
+public func ltxt(_ key: String, default defaultKey: String? = nil, comment: String? = nil) -> String {
+  return NSLocalizedString(key, tableName: nil, bundle: .main, value: NSLocalizedString(defaultKey ?? "", tableName: nil, bundle: .main, value: key, comment: comment ?? key), comment: comment ?? key)
 }
