@@ -67,6 +67,13 @@ public class StateMachine {
     notifyStateUpdate()
   }
 
+  /// Marks all key paths and state types as dirty, consequently triggering an update cycle.
+  public func invalidateAll() {
+    setDirty()
+
+    notifyStateUpdate()
+  }
+
   /// Marks the specified key path(s) as dirty, consequently triggering an update cycle.
   ///
   /// - Parameter keyPaths: The key path(s) (relative to the property owner) to mark as dirty.
