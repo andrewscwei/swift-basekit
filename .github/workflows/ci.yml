@@ -2,9 +2,6 @@ name: CI
 on:
   push:
     branches: ['**']
-env:
-  LC_ALL: en_US.UTF-8
-  LANG: en_US.UTF-8
 jobs:
   build:
     name: Build/Test
@@ -12,7 +9,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Restore Ruby dependencies
+      - name: Configure Ruby dependencies cache
         uses: actions/cache@v2
         with:
           path: vendor/bundle
@@ -22,6 +19,6 @@ jobs:
       - name: Install Ruby dependencies
         run: |
           bundle config path vendor/bundle
-          bundle install --path vendor/bundle
+          bundle install
       - name: Test
         run: bundle exec fastlane test
