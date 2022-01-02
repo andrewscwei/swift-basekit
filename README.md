@@ -1,4 +1,4 @@
-# BaseKit [![CircleCI](https://img.shields.io/circleci/build/github/sybl/swift-basekit/main?token=2e11ae7785101515e1c741fcb008e5f3ae3e6150)](https://circleci.com/gh/sybl/swift-basekit/tree/main)
+# BaseKit [![CI](https://github.com/sybl/swift-basekit/workflows/CI/badge.svg?branch=main)](https://github.com/sybl/swift-basekit/actions/workflows/ci.yml?query=branch%3Amain)
 
 BaseKit is a lightweight Swift utility library consisting of low level functions, classes and protocols that are essential for building iOS/iPadOS/macOS apps.
 
