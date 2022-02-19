@@ -1,7 +1,8 @@
 name: CI
 on:
   push:
-    branches: ['**']
+    branches: ["**"]
+    tags-ignore: ["v*"]
 jobs:
   build:
     name: Build/Test
@@ -35,5 +36,5 @@ jobs:
     steps:
       - uses: andrewscwei/slack-action@v1.0.0
         with:
-          success: ${{ needs.build.result == 'success' && needs.deploy.result == 'success' }}
+          success: ${{ needs.build.result == 'success' }}
           webhook-url: ${{ secrets.SLACK_DEVOPS_WEBHOOK_URL }}
