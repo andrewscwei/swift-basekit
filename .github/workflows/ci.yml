@@ -30,12 +30,10 @@ jobs:
   notify:
     name: Notify
     needs: [build]
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DEVOPS_WEBHOOK_URL }}
-    if: ${{ always() && env.SLACK_WEBHOOK_URL != null }}
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - uses: andrewscwei/slack-action@v1.0.0
         with:
           success: ${{ needs.build.result == 'success' && needs.deploy.result == 'success' }}
-          webhook-url: ${{ env.SLACK_WEBHOOK_URL }}
+          webhook-url: ${{ secrets.SLACK_DEVOPS_WEBHOOK_URL }}
