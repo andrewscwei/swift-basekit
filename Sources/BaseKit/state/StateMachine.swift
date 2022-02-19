@@ -1,4 +1,4 @@
-// © Sybl
+// © GHOZT
 
 /// A state container that manages stateful properties for an object and emits an event to the
 /// object whenever those properties are modified. The object assumes the role of the delegate and

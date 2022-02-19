@@ -1,4 +1,4 @@
-// © Sybl
+// © GHOZT
 
 /// A wrapper object that weakly references another object. Note that while value types can be
 /// wrapped in a `WeakReference`, there is little meaning to that because the "weakly referenced"

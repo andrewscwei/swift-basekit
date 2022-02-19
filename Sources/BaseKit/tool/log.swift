@@ -1,4 +1,4 @@
-// © Sybl
+// © GHOZT
 
 import os.log
 import Foundation
