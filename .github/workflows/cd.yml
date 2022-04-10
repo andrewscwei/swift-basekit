@@ -1,0 +1,51 @@
+name: CD
+on:
+  push:
+    tags: ["v*"]
+  release:
+    types: [published]
+jobs:
+  build:
+    name: Build/Test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+      - name: Authenticate private GitHub repos
+        run: git config --global url."https://oauth2:${{ secrets.GH_ACCESS_TOKEN }}@github.com".insteadOf https://github.com
+      - name: Configure Ruby dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Install Ruby dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install
+      - name: Test
+        run: bundle exec fastlane test
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body_path: RELEASE.md
+          draft: false
+          prerelease: false
+  notify:
+    name: Notify
+    needs: [build]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: andrewscwei/slack-action@v1.0.0
+        with:
+          success: ${{ needs.build.result == 'success' }}
+          webhook-url: ${{ secrets.SLACK_DEVOPS_WEBHOOK_URL }}

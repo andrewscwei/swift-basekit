@@ -1,4 +1,4 @@
-# BaseKit [![CI](https://github.com/0xGHOZT/swift-basekit/workflows/CI/badge.svg?branch=main)](https://github.com/0xGHOZT/swift-basekit/actions/workflows/ci.yml?query=branch%3Amain)
+# BaseKit [![CI](https://github.com/0xGHOZT/swift-basekit/workflows/CI/badge.svg?branch=master)](https://github.com/0xGHOZT/swift-basekit/actions/workflows/ci.yml?query=branch%3Amain)
 
 BaseKit is a lightweight Swift utility library consisting of low level functions, classes and protocols that are essential for building iOS/iPadOS/macOS apps.
 
