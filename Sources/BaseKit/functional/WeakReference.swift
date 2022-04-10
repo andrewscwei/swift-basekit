@@ -1,22 +1,20 @@
 // © GHOZT
 
-/// A wrapper object that weakly references another object. Note that while value types can be
-/// wrapped in a `WeakReference`, there is little meaning to that because the "weakly referenced"
-/// object gets passed around as a value regardless.
+/// An immutable object that holds a weak reference to a target object specified during
+/// initialization. If the target object is a value type, it will be passed around as a value
+/// regardless.
 public struct WeakReference<T> {
 
-  private let provider: () -> T?
+  private let getReference: () -> T?
 
   /// Creates a new `WeakReference` instance.
   ///
-  /// - Parameter object: The target object to store as a weak reference. Note that while value
-  ///                     types can be wrapped in a `WeakReference`, there is little meaning to that
-  ///                     because the "weakly referenced" object gets passed around as a value
-  ///                     regardless.
+  /// - Parameter object: The target object to store as a weak reference. If the target object is a
+  ///                     value type, it will be passed around as a value regardless.
   public init(_ object: T) {
     let reference = object as AnyObject
 
-    provider = { [weak reference] in
+    getReference = { [weak reference] in
       reference as? T
     }
   }
@@ -26,5 +24,5 @@ public struct WeakReference<T> {
   /// apply if the wrapped object is a value type).
   ///
   /// - Returns: The wrapped object (if it still exists).
-  public func get() -> T? { provider() }
+  public func get() -> T? { getReference() }
 }
