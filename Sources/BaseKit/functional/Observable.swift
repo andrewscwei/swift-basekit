@@ -25,8 +25,8 @@ public protocol Observable: AnyObject {
 
   /// Iteratively executes a block on each registered observer.
   ///
-  /// - Parameter iterator: The block to execute, with each registered observer as the argument.
-  func notifyObservers(iterator: (Observer) -> Void)
+  /// - Parameter iteratee: The block to execute, with each registered observer as the argument.
+  func notifyObservers(iteratee: (Observer) -> Void)
 }
 
 extension Observable {
@@ -44,10 +44,10 @@ extension Observable {
     observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject }
   }
 
-  public func notifyObservers(iterator: (Observer) -> Void) {
+  public func notifyObservers(iteratee: (Observer) -> Void) {
     for o in observers {
       guard let observer = o.get() else { continue }
-      iterator(observer)
+      iteratee(observer)
     }
   }
 }
