@@ -21,17 +21,17 @@ public var kZenLogging: Bool = false
 public func log(_ level: OSLogType = .info, isPublic: Bool = true, isEnabled: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, message: () -> String) {
   if !isEnabled { return }
 
-  #if DEBUG
-
+#if DEBUG
   let fileName = fileName.components(separatedBy: "/").last?.components(separatedBy: ".").first
   let subsystem = Bundle.main.bundleIdentifier ?? "app"
-  let category = "\(fileName ?? "???"):\(lineNumber)"
 
   if kZenLogging {
     guard level != .default else { return }
-    print(getZenSymbol(for: level), "[\(category)]", message())
+    print(getZenSymbol(for: level), "[\(fileName ?? "???")]", message())
   }
   else {
+    let category = "\(fileName ?? "???"):\(lineNumber)"
+
     if isPublic {
       os_log("%{public}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
     }
@@ -39,8 +39,7 @@ public func log(_ level: OSLogType = .info, isPublic: Bool = true, isEnabled: Bo
       os_log("%{private}@", log: OSLog(subsystem: subsystem, category: category), type: level, message())
     }
   }
-
-  #endif
+#endif
 }
 
 /// Returns the logging symbol (in zen mode) of the specified log level.
