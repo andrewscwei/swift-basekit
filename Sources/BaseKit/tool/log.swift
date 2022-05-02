@@ -27,7 +27,7 @@ public func log(_ level: OSLogType = .info, isPublic: Bool = true, isEnabled: Bo
 
   if kZenLogging {
     guard level != .default else { return }
-    print(getZenSymbol(for: level), "[\(fileName ?? "???")]", message())
+    print(getZenSymbol(for: level), message())
   }
   else {
     let category = "\(fileName ?? "???"):\(lineNumber)"
