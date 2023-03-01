@@ -2,9 +2,9 @@
 
 import Foundation
 
-/// An abstract class that represents the code and data associated with a single asynchronous task.
-/// To use an `AsyncOperation`, you must either add it to a `OperationQueue` or manually invoke
-/// `start()` on it.
+/// An abstract class that represents the code and data associated with a single
+/// asynchronous task. To use an `AsyncOperation`, you must either add it to a
+/// `OperationQueue` or manually invoke `start()` on it.
 open class AsyncOperation: Operation {
 
   public override var isAsynchronous: Bool { true }
@@ -49,13 +49,14 @@ open class AsyncOperation: Operation {
 
   /// Creates a new `AsyncOperation` instance.
   ///
-  /// - Parameter queue: A `DispatchQueue` used for thread-safe read and write access.
+  /// - Parameter queue: A `DispatchQueue` used for thread-safe read and write
+  ///   access.
   public init(queue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
     self.queue = queue
   }
 
-  /// Starts the async operation manually. Note that if this operation is added to an
-  /// `OperationQueue`, `start()` will be invoked automatically.
+  /// Starts the async operation manually. Note that if this operation is added
+  /// to an `OperationQueue`, `start()` will be invoked automatically.
   public override func start() {
     guard !isCancelled else {
       finish()
@@ -67,7 +68,8 @@ open class AsyncOperation: Operation {
     main()
   }
 
-  /// The main executing block running the async operation that must be overridden by subclasses.
+  /// The main executing block running the async operation that must be
+  /// overridden by subclasses.
   public override func main() {
     fatalError("Subclass <\(Self.self)> must override `main()` without calling `super`, and call `finish()` when done")
   }

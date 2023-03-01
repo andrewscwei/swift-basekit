@@ -5,12 +5,14 @@ import Foundation
 /// Associated value for storing weakly referenced observers.
 private var ptr_observers: UInt8 = 0
 
-/// An object conforming to the `Observable` protocol becomes observable, maintaining weak
-/// references of its observers so it can notify them when certain events happen. Observers conform
-/// to the associated `Observer` type and define their own event handlers.
+/// An object conforming to the `Observable` protocol becomes observable,
+/// maintaining weak references of its observers so it can notify them when
+/// certain events happen. Observers conform to the associated `Observer` type
+/// and define their own event handlers.
 public protocol Observable: AnyObject {
 
-  /// A type must conform to this associated type to become a valid observer of this `Observable`.
+  /// A type must conform to this associated type to become a valid observer of
+  /// this `Observable`.
   associatedtype Observer = AnyObject
 
   /// Adds a weakly referenced observer.
@@ -25,7 +27,8 @@ public protocol Observable: AnyObject {
 
   /// Iteratively executes a block on each registered observer.
   ///
-  /// - Parameter iteratee: The block to execute, with each registered observer as the argument.
+  /// - Parameter iteratee: The block to execute, with each registered observer
+  ///                        as the argument.
   func notifyObservers(iteratee: (Observer) -> Void)
 }
 

@@ -27,11 +27,12 @@ public enum Either<L, R> {
     }
   }
 
-  /// Executes a block with the left value as its argument (if this is a `.left`) and returns the
-  /// current `Either` to allow for method chaining. If this is a `.right`, the block will not be
-  /// executed.
+  /// Executes a block with the left value as its argument (if this is a
+  /// `.left`) and returns the current `Either` to allow for method chaining. If
+  /// this is a `.right`, the block will not be executed.
   ///
-  /// - Parameter execute: The block to execute with the left value as its argument.
+  /// - Parameter execute: The block to execute with the left value as its
+  ///                      argument.
   ///
   /// - Throws: Error thrown by the block.
   ///
@@ -45,11 +46,12 @@ public enum Either<L, R> {
     return self
   }
 
-  /// Executes a block with the right value as its argument (if this is a `.right`) and returns the
-  /// current `Either` to allow for function chaining. If this is a `.left`, the block will not be
-  /// executed.
+  /// Executes a block with the right value as its argument (if this is a
+  /// `.right`) and returns the current `Either` to allow for function chaining.
+  /// If this is a `.left`, the block will not be executed.
   ///
-  /// - Parameter execute: The block to execute with the right value as its argument.
+  /// - Parameter execute: The block to execute with the right value as its
+  ///                      argument.
   ///
   /// - Throws: Error thrown by the block.
   ///
@@ -63,9 +65,11 @@ public enum Either<L, R> {
     return self
   }
 
-  /// Returns a new `Either` with a new `L` value transformed by the given closure.
+  /// Returns a new `Either` with a new `L` value transformed by the given
+  /// closure.
   ///
-  /// - Parameter transform: The block to execute to transform the current `L` value.
+  /// - Parameter transform: The block to execute to transform the current `L`
+  ///                        value.
   ///
   /// - Throws: Error thrown by the transform closure.
   ///
@@ -77,9 +81,11 @@ public enum Either<L, R> {
     }
   }
 
-  /// Returns a new `Either` with a new `R` value transformed by the given closure.
+  /// Returns a new `Either` with a new `R` value transformed by the given
+  /// closure.
   ///
-  /// - Parameter transform: The block to execute to transform the current `R` value.
+  /// - Parameter transform: The block to execute to transform the current `R`
+  ///                        value.
   ///
   /// - Throws: Error thrown by the transform closure.
   ///
@@ -91,12 +97,14 @@ public enum Either<L, R> {
     }
   }
 
-  /// Executes the first block if this is a `.left` or the second block if this is a `right`, each
-  /// passing the associated contained value.
+  /// Executes the first block if this is a `.left` or the second block if this
+  /// is a `right`, each passing the associated contained value.
   ///
   /// - Parameters:
-  ///   - executeL: The block to execute with the left value if this is a `.left`.
-  ///   - executeR: The block to execute with the right value if this is a `.right`.
+  ///   - executeL: The block to execute with the left value if this is a
+  ///               `.left`.
+  ///   - executeR: The block to execute with the right value if this is a
+  ///               `.right`.
   ///
   /// - Throws: Error thrown by either block.
   ///
@@ -109,8 +117,8 @@ public enum Either<L, R> {
   }
 }
 
-/// Extension to handle codable `L` and `R` values, which will be encoded/decoded into a single
-/// value.
+/// Extension to handle codable `L` and `R` values, which will be
+/// encoded/decoded into a single value.
 extension Either: Codable where L: Codable, R: Codable {
 
   enum CodingKeys: CodingKey {

@@ -3,8 +3,8 @@
 import os.log
 import Foundation
 
-/// Specifies whether zen mode is enabled for logging. In zen mode, logs are simplified to improve
-/// readability but unified logging is disabled.
+/// Specifies whether zen mode is enabled for logging. In zen mode, logs are
+/// simplified to improve readability but unified logging is disabled.
 public var kZenLogging: Bool = false
 
 /// Logs a message to the unified logging system.
@@ -12,8 +12,8 @@ public var kZenLogging: Bool = false
 /// - Parameters:
 ///   - level: The log level.
 ///   - isPublic: Specifies if the log is publicly accessible.
-///   - isEnabled: Specifies if the log is enabled, a convenient way to skip this log based on some
-///                external flag.
+///   - isEnabled: Specifies if the log is enabled, a convenient way to skip
+///                this log based on some external flag.
 ///   - fileName: Name of the file where this function was called.
 ///   - functionName: Name of the function where this function was called.
 ///   - lineNumber: Line number where this function was called.
