@@ -44,7 +44,8 @@ public func log(_ level: OSLogType = .info, isPublic: Bool = true, isEnabled: Bo
 
 /// Returns the logging symbol (in zen mode) of the specified log level.
 ///
-/// - Parameter level: The log level.
+/// - Parameters:
+///   - level: The log level.
 ///
 /// - Returns: The log symbol.
 private func getZenSymbol(for level: OSLogType) -> String {

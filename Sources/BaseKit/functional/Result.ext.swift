@@ -26,8 +26,9 @@ extension Result {
   /// Executes a block if this is a `.success`, then returns the current
   /// `Result` to allow for method chaining.
   ///
-  /// - Parameter execute: The block to execute if this is a `.success`, with
-  ///                      the success value as its argument.
+  /// - Parameters:
+  ///   - execute: The block to execute if this is a `.success`, with the
+  ///              success value as its argument.
   ///
   /// - Returns: The current `Result`.
   @discardableResult public func ifSuccess(execute: (Success) -> Void) -> Result<Success, Failure> {
@@ -42,8 +43,9 @@ extension Result {
   /// Executes a block if this is a `.failure`, then returns the current
   /// `Result` to allow for function chaining.
   ///
-  /// - Parameter execute: The block to execute if this is a `.failure`, with
-  ///                      the error as its argument.
+  /// - Parameters:
+  ///   - execute: The block to execute if this is a `.failure`, with the error
+  ///              as its argument.
   ///
   /// - Returns: The current `Result`.
   @discardableResult public func ifFailure(execute: (Failure) -> Void) -> Result<Success, Failure> {
@@ -59,8 +61,9 @@ extension Result {
   /// its argument, then returns the new `Result` of the executed block. If this
   /// is a `.failure`, the current `Result` is returned immediately.
   ///
-  /// - Parameter execute: The block to execute if this is a success, with the
-  ///                      current success value as its argument.
+  /// - Parameters:
+  ///   - execute: The block to execute if this is a success, with the current
+  ///              success value as its argument.
   ///
   /// - Returns: The new `Result` if this is a `.success` or the current
   ///            `Result` if this is a `.failure`.
@@ -75,7 +78,8 @@ extension Result {
   /// argument, then returns the new `Result` of the executed block. If this is
   /// a `.success`, the current `Result` is returned immediately.
   ///
-  /// - Parameter execute: The block to execute if this is a failure.
+  /// - Parameters:
+  ///   - execute: The block to execute if this is a failure.
   ///
   /// - Returns: The new `Result` if this is a `.failure` or the current
   ///            `Result` if this is a `.success`.

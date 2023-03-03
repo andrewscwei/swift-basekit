@@ -49,7 +49,8 @@ open class AsyncOperation: Operation {
 
   /// Creates a new `AsyncOperation` instance.
   ///
-  /// - Parameter queue: A `DispatchQueue` used for thread-safe read and write
+  /// - Parameters:
+  ///   - queue: A `DispatchQueue` used for thread-safe read and write
   ///   access.
   public init(queue: DispatchQueue = DispatchQueue.global(qos: .utility)) {
     self.queue = queue

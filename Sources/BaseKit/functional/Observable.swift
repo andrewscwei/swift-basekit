@@ -17,17 +17,20 @@ public protocol Observable: AnyObject {
 
   /// Adds a weakly referenced observer.
   ///
-  /// - Parameter observer: The observer to add.
+  /// - Parameters:
+  ///   - observer: The observer to add.
   func addObserver(_ observer: Observer)
 
   /// Removes an existing observer.
   ///
-  /// - Parameter observer: The observer to remove.
+  /// - Parameters:
+  ///   - observer: The observer to remove.
   func removeObserver(_ observer: Observer)
 
   /// Iteratively executes a block on each registered observer.
   ///
-  /// - Parameter iteratee: The block to execute, with each registered observer
+  /// - Parameters:
+  ///   - iteratee: The block to execute, with each registered observer
   ///                        as the argument.
   func notifyObservers(iteratee: (Observer) -> Void)
 }

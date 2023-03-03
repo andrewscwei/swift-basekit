@@ -84,8 +84,9 @@ public class StateMachine {
   /// Marks the specified key path(s) as dirty, consequently triggering an
   /// update cycle.
   ///
-  /// - Parameter keyPaths: The key path(s) (relative to the property owner) to
-  ///                       mark as dirty.
+  /// - Parameters:
+  ///   - keyPaths: The key path(s) (relative to the property owner) to mark as
+  ///               dirty.
   public func invalidate(_ keyPaths: AnyKeyPath...) {
     for keyPath in keyPaths {
       setDirty(keyPath)
@@ -129,14 +130,16 @@ public class StateMachine {
 
   /// Marks a state key path as dirty.
   ///
-  /// - Parameter keyPath: The state key path.
+  /// - Parameters:
+  ///   - keyPath: The state key path.
   private func setDirty(_ keyPath: AnyKeyPath) {
     dirtyStateKeyPaths?.insert(keyPath)
   }
 
   /// Marks a state type as dirty.
   ///
-  /// - Parameter type: The state type.
+  /// - Parameters:
+  ///   - type: The state type.
   private func setDirty(_ type: StateType) {
     dirtyStateTypes.insert(type)
   }

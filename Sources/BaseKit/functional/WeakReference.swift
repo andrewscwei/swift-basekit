@@ -9,9 +9,10 @@ public struct WeakReference<T> {
 
   /// Creates a new `WeakReference` instance.
   ///
-  /// - Parameter object: The target object to store as a weak reference. If the
-  ///                     target object is a value type, it will be passed
-  ///                     around as a value regardless.
+  /// - Parameters:
+  ///   - object: The target object to store as a weak reference. If the target
+  ///             object is a value type, it will be passed around as a value
+  ///             regardless.
   public init(_ object: T) {
     let reference = object as AnyObject
 

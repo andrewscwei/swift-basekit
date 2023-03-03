@@ -31,8 +31,8 @@ public enum Either<L, R> {
   /// `.left`) and returns the current `Either` to allow for method chaining. If
   /// this is a `.right`, the block will not be executed.
   ///
-  /// - Parameter execute: The block to execute with the left value as its
-  ///                      argument.
+  /// - Parameters:
+  ///   - execute: The block to execute with the left value as its argument.
   ///
   /// - Throws: Error thrown by the block.
   ///
@@ -50,8 +50,8 @@ public enum Either<L, R> {
   /// `.right`) and returns the current `Either` to allow for function chaining.
   /// If this is a `.left`, the block will not be executed.
   ///
-  /// - Parameter execute: The block to execute with the right value as its
-  ///                      argument.
+  /// - Parameters:
+  ///   - execute: The block to execute with the right value as its argument.
   ///
   /// - Throws: Error thrown by the block.
   ///
@@ -68,8 +68,8 @@ public enum Either<L, R> {
   /// Returns a new `Either` with a new `L` value transformed by the given
   /// closure.
   ///
-  /// - Parameter transform: The block to execute to transform the current `L`
-  ///                        value.
+  /// - Parameters:
+  ///   - transform: The block to execute to transform the current `L` value.
   ///
   /// - Throws: Error thrown by the transform closure.
   ///
@@ -84,8 +84,8 @@ public enum Either<L, R> {
   /// Returns a new `Either` with a new `R` value transformed by the given
   /// closure.
   ///
-  /// - Parameter transform: The block to execute to transform the current `R`
-  ///                        value.
+  /// - Parameters:
+  ///   - transform: The block to execute to transform the current `R` value.
   ///
   /// - Throws: Error thrown by the transform closure.
   ///

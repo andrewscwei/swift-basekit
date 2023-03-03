@@ -44,7 +44,8 @@ public struct StateType: OptionSet {
   /// Verifies if this `StateType` set includes the specified `StateType`
   /// values.
   ///
-  /// - Parameter types: `StateType` values.
+  /// - Parameters:
+  ///   - types: `StateType` values.
   ///
   /// - Returns: `true` if any one of the provided `StateType` values is
   ///             included, `false` if none are included.
