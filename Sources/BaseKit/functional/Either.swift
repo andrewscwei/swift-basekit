@@ -121,22 +121,6 @@ public enum Either<L, R> {
 /// encoded/decoded into a single value.
 extension Either: Codable where L: Codable, R: Codable {
 
-  enum CodingKeys: CodingKey {
-    case left
-    case right
-  }
-
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.singleValueContainer()
-
-    switch self {
-    case .left(let value):
-      try container.encode(value)
-    case .right(let value):
-      try container.encode(value)
-    }
-  }
-
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
 
@@ -147,6 +131,17 @@ extension Either: Codable where L: Codable, R: Codable {
     catch {
       let value = try container.decode(R.self)
       self = .right(value)
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+
+    switch self {
+    case .left(let value):
+      try container.encode(value)
+    case .right(let value):
+      try container.encode(value)
     }
   }
 }
