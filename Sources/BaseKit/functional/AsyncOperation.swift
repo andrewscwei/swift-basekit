@@ -6,7 +6,6 @@ import Foundation
 /// asynchronous task. To use an `AsyncOperation`, you must either add it to a
 /// `OperationQueue` or manually invoke `start()` on it.
 open class AsyncOperation: Operation {
-
   public override var isAsynchronous: Bool { true }
 
   private let queue: DispatchQueue

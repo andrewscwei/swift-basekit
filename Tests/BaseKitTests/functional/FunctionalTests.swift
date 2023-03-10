@@ -2,7 +2,6 @@ import XCTest
 @testable import BaseKit
 
 class FunctionalTests: XCTestCase {
-
   func testAnyOptional() {
     var someOptional: String? = nil
 

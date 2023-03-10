@@ -10,7 +10,6 @@ private var ptr_observers: UInt8 = 0
 /// certain events happen. Observers conform to the associated `Observer` type
 /// and define their own event handlers.
 public protocol Observable: AnyObject {
-
   /// A type must conform to this associated type to become a valid observer of
   /// this `Observable`.
   associatedtype Observer = AnyObject
@@ -36,7 +35,6 @@ public protocol Observable: AnyObject {
 }
 
 extension Observable {
-
   private var observers: [WeakReference<Observer>] {
     get { return getAssociatedValue(for: self, key: &ptr_observers, defaultValue: { [] }) }
     set { return setAssociatedValue(for: self, key: &ptr_observers, value: newValue) }

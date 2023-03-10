@@ -4,7 +4,6 @@ import Foundation
 
 /// Wraps an immutable value to allow passing it as a reference.
 public class Reference<T> {
-
   /// The wrapped value.
   public fileprivate(set) var value: T
 
@@ -15,7 +14,6 @@ public class Reference<T> {
 
 /// Wraps a mutable value to allow passing it as a reference.
 public class MutableReference<T>: Reference<T> {
-
   /// Updates the wrapped value.
   ///
   /// - Parameters:

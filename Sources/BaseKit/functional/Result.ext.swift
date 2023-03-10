@@ -3,7 +3,6 @@
 import Foundation
 
 extension Result {
-
   /// A successful `Result` with `Void` as its success value.
   public static var success: Result<Void, Failure> { .success(()) }
 

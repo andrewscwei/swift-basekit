@@ -6,7 +6,6 @@ import Foundation
 /// filesystem, creating the file on `init` and destroying it on `deinit`. Use
 /// `keepAlive()` to delay `TemporaryFile` from being deallocated.
 public class TemporaryFile {
-
   /// URL of the associated file in the device filesystem.
   public let url: URL
 

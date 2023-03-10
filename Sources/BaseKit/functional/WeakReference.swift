@@ -4,7 +4,6 @@
 /// during initialization. If the target object is a value type, it will be
 /// passed around as a value regardless.
 public struct WeakReference<T> {
-
   private let getReference: () -> T?
 
   /// Creates a new `WeakReference` instance.

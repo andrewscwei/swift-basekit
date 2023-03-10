@@ -4,7 +4,6 @@ import Foundation
 
 /// A disjoint union enum holding a value of one of two types, `L` or `R`.
 public enum Either<L, R> {
-
   /// An `Either` holding a value of type `L`.
   case left(L)
 
@@ -120,7 +119,6 @@ public enum Either<L, R> {
 /// Extension to handle codable `L` and `R` values, which will be
 /// encoded/decoded into a single value.
 extension Either: Codable where L: Codable, R: Codable {
-
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
 

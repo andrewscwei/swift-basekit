@@ -10,7 +10,6 @@ protocol MockObserver2: AnyObject {
 }
 
 class ObservableTests: XCTestCase {
-
   func testObservable() {
     class SomeMockObserver: MockObserver1, MockObserver2 {
       func foo() -> String { "foo" }
