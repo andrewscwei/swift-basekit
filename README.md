@@ -45,7 +45,7 @@ In `Package.swift`, add the following to `dependencies`:
 
 ```swift
 dependencies: [
-  .package(name: "BaseKit", url: "git@github.com:0xGHOZT/swift-basekit", from: "0.24.0")
+  .package(name: "BaseKit", url: "git@github.com:0xGHOZT/swift-basekit", from: "0.25.0")
 ]
 ```
 
