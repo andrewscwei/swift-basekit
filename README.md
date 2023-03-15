@@ -1,6 +1,15 @@
 # BaseKit [![CI](https://github.com/0xGHOZT/swift-basekit/workflows/CI/badge.svg?branch=master)](https://github.com/0xGHOZT/swift-basekit/actions/workflows/ci.yml?query=branch%3Amain)
 
-BaseKit is a lightweight Swift utility library consisting of low level functions, classes and protocols that are essential for building iOS/iPadOS/macOS apps.
+BaseKit is a lightweight Swift library consisting of low level functions, classes and protocols that are essential for adopting the clean architecture pattern in building iOS/iPadOS/macOS apps.
+
+### Key Features:
+
+- classes and protocols for implementing the repository pattern, i.e. `Repository`, `DataSource`
+- observable data containers, i.e. `LiveData`, `Reference` and `WeakReference`
+- better data representation via `Either` and `Result` extension
+- protocols for implementing application use cases, i.e. `UseCase` and `Interactor`
+- utility class for accessing `UserDefaults` and `KeyChain`
+- debug tools
 
 ## Setup
 
@@ -36,7 +45,7 @@ In `Package.swift`, add the following to `dependencies`:
 
 ```swift
 dependencies: [
-  .package(name: "BaseKit", url: "git@github.com:0xGHOZT/swift-basekit", from: "0.17.0")
+  .package(name: "BaseKit", url: "git@github.com:0xGHOZT/swift-basekit", from: "0.24.0")
 ]
 ```
 

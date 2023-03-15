@@ -1,0 +1,15 @@
+// © GHOZT
+
+import Foundation
+
+/// A type of `LiveData` that allows modifying its wrapped value from
+/// externally.
+public class MutableLiveData<T: Equatable>: LiveData<T> {
+  /// Sets the wrapped value.
+  ///
+  /// - Parameters:
+  ///   - value: The new wrapped value.
+  public func setValue(_ newValue: T?) {
+    value = newValue
+  }
+}
