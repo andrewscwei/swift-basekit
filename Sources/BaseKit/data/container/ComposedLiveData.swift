@@ -4,7 +4,7 @@ import Foundation
 
 /// A type of `LiveData` whose wrapped value is composed by the wrapped value of
 /// another `LiveData`.
-public class ComposedLiveData<T: Codable & Equatable, R: Codable & Equatable>: LiveData<T> {
+public class ComposedLiveData<T: Codable & Equatable, R: Equatable>: LiveData<T> {
   private let mapValue: (R?) -> T?
 
   let liveData: LiveData<R>
