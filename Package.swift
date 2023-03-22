@@ -28,7 +28,7 @@ enum Environment: String {
 
 let package = Package(
   name: "BaseKit",
-  platforms: [.iOS(.v11)],
+  platforms: [.iOS(.v14)],
   products: [
     .library(
       name: "BaseKit",
