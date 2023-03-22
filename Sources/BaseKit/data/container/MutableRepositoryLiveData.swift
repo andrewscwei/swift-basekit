@@ -3,34 +3,27 @@
 import Foundation
 
 /// A type of `RepositoryLiveData` that permits modifying of its wrapped value
-/// from externally, subsequently modifying the value of the associated
-/// `Repository`.
-public typealias MutableRepositoryLiveData<T: Codable & Equatable> = MutableTransformableRepositoryLiveData<T, T>
-
-/// A type of `TransformableRepositoryLiveData` that permits modifying of its
-/// wrapped value from externally, subsequently modifying the value of the
-/// associated `Repository`.
-public class MutableTransformableRepositoryLiveData<T: Codable & Equatable, R: Codable & Equatable>: TransformableRepositoryLiveData<T, R> {
+/// from externally, subsequently modifying the value in the `Repository`.
+public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: RepositoryLiveData<T, R> {
   private let mapValueToRepositoryValue: (T) -> R
 
-  /// Creates a new `MutableTransformableRepositoryLiveData` instance and
-  /// immediately assigns its wrapped value to the `Repository` value. If the
-  /// `Repository` is not synced, the wrapped value would be `nil` and a sync
-  /// will be invoked where observers can anticipate the synced value upon the
-  /// next change event.
+  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
+  /// its wrapped value to the `Repository` value. If the `Repository` is not
+  /// synced, the wrapped value would be `nil` and a sync will be invoked which
+  /// observers can expect the synced value upon the next change event.
   ///
   /// - Parameters:
   ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - mapRepositoryValueToValue: A block that maps the repository value to
+  ///   - mapRespositoryValueToValue: A block that maps the repository value to
   ///                                the wrapped value.
   ///   - mapValueToRepositoryValue: A block that maps the wrapped value to the
   ///                                repository value.
-  public init(_ repository: Repository<R>, mapRepositoryValueToValue: @escaping (R) -> T, mapValueToRepositoryValue: @escaping (T) -> R) {
+  public init(_ repository: Repository<R>, mapRespositoryValueToValue: @escaping (R) -> T, mapValueToRepositoryValue: @escaping (T) -> R) {
     self.mapValueToRepositoryValue = mapValueToRepositoryValue
-    super.init(repository, mapRepositoryValueToValue: mapRepositoryValueToValue)
+    super.init(repository, transform: mapRespositoryValueToValue)
   }
 
-  /// Creates a new `MutableTransformableRepositoryLiveData` instance and
+  /// Creates a new `MutableRepositoryLiveData` instance and
   /// immediately assigns its wrapped value to the `Repository` value. If the
   /// `Repository` is not synced, the wrapped value would be `nil` and a sync
   /// will be invoked where observers can anticipate the synced value upon the
@@ -39,7 +32,7 @@ public class MutableTransformableRepositoryLiveData<T: Codable & Equatable, R: C
   /// - Parameters:
   ///   - repository: The `Repository` to provide the wrapped value.
   public convenience init(_ repository: Repository<T>) where R == T {
-    self.init(repository, mapRepositoryValueToValue: { $0 }, mapValueToRepositoryValue: { $0 })
+    self.init(repository, mapRespositoryValueToValue: { $0 }, mapValueToRepositoryValue: { $0 })
   }
 
   /// Sets the wrapped value, subsequently updating the repository value.

@@ -2,29 +2,25 @@
 
 import Foundation
 
-/// A type of `LiveData` that wraps a `Repository` value `T`.
-public typealias RepositoryLiveData<T: Codable & Equatable> = TransformableRepositoryLiveData<T, T>
-
 /// A type of `LiveData` that wraps the transformed value `T` of a `Repository`
 /// value `R`.
-public class TransformableRepositoryLiveData<T: Codable & Equatable, R: Codable & Equatable>: LiveData<T>, RepositoryObserver {
-  private let mapRepositoryValueToValue: (R) -> T
+public class RepositoryLiveData<T: Equatable, R: Codable & Equatable>: LiveData<T>, RepositoryObserver {
+  private let transform: (R) -> T
 
   let repository: Repository<R>
 
-  /// Creates a new `TransformableRepositoryLiveData` instance and immediately
-  /// assigns its wrapped value to the `Repository` value. If the `Repository`
+  /// Creates a new `RepositoryLiveData` instance and immediately assigns its
+  /// wrapped value to a transformed `Repository` value. If the `Repository`
   /// is not synced, the wrapped value would be `nil` and a sync will be invoked
-  /// where observers can anticipate the synced value upon the next change
-  /// event.
+  /// which observers can expect the synced value upon the next change event.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - mapRepositoryValueToValue: A block that maps the repository value to
-  ///                                the wrapped value.
-  public init(_ repository: Repository<R>, mapRepositoryValueToValue: @escaping (R) -> T) {
+  ///   - repository: The `Repository`.
+  ///   - transform: A block that transforms the repository value to the wrapped
+  ///                value.
+  public init(_ repository: Repository<R>, transform: @escaping (R) -> T) {
     self.repository = repository
-    self.mapRepositoryValueToValue = mapRepositoryValueToValue
+    self.transform = transform
 
     super.init()
 
@@ -32,14 +28,14 @@ public class TransformableRepositoryLiveData<T: Codable & Equatable, R: Codable 
 
     switch repository.getCurrent() {
     case .synced(let value):
-      currentValue = mapRepositoryValueToValue(value)
+      currentValue = transform(value)
     case .notSynced:
       currentValue = nil
       sync()
     }
   }
 
-  /// Creates a new `TransformableRepositoryLiveData` instance and immediately
+  /// Creates a new `RepositoryLiveData` instance and immediately
   /// assigns its wrapped value to the `Repository` value. If the `Repository`
   /// is not synced, the wrapped value would be `nil` and a sync will be invoked
   /// where observers can anticipate the synced value upon the next change
@@ -67,7 +63,7 @@ public class TransformableRepositoryLiveData<T: Codable & Equatable, R: Codable 
     var newValue: T? = nil
 
     if let data = data as? R {
-      newValue = mapRepositoryValueToValue(data)
+      newValue = transform(data)
     }
 
     value = newValue
