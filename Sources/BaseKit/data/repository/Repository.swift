@@ -118,7 +118,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   /// `ReadOnlyRepository`, it is equivalent to a `pull`.
   ///
   /// Only one sync job can run at any given time. Until the running job is
-  /// complete, subsequent invocations to this method will not trigger a new
+  /// complete, subsequent invocations of this method will not trigger a new
   /// job. Instead, the result of the running job will be passed to the
   /// `completion` block when it finishes.
   ///
