@@ -14,13 +14,13 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   ///
   /// - Parameters:
   ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - mapRespositoryValueToValue: A block that maps the repository value to
+  ///   - mapRepositoryValueToValue: A block that maps the repository value to
   ///                                the wrapped value.
   ///   - mapValueToRepositoryValue: A block that maps the wrapped value to the
   ///                                repository value.
-  public init(_ repository: Repository<R>, mapRespositoryValueToValue: @escaping (R) -> T, mapValueToRepositoryValue: @escaping (T) -> R) {
+  public init(_ repository: Repository<R>, mapRepositoryValueToValue: @escaping (R) -> T, mapValueToRepositoryValue: @escaping (T) -> R) {
     self.mapValueToRepositoryValue = mapValueToRepositoryValue
-    super.init(repository, transform: mapRespositoryValueToValue)
+    super.init(repository, transform: mapRepositoryValueToValue)
   }
 
   /// Creates a new `MutableRepositoryLiveData` instance and
@@ -32,7 +32,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   /// - Parameters:
   ///   - repository: The `Repository` to provide the wrapped value.
   public convenience init(_ repository: Repository<T>) where R == T {
-    self.init(repository, mapRespositoryValueToValue: { $0 }, mapValueToRepositoryValue: { $0 })
+    self.init(repository, mapRepositoryValueToValue: { $0 }, mapValueToRepositoryValue: { $0 })
   }
 
   /// Sets the wrapped value, subsequently updating the repository value.

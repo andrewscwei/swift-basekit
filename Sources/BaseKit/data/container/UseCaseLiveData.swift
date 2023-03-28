@@ -31,7 +31,7 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   }
 
   /// Interacts with the use case with the specified input. Upon success, the
-  /// output will be stored in the wrapped value. If a failure occured, the
+  /// output will be stored in the wrapped value. If a failure occurred, the
   /// wrapped value will be set to `nil`.
   ///
   /// - Parameters:
@@ -48,7 +48,7 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   }
 
   /// Interacts with the use case with the specified input. Upon success, the
-  /// output will be stored in the wrapped value. If a failure occured, the
+  /// output will be stored in the wrapped value. If a failure occurred, the
   /// wrapped value will be set to `nil`.
   public func interact() where U.Input == Void {
     useCase.run(params: ()) { result in

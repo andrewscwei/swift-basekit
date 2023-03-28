@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// A `TemperaryFile` binds its in-memory lifecycle to a file in the device
+/// A `TemporaryFile` binds its in-memory lifecycle to a file in the device
 /// filesystem, creating the file on `init` and destroying it on `deinit`. Use
 /// `keepAlive()` to delay `TemporaryFile` from being deallocated.
 public class TemporaryFile {
