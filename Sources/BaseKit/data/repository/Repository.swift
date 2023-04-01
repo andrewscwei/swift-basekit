@@ -17,7 +17,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   open var debugMode: Bool { false }
 
   /// The current value of the data.
-  private var current: RepositoryStorage<DataType> = .notSynced
+  private var current: RepositoryData<DataType> = .notSynced
 
   /// `DispatchQueue` for handling all asynchronous operations.
   let queue: DispatchQueue
@@ -76,7 +76,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   /// Gets the current value synchronously.
   ///
   /// - Returns: The current value.
-  func getCurrent() -> RepositoryStorage<DataType> { lockQueue.sync { current } }
+  func getCurrent() -> RepositoryData<DataType> { lockQueue.sync { current } }
 
   /// Sets the current value synchronously.
   ///
@@ -84,7 +84,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   ///   - value: The value to set.
   ///
   /// - Returns: `true` if the value changed, `false` otherwise.
-  @discardableResult func setCurrent(_ value: RepositoryStorage<DataType>) -> Bool {
+  @discardableResult func setCurrent(_ value: RepositoryData<DataType>) -> Bool {
     guard getCurrent() != value else { return false }
 
     lockQueue.sync { current = value }

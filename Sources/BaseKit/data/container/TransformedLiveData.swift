@@ -4,7 +4,7 @@ import Foundation
 
 /// A type of `LiveData` whose wrapped value is a transformed result of the
 /// wrapped value of another `LiveData`.
-public class TransformedLiveData<T: Equatable, V: Equatable>: LiveData<T> {
+public class TransformedLiveData<T, V>: LiveData<T> {
   private let transform: (V?) -> T?
 
   let liveData: LiveData<V>
@@ -15,7 +15,7 @@ public class TransformedLiveData<T: Equatable, V: Equatable>: LiveData<T> {
   ///   - liveData: The `LiveData` whose wrapped value will be used to compose
   ///               the wrapped value of the internal wrapped value.
   ///   - transform: A block that maps the `LiveData`'s wrapped value to the
-  ///               internal wrapped value.
+  ///                internal wrapped value.
   public init(_ liveData: LiveData<V>, transform: @escaping (V?) -> T?) {
     self.liveData = liveData
     self.transform = transform

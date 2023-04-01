@@ -2,9 +2,9 @@
 
 import Foundation
 
-/// A type of `LiveData` that wraps the transformed value `T` of the ouptut of
-/// a `UseCase`.
-public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
+/// A type of `LiveData` that wraps the transformed value `T` of the output of a
+/// `UseCase`.
+public class UseCaseLiveData<T, U: UseCase>: LiveData<T> {
   private let transform: (U.Output) -> T
 
   let useCase: U

@@ -2,17 +2,21 @@
 
 import Foundation
 
-/// Wraps an immutable value to allow passing it as a reference.
+/// Wraps a value to allow passing it as an immutable reference.
 public class Reference<T> {
   /// The wrapped value.
   public fileprivate(set) var value: T
 
+  /// Creates a new `Reference` instance.
+  ///
+  /// - Parameters:
+  ///   - value: The wrapped value.
   public init(value: T) {
     self.value = value
   }
 }
 
-/// Wraps a mutable value to allow passing it as a reference.
+/// Wraps a value to allow passing it as a mutable reference.
 public class MutableReference<T>: Reference<T> {
   /// Updates the wrapped value.
   ///

@@ -2,17 +2,18 @@
 
 import Foundation
 
-/// A data holder class that wraps some data `T` and notifies its observers
-/// whenever the value of the wrapped data changes.
+/// A data holder that wraps some value of type `T` and notifies observers
+/// whenever the value updates. The wrapped value can be `nil`, indicating the
+/// absence of a value.
 ///
-/// Observers can be registered and unregistered via `observe(for:listener:)`
-/// and `unobserve(for:)`, respectively. Observers will only be notified if the
-/// value of the wrapped data changes (i.e. assigning the same value to the
-/// wrapped data will not notify observers).
+/// Observers must be explicitly registered and unregistered and are notified
+/// every time the wrapped value is assigned. If `T` conforms to `Equatable`,
+/// observers are notified only if the wrapped value is unequal to the previous
+/// value.
 ///
-/// The value of the wrapped data cannot be modified via this class. For its
-/// mutable counterpart, see `MutableLiveData`.
-public class LiveData<T: Equatable>: CustomStringConvertible {
+/// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
+/// for the mutable variant of `LiveData`.
+public class LiveData<T>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 
   let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.arckit.LiveData<\(T.self)>", qos: .utility)
@@ -25,23 +26,25 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
 
     set {
-      guard value != newValue else { return }
+      guard !isEqual(value, newValue) else { return }
       lockQueue.sync { currentValue = newValue }
       emit()
     }
   }
 
-  /// Creates a new `LiveData` instance with the specified value to wrap.
+  /// Creates a new `LiveData` instance with an initial wrapped value.
   ///
   /// - Parameters:
-  ///   - value: The value of the wrapped data.
+  ///   - value: The initial wrapped value.
   public init(_ value: T? = nil) {
     currentValue = value
   }
 
   /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields the wrapped value. Consequently, the new value will be
-  /// emitted to all observers.
+  /// eventually yields an initial wrapped value.
+  ///
+  /// Registered observers will be notified when the initial wrapped value is
+  /// assigned.
   ///
   /// - Parameters:
   ///   - getValue: The asynchronous block to execute.
@@ -52,8 +55,11 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   }
 
   /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields the wrapped value in a `Result` object. Consequently,
-  /// the new value will be emitted to all observers.
+  /// eventually yields an initial wrapped value represented by the success
+  /// value of a `Result` object.
+  ///
+  /// Registered observers will be notified when the initial wrapped value is
+  /// assigned.
   ///
   /// - Parameters:
   ///   - getValue: The asynchronous block to execute.
@@ -70,7 +76,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Emits the wrapped value to all observers.
+  /// Emits the current wrapped value to all observers.
   public func emit() {
     let listeners = lockQueue.sync { self.listeners }
 
@@ -84,14 +90,20 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     value = nil
   }
 
-  /// Begins observing changes in the wrapped value. `listener` will be invoked
-  /// every time the value is modified. If the observer is already observing
-  /// this `LiveData`, the previous `listener` will be overwritten by this one.
+  /// Registers an observer to begin listening for changes in the wrapped value.
+  /// Registering an already registered observer will replace the previous
+  /// `listener`.
+  ///
+  /// `listener` is invoked dependent on 2 conditions:
+  ///   1. If `T` conforms to `Equatable`, invocation takes place every time the
+  ///      wrapped value is not equal the previous value.
+  ///   2. If `T` does not conform to `Equatable`, invocation takes place every
+  ///      time the wrapped value assigned a value.
   ///
   /// - Parameters:
-  ///   - observer: The object observing this `LiveData`.
-  ///   - listener: The block to execute when the wrapped value is modified. It
-  ///               is best to use `weak self` within the block.
+  ///   - observer: The object to register as an observer of this `LiveData`.
+  ///   - listener: The block to execute when the wrapped data is updated. It is
+  ///               best to use `weak self` within the block.
   public func observe(for observer: AnyObject, listener: @escaping Listener) {
     lockQueue.sync {
       let identifier = ObjectIdentifier(observer)
@@ -100,12 +112,12 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Stops observing changes in the wrapped value for the specified object
-  /// (a.k.a. the observer). Nothing happens if the object was never an observer
-  /// of this `LiveData`.
+  /// Unregisters a registered observer. If the alleged observer was never
+  /// registered, nothing happens. The unregistered observer will no longer be
+  /// notified of changes in the wrapped data of this `LiveData`.
   ///
   /// - Parameters:
-  ///   - observer: The object observing this `LiveData`.
+  ///   - observer: The observer to unregister.
   public func unobserve(for observer: AnyObject) {
     lockQueue.sync {
       let identifier = ObjectIdentifier(observer)
@@ -121,4 +133,8 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
       return "LiveData<\(T.self)<nil>>"
     }
   }
+
+  func isEqual(_ p0: T?, _ p1: T?) -> Bool { p0 == nil && p1 == nil }
+
+  func isEqual(_ p0: T?, _ p1: T?) -> Bool where T: Equatable { p0 == p1 }
 }
