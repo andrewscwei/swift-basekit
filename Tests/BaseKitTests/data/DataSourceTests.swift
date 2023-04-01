@@ -18,7 +18,7 @@ class DataSourceTests: XCTestCase {
 
       func read(completion: @escaping (Result<String, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.read))
+          completion(.failure(debugError))
         }
       }
     }
@@ -59,7 +59,7 @@ class DataSourceTests: XCTestCase {
 
       func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.write))
+          completion(.failure(debugError))
         }
       }
     }
@@ -113,13 +113,13 @@ class DataSourceTests: XCTestCase {
 
       func read(completion: @escaping (Result<String, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.read))
+          completion(.failure(debugError))
         }
       }
 
       func write(_ value: String, completion: @escaping (Result<String, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.write))
+          completion(.failure(debugError))
         }
       }
     }
@@ -186,13 +186,13 @@ class DataSourceTests: XCTestCase {
 
       func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.write))
+          completion(.failure(debugError))
         }
       }
 
       func delete(completion: @escaping (Result<Void, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.delete))
+          completion(.failure(debugError))
         }
       }
     }
@@ -257,19 +257,19 @@ class DataSourceTests: XCTestCase {
 
       func read(completion: @escaping (Result<Int?, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.read))
+          completion(.failure(debugError))
         }
       }
 
       func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.write))
+          completion(.failure(debugError))
         }
       }
 
       func delete(completion: @escaping (Result<Void, Error>) -> Void) {
         delay(1.0) {
-          completion(.failure(DataSourceError.delete))
+          completion(.failure(debugError))
         }
       }
     }

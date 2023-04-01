@@ -136,7 +136,10 @@ public class MutableRepositoryLiveData<T, R: Codable & Equatable>: RepositoryLiv
       }
     }
 
-    throw LiveDataError.immutable(cause: nil)
+    throw NSError(domain: "sh.ghozt.BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
+      NSLocalizedDescriptionKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only",
+      NSLocalizedFailureErrorKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only"
+    ])
   }
 
   /// Sets the wrapped value by directly mutating the existing wrapped value
@@ -146,7 +149,12 @@ public class MutableRepositoryLiveData<T, R: Codable & Equatable>: RepositoryLiv
   /// - Parameters:
   ///   - mutator: The mutator block.
   public func setValue(mutator: (inout T) throws -> Void) throws {
-    guard var newValue = value else { throw LiveDataError.immutable(cause: nil) }
+    guard var newValue = value else {
+      throw NSError(domain: "sh.ghozt.BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
+        NSLocalizedDescriptionKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil",
+        NSLocalizedFailureErrorKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil"
+      ])
+    }
 
     try mutator(&newValue)
     try setValue(newValue)

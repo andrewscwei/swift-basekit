@@ -16,7 +16,7 @@ import Foundation
 public class LiveData<T>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 
-  let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.arckit.LiveData<\(T.self)>", qos: .utility)
+  let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.BaseKit.LiveData<\(T.self)>", qos: .utility)
   private var listeners: [AnyHashable: Listener] = [:]
   var currentValue: T?
 

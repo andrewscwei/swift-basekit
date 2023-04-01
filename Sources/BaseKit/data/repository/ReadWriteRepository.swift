@@ -92,7 +92,10 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
       switch current {
       case .notSynced:
         log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... ERR: Nothing to sync" }
-        self?.dispatchSyncResult(result: .failure(RepositoryError.notSynced))
+        self?.dispatchSyncResult(result: .failure(NSError(domain: "sh.ghozt.BaseKit.ReadWriteRepository", code: 0, userInfo: [
+          NSLocalizedDescriptionKey: "Repository is not synced",
+          NSLocalizedFailureErrorKey: "Repository is not synced"
+        ])))
         return
       case .synced(let value):
         self?.push(value) { [weak self] result in

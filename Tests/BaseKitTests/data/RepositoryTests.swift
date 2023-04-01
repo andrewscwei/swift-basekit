@@ -71,7 +71,7 @@ class MockReadWriteDeleteDataSource: ReadWriteDeleteDataSource {
         completion(.success(value))
       }
       else {
-        completion(.failure(DataSourceError.unexpectedNilValue))
+        completion(.failure(debugError))
       }
     }
   }
@@ -90,7 +90,7 @@ class MockReadWriteDeleteDataSource: ReadWriteDeleteDataSource {
         completion(.success)
       }
       else {
-        completion(.failure(DataSourceError.unexpectedNilValue))
+        completion(.failure(debugError))
       }
     }
   }

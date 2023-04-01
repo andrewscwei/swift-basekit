@@ -30,7 +30,8 @@ open class ReadWriteDeleteRepository<T: Codable & Equatable>: ReadWriteRepositor
   ///                 delete, the `Result` is still a `.success`.
   public func delete(completion: @escaping (Result<Void, Error>) -> Void = { _ in }) {
     if case .synced(let value) = getCurrent(), value == nil {
-      completion(.failure(DataSourceError.unexpectedNilValue))
+      // Nothing happens if deleting an already deleted value.
+      completion(.success(()))
     }
     else {
       setIsDirty(setCurrent(.synced(nil)))
