@@ -110,8 +110,6 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   ///
   /// - Throws: If the repository is not writable.
   public func setValue(_ newValue: T?) throws {
-    guard value != newValue else { return }
-
     if let repository = repository as? ReadWriteDeleteRepository<R> {
       if let newValue = newValue {
         switch repository.getCurrent() {

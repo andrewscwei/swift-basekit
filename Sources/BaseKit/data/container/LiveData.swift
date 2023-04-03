@@ -3,13 +3,8 @@
 import Foundation
 
 /// A data holder that wraps some value of type `T` and notifies observers
-/// whenever the value updates. The wrapped value can be `nil`, indicating the
+/// whenever the value changes. The wrapped value can be `nil`, indicating the
 /// absence of a value.
-///
-/// Observers must be explicitly registered and unregistered and are notified
-/// every time the wrapped value is assigned. If `T` conforms to `Equatable`,
-/// observers are notified only if the wrapped value is unequal to the previous
-/// value.
 ///
 /// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
 /// for the mutable variant of `LiveData`.
@@ -27,7 +22,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
 
     set {
       guard value != newValue else { return }
-      
+
       lockQueue.sync { currentValue = newValue }
       emit()
     }
@@ -94,12 +89,6 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   /// Registers an observer to begin listening for changes in the wrapped value.
   /// Registering an already registered observer will replace the previous
   /// `listener`.
-  ///
-  /// `listener` is invoked dependent on 2 conditions:
-  ///   1. If `T` conforms to `Equatable`, invocation takes place every time the
-  ///      wrapped value is not equal the previous value.
-  ///   2. If `T` does not conform to `Equatable`, invocation takes place every
-  ///      time the wrapped value assigned a value.
   ///
   /// - Parameters:
   ///   - observer: The object to register as an observer of this `LiveData`.
