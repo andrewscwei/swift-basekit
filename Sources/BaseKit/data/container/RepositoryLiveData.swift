@@ -4,7 +4,7 @@ import Foundation
 
 /// A type of `LiveData` that wraps a value `T` as a result of a transformed
 /// `Repository` value `R`.
-public class RepositoryLiveData<T, R: Codable & Equatable>: LiveData<T>, RepositoryObserver {
+public class RepositoryLiveData<T: Equatable, R: Codable & Equatable>: LiveData<T>, RepositoryObserver {
   private let transform: (R, T?) -> T?
 
   let repository: Repository<R>

@@ -13,7 +13,7 @@ import Foundation
 ///
 /// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
 /// for the mutable variant of `LiveData`.
-public class LiveData<T>: CustomStringConvertible {
+public class LiveData<T: Equatable>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 
   let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.BaseKit.LiveData<\(T.self)>", qos: .utility)
@@ -26,7 +26,8 @@ public class LiveData<T>: CustomStringConvertible {
     }
 
     set {
-      guard !isEqual(value, newValue) else { return }
+      guard value != newValue else { return }
+      
       lockQueue.sync { currentValue = newValue }
       emit()
     }
@@ -133,8 +134,4 @@ public class LiveData<T>: CustomStringConvertible {
       return "LiveData<\(T.self)<nil>>"
     }
   }
-
-  func isEqual(_ p0: T?, _ p1: T?) -> Bool { p0 == nil && p1 == nil }
-
-  func isEqual(_ p0: T?, _ p1: T?) -> Bool where T: Equatable { p0 == p1 }
 }

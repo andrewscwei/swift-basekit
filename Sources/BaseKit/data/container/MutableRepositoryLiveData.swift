@@ -4,7 +4,7 @@ import Foundation
 
 /// A type of `RepositoryLiveData` that permits modifying of its wrapped value
 /// from externally, subsequently modifying the value in the `Repository`.
-public class MutableRepositoryLiveData<T, R: Codable & Equatable>: RepositoryLiveData<T, R> {
+public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: RepositoryLiveData<T, R> {
   private let reverseTransform: (T, R?) -> R
 
   /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
@@ -110,7 +110,7 @@ public class MutableRepositoryLiveData<T, R: Codable & Equatable>: RepositoryLiv
   ///
   /// - Throws: If the repository is not writable.
   public func setValue(_ newValue: T?) throws {
-    guard !isEqual(value, newValue) else { return }
+    guard value != newValue else { return }
 
     if let repository = repository as? ReadWriteDeleteRepository<R> {
       if let newValue = newValue {

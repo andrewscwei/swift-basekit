@@ -4,7 +4,7 @@ import Foundation
 
 /// A type of `LiveData` whose wrapped value is the transformed result of the
 /// wrapped values of two `LiveData`.
-public class ComposedLiveData<T, V0, V1>: LiveData<T> {
+public class ComposedLiveData<T: Equatable, V0: Equatable, V1: Equatable>: LiveData<T> {
   public let transform: (V0?, V1?) -> T?
 
   let liveData0: LiveData<V0>

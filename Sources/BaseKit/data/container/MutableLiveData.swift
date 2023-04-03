@@ -3,7 +3,7 @@
 import Foundation
 
 /// A type of `LiveData` whose wrapped value can be modified.
-public class MutableLiveData<T>: LiveData<T> {
+public class MutableLiveData<T: Equatable>: LiveData<T> {
   /// Sets the wrapped value.
   ///
   /// - Parameters:
