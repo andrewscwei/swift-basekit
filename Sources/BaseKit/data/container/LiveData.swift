@@ -11,8 +11,10 @@ import Foundation
 public class LiveData<T: Equatable>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 
+  public var debug: Bool = false
+
   let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.BaseKit.LiveData<\(T.self)>", qos: .utility)
-  private var listeners: [AnyHashable: Listener] = [:]
+  var listeners: [AnyHashable: Listener] = [:]
   var currentValue: T?
 
   public internal(set) var value: T? {
@@ -24,6 +26,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
       guard value != newValue else { return }
 
       lockQueue.sync { currentValue = newValue }
+      log(.debug, isEnabled: debug) { "[LiveData<\(T.self)>] Updating value... OK: \(newValue.map { "\($0)" } ?? "nil")" }
       emit()
     }
   }
