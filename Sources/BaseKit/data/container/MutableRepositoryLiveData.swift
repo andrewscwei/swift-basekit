@@ -141,12 +141,12 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   }
 
   /// Sets the wrapped value by directly mutating the existing wrapped value
-  /// (changes made to the wrapped value inside the `mutator` block will also be
+  /// (changes made to the wrapped value inside the `mutate` block will also be
   /// applied outside the block).
   ///
   /// - Parameters:
-  ///   - mutator: The mutator block.
-  public func setValue(mutator: (inout T) throws -> Void) throws {
+  ///   - mutate: The mutate block.
+  public func setValue(mutate: (inout T) throws -> Void) throws {
     guard var newValue = value else {
       throw NSError(domain: "sh.ghozt.BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
         NSLocalizedDescriptionKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil",
@@ -154,7 +154,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
       ])
     }
 
-    try mutator(&newValue)
+    try mutate(&newValue)
     try setValue(newValue)
   }
 }
