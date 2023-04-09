@@ -22,6 +22,19 @@ extension Result {
     }
   }
 
+
+  /// Returns the error of this `Result` if it is a `.failure`.
+  ///
+  /// - Returns: The `Error` if it exists, `nil` otherwise.
+  public func getError() -> Error? {
+    switch self {
+    case .failure(let error):
+      return error
+    case .success:
+      return nil
+    }
+  }
+
   /// Executes a block if this is a `.success`, then returns the current
   /// `Result` to allow for method chaining.
   ///

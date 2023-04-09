@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -28,7 +28,7 @@ enum Environment: String {
 
 let package = Package(
   name: "BaseKit",
-  platforms: [.iOS(.v14)],
+  platforms: [.iOS(.v15)],
   products: [
     .library(
       name: "BaseKit",
