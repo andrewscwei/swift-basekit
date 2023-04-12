@@ -143,7 +143,7 @@ open class Repository<T: Codable & Equatable>: Observable {
     log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))..." }
 
     guard !isSyncing() else {
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Previous sync in progress, ignoring current sync request" }
+      log(.default, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Previous sync in progress, ignoring current sync request" }
       return
     }
 
@@ -155,13 +155,13 @@ open class Repository<T: Codable & Equatable>: Observable {
         }
 
         guard self?.isSyncing(identifier: identifier) == true else {
-          log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
+          log(.default, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
           return
         }
 
         self?.didSyncDownstream(identifier: identifier, result: result) { [weak self] result in
           guard self?.isSyncing(identifier: identifier) == true else {
-            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
+            log(.default, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
             return
           }
 
