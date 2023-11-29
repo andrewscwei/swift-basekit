@@ -49,6 +49,3 @@ dependencies: [
 ]
 ```
 
----
-
-© GHOZT
