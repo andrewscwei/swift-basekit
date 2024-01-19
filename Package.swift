@@ -34,8 +34,7 @@ let package = Package(
       name: "BaseKit",
       targets: ["BaseKit"]),
   ],
-  dependencies: [
-  ],
+  dependencies: [],
   targets: [
     .target(
       name: "BaseKit",
