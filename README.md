@@ -14,10 +14,14 @@ BaseKit is a lightweight Swift library consisting of low level functions, classe
 ## Setup
 
 ```sh
-$ bundle install
+# Prepare Ruby environment
+$ brew install rbenv ruby-build
+$ rbenv install
+$ rbenv rehash
+$ gem install bundler
 
-# Run tests
-$ bundle exec fastlane test
+# Install fastlane
+$ bundle install
 ```
 
 ## Usage
@@ -45,7 +49,6 @@ In `Package.swift`, add the following to `dependencies`:
 
 ```swift
 dependencies: [
-  .package(name: "BaseKit", url: "git@github.com:ghoztsys/swift-basekit", from: "0.25.0")
+  .package(name: "BaseKit", url: "git@github.com:ghoztsys/swift-basekit", from: "0.31.0")
 ]
 ```
-
