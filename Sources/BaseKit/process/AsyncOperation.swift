@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// An abstract class that represents the code and data associated with a single

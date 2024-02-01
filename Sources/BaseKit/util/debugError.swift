@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Returns a dummy error meant for development use only.

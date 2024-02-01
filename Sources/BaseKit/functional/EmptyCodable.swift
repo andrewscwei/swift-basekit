@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// `Codable` struct with no properties.

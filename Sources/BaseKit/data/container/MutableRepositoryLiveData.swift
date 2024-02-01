@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A type of `RepositoryLiveData` that permits modifying of its wrapped value
@@ -134,7 +132,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
       }
     }
 
-    throw NSError(domain: "sh.ghozt.BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
+    throw NSError(domain: "BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
       NSLocalizedDescriptionKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only",
       NSLocalizedFailureErrorKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only"
     ])
@@ -148,7 +146,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   ///   - mutate: The mutate block.
   public func setValue(mutate: (inout T) throws -> Void) throws {
     guard var newValue = value else {
-      throw NSError(domain: "sh.ghozt.BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
+      throw NSError(domain: "BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
         NSLocalizedDescriptionKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil",
         NSLocalizedFailureErrorKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil"
       ])

@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Protocol for a read-only `DataSource`.

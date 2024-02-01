@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Returns the typed value associated with a given object for a given key. The

@@ -1,5 +1,3 @@
-// © GHOZT
-
 /// An immutable object that holds a weak reference to a target object specified
 /// during initialization. If the target object is a value type, it will be
 /// passed around as a value regardless.

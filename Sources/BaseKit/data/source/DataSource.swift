@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A type conforming to `DataSource` provides an interface to access data from

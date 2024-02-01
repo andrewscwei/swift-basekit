@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A data holder that wraps some value of type `T` and notifies observers
@@ -13,7 +11,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
 
   public var debug: Bool = false
 
-  let lockQueue: DispatchQueue = DispatchQueue(label: "sh.ghozt.BaseKit.LiveData<\(T.self)>", qos: .utility)
+  let lockQueue: DispatchQueue = DispatchQueue(label: "BaseKit.LiveData<\(T.self)>", qos: .utility)
   var listeners: [AnyHashable: Listener] = [:]
   var currentValue: T?
 

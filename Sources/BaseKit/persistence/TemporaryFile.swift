@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A `TemporaryFile` binds its in-memory lifecycle to a file in the device

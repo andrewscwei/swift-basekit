@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A `Repository` provides access to some data (as defined by the associated
@@ -44,7 +42,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   ///            shared between all repositories.
   public init(queue: DispatchQueue = .global(qos: .utility)) {
     self.queue = queue
-    lockQueue = .init(label: "sh.ghozt.BaseKit.Repository.\(Self.self)", qos: .utility)
+    lockQueue = .init(label: "BaseKit.Repository.\(Self.self)", qos: .utility)
 
     if autoSync {
       sync()
@@ -68,7 +66,7 @@ open class Repository<T: Codable & Equatable>: Observable {
         sync(completion: completion)
       }
       else {
-        completion(.failure(NSError(domain: "sh.ghozt.BaseKit.Repository", code: 0, userInfo: [
+        completion(.failure(NSError(domain: "BaseKit.Repository", code: 0, userInfo: [
           NSLocalizedDescriptionKey: "Repository is not synced",
           NSLocalizedFailureErrorKey: "Repository is not synced"
         ])))

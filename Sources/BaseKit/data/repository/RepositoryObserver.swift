@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A type conforming to the `RepositoryObserver` protocol gets notified

@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Associated value for storing weakly referenced observers.

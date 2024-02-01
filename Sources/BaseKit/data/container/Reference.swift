@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Wraps a value to allow passing it as an immutable reference.

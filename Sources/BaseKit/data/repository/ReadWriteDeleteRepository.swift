@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// An abstract class for a read/write/delete `Repository`.

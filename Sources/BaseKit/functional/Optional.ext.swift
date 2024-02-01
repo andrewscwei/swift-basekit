@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// An `ExpressibleByNilLiteral` value conforming to the `AnyOptional` protocol

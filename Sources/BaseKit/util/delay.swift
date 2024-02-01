@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Executes a block after the specified number of seconds, returns immediately.

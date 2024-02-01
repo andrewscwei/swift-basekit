@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Creates a generic error.

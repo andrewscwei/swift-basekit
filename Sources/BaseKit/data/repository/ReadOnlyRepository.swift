@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A `Repository` with read-only access to its data source(s).

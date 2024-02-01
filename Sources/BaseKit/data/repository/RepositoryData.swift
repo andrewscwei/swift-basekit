@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A container for data stored in a `Repository`.

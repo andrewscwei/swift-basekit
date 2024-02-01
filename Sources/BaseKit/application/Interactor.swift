@@ -1,5 +1,3 @@
-// © GHOZT
-
 public protocol Interactor {
   /// Indicates whether debug logging is enabled.
   var debugMode: Bool { get }

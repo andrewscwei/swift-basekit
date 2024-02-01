@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A type of `LiveData` that wraps the transformed value `T` of the output of a

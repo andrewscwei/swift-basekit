@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// A type of `LiveData` whose wrapped value can be modified.

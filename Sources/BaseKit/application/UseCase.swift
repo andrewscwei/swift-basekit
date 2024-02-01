@@ -1,5 +1,3 @@
-// © GHOZT
-
 import Foundation
 
 /// Abstract class for all use cases/interactors with an input parameter of type
