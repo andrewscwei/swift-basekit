@@ -1,4 +1,4 @@
-# BaseKit [![CI](https://github.com/andrewscwei/swift-basekit/workflows/CI/badge.svg?branch=master)](https://github.com/andrewscwei/swift-basekit/actions/workflows/ci.yml?query=branch%3Amaster) [![CD](https://github.com/andrewscwei/swift-basekit/workflows/CD/badge.svg?branch=master)](https://github.com/andrewscwei/swift-basekit/actions/workflows/cd.yml?query=branch%3Amaster)
+# BaseKit [![CI](https://github.com/andrewscwei/swift-basekit/workflows/CI/badge.svg)](https://github.com/andrewscwei/swift-basekit/actions/workflows/ci.yml) [![CD](https://github.com/andrewscwei/swift-basekit/workflows/CD/badge.svg)](https://github.com/andrewscwei/swift-basekit/actions/workflows/cd.yml)
 
 BaseKit is a lightweight Swift library consisting of low level classes, protocols and functions that are essential for adopting the [clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) pattern when building iOS/iPadOS/macOS apps.
 
