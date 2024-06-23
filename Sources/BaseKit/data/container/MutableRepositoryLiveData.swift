@@ -112,9 +112,9 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
       if let newValue = newValue {
         switch repository.getCurrent() {
         case .notSynced:
-          return repository.set(reverseTransform(newValue, nil))
-        case .synced(let currentRepositoryValue):
-          return repository.set(reverseTransform(newValue, currentRepositoryValue))
+            return repository.set(reverseTransform(newValue, nil))
+        case .synced(let data):
+          return repository.set(reverseTransform(newValue, data))
         }
       }
       else {
@@ -125,9 +125,9 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
       if let newValue = newValue {
         switch repository.getCurrent() {
         case .notSynced:
-          return repository.set(reverseTransform(newValue, nil))
-        case .synced(let currentRepositoryValue):
-          return repository.set(reverseTransform(newValue, currentRepositoryValue))
+            return repository.set(reverseTransform(newValue, nil))
+        case .synced(let data):
+          return repository.set(reverseTransform(newValue, data))
         }
       }
     }

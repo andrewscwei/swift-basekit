@@ -9,13 +9,8 @@ open class ReadWriteDeleteRepository<T: Codable & Equatable>: ReadWriteRepositor
       switch value {
       case .notSynced:
         observer.repositoryDidFailToSyncData(self)
-      case .synced(let value):
-        if let value = value {
-          observer.repository(self, dataDidChange: value)
-        }
-        else {
-          observer.repository(self, dataDidChange: nil)
-        }
+      case .synced(let data):
+        observer.repository(self, dataDidChange: data)
       }
     }
   }
