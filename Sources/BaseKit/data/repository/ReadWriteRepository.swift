@@ -39,7 +39,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
       }
     }
     else {
-      log(.default, isEnabled: self.debugMode) { "<\(Self.self)> Setting value to \"\(value)\"... SKIP: No change"}
+      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting value to \"\(value)\"... SKIP: No change"}
       completion(.success(value))
     }
   }

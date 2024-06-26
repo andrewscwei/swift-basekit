@@ -1,5 +1,8 @@
 import Foundation
 
+/// Specifies if debug mode is enabled for `Repository` instances.
+public var kRepositoryDebugMode = false
+
 /// A `Repository` provides access to some data (as defined by the associated
 /// type `DataType`) that is pulled and aggregated from one or more data sources
 /// (of type `DataSource`).
@@ -12,7 +15,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   open var autoSync: Bool { true }
 
   /// Specifies if this repository is in debug mode (generating debug logs).
-  open var debugMode: Bool { false }
+  open var debugMode: Bool { kRepositoryDebugMode }
 
   /// The current value of the data.
   private var current: RepositoryData<DataType> = .notSynced
@@ -62,7 +65,7 @@ open class Repository<T: Codable & Equatable>: Observable {
       completion(.success(value))
     case .notSynced:
       if autoSync {
-        log(.default, isEnabled: debugMode) { "<\(Self.self)> Getting stored value... SKIP: Repository not synced, proceeding to sync"}
+        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting stored value... SKIP: Repository not synced, proceeding to sync"}
         sync(completion: completion)
       }
       else {
@@ -141,7 +144,7 @@ open class Repository<T: Codable & Equatable>: Observable {
     log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))..." }
 
     guard !isSyncing() else {
-      log(.default, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Previous sync in progress, ignoring current sync request" }
+      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Previous sync in progress, ignoring current sync request" }
       return
     }
 
@@ -153,13 +156,13 @@ open class Repository<T: Codable & Equatable>: Observable {
         }
 
         guard self?.isSyncing(identifier: identifier) == true else {
-          log(.default, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
+          log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
           return
         }
 
         self?.didSyncDownstream(identifier: identifier, result: result) { [weak self] result in
           guard self?.isSyncing(identifier: identifier) == true else {
-            log(.default, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
+            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
             return
           }
 
