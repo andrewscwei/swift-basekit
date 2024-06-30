@@ -169,13 +169,13 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
   }
 
   func testReadWriteRepositories() {
-    let expectation1 = XCTestExpectation()
-    let expectation2 = XCTestExpectation()
-    let expectation3 = XCTestExpectation()
+    let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockReadWriteRepository")
+    let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockReadWriteRepository")
+    let expectation3 = XCTestExpectation(description: "Should result in success when reading from MockReadWriteRepository after writing")
 
     let repo = MockReadWriteRepository()
 
@@ -196,15 +196,15 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
   }
 
   func testReadWriteDeleteRepositories() {
-    let expectation1 = XCTestExpectation()
-    let expectation2 = XCTestExpectation()
-    let expectation3 = XCTestExpectation()
-    let expectation4 = XCTestExpectation()
-    let expectation5 = XCTestExpectation()
+    let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockReadWriteDeleteRepository")
+    let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockReadWriteDeleteRepository")
+    let expectation3 = XCTestExpectation(description: "Should result in success when reading from MockReadWriteDeleteRepository after writing")
+    let expectation4 = XCTestExpectation(description: "Should result in success when deleting from MockReadWriteDeleteRepository")
+    let expectation5 = XCTestExpectation(description: "Should result in success when reading from MockReadWriteDeleteRepository after deleting")
 
     let repo = MockReadWriteDeleteRepository()
 
@@ -239,13 +239,13 @@ class RepositoryTests: XCTestCase {
       }
     }
 
-    wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 10.0)
+    wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 5.0)
   }
 
   func testRepositoryObserver() {
-    let expectation1 = XCTestExpectation()
-    let expectation2 = XCTestExpectation()
-    let expectation3 = XCTestExpectation()
+    let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockReadOnlyRepository")
+    let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockReadWriteRepository")
+    let expectation3 = XCTestExpectation(description: "Should result in success when writing to MockReadWriteDeleteRepository")
 
     let observer = MockRepositoryObserver()
     let readOnlyRepository = MockReadOnlyRepository()
@@ -268,6 +268,6 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
   }
 }
