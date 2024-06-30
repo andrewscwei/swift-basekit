@@ -4,6 +4,8 @@ public struct UserDefaultsUtil {
 
   enum Error: Swift.Error {
     case typeMismatch(cause: Swift.Error?)
+
+    static let typeMismatch: Error = .typeMismatch(cause: nil)
   }
 
   /// Retrieves a value from `UserDefaults` using the specified key. If the
@@ -19,7 +21,7 @@ public struct UserDefaultsUtil {
   /// - Throws: If the retrieved value cannot be decoded to type `T`.
   public static func get<T: Codable>(_ key: String) throws -> T? {
     guard let object = UserDefaults.standard.object(forKey: key) else { return nil }
-    guard let data = object as? Data else { throw Error.typeMismatch(cause: nil) }
+    guard let data = object as? Data else { throw Error.typeMismatch }
 
     do {
       let value = try JSONDecoder().decode(T.self, from: data)
