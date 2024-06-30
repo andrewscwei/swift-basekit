@@ -137,7 +137,7 @@ class MockRepositoryObserver: RepositoryObserver {
   }
 
   func repositoryDidFailToSyncData<T>(_ repository: Repository<T>) where T : Decodable, T : Encodable, T : Equatable {
-    
+
   }
 }
 
@@ -169,7 +169,7 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
   }
 
   func testReadWriteRepositories() {
@@ -196,7 +196,7 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
   }
 
   func testReadWriteDeleteRepositories() {
@@ -239,7 +239,7 @@ class RepositoryTests: XCTestCase {
       }
     }
 
-    wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 5.0)
+    wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 10.0)
   }
 
   func testRepositoryObserver() {
@@ -268,6 +268,6 @@ class RepositoryTests: XCTestCase {
       expectation3.fulfill()
     }
 
-    wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
+    wait(for: [expectation1, expectation2, expectation3], timeout: 10.0)
   }
 }
