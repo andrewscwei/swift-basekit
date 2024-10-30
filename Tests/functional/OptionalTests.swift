@@ -3,12 +3,10 @@ import XCTest
 
 class OptionalTests: XCTestCase {
   func testAnyOptional() {
-    var someOptional: String? = nil
+    let mockOptional1: String? = nil
+    let mockOptional2: String? = "foo"
 
-    XCTAssertTrue(someOptional.isNil)
-
-    someOptional = "foo"
-
-    XCTAssertFalse(someOptional.isNil)
+    XCTAssertTrue(mockOptional1.isNil)
+    XCTAssertFalse(mockOptional2.isNil)
   }
 }

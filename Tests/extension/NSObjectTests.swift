@@ -3,10 +3,10 @@ import XCTest
 
 class NSObjectTests: XCTestCase {
   func testClassName() {
-    class Foo: NSObject {}
-    class Bar: NSObject {}
+    class MockClass1: NSObject {}
+    class MockClass2: NSObject {}
 
-    XCTAssertEqual(Foo.className, "Foo")
-    XCTAssertEqual(Bar.className, "Bar")
+    XCTAssertEqual(MockClass1.className, "MockClass1")
+    XCTAssertEqual(MockClass2.className, "MockClass2")
   }
 }
