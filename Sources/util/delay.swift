@@ -1,11 +1,14 @@
 import Foundation
 
-/// Executes a block after the specified number of seconds, returns immediately.
+/// Suspends execution for the specified number of seconds before resuming.
 ///
 /// - Parameters:
-///   - queue: The dispatch queue to execute the block on.
-///   - seconds: The number of seconds to wait for before executing the block.
-///   - execute: The block to execute.
-public func delay(queue: DispatchQueue = DispatchQueue.main, _ seconds: TimeInterval, execute: @Sendable @escaping () -> Void) {
-  queue.asyncAfter(deadline: .now() + seconds, execute: execute)
+///   - queue: The dispatch queue to suspend on.
+///   - seconds: The number of seconds to wait before resuming.
+public func delay(queue: DispatchQueue = .main, _ seconds: TimeInterval) async {
+  await withCheckedContinuation { continuation in
+    queue.asyncAfter(deadline: .now() + seconds) {
+      continuation.resume()
+    }
+  }
 }

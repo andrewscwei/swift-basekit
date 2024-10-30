@@ -13,7 +13,7 @@ import Foundation
 ///            object. Defaults to `description`.
 ///
 /// - Returns:The `Error` object.
-public func error(_ description: String, domain: String = NSCocoaErrorDomain, code: Int = 0, reason: String? = nil) -> Error {
+public func error(_ description: String = "Unknown error", domain: String = NSCocoaErrorDomain, code: Int = 0, reason: String? = nil) -> Error {
   NSError(domain: domain, code: code, userInfo: [
     NSLocalizedDescriptionKey: description,
     NSLocalizedFailureErrorKey: reason ?? description,

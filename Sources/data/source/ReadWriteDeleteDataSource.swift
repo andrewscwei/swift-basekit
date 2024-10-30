@@ -2,11 +2,10 @@ import Foundation
 
 /// Protocol for a read/write/delete `DataSource`.
 public protocol ReadWriteDeleteDataSource: WriteDeleteDataSource {
-  /// Asynchronously reads from the data source and passes the read value
-  /// wrapped in a `Result` to a callback.
+  /// Reads the value of the data from the data source.
   ///
-  /// - Parameters:
-  ///   - completion: Handler invoked with the `Result` upon completion.
-  func read(completion: @escaping (Result<DataType?, Error>) -> Void)
+  /// - Returns: The value of the data. Note that the value can be `nil`
+  ///            indicating the absence of a value (i.e. deleted).
+  @discardableResult func read() async throws -> DataType?
 }
 
