@@ -113,16 +113,9 @@ open class Repository<T: Codable & Equatable>: Observable {
   /// - Parameters:
   ///   - completion: Handler invoked upon completion.
   func syncDownstream(completion: @escaping (Result<DataType, Error>) -> Void) {
-    syncListeners.append(completion)
-
     let identifier = generateSyncIdentifier()
 
     log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))..." }
-
-    guard !isSyncing() else {
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Previous sync in progress, ignoring current sync request" }
-      return
-    }
 
     let workItem = DispatchWorkItem { [weak self] in
       self?.pull { [weak self] result in
@@ -157,10 +150,12 @@ open class Repository<T: Codable & Equatable>: Observable {
     }
 
     lockQueue.sync {
+      self.syncListeners.append(completion)
       self.syncJob = workItem
       self.syncIdentifier = identifier
-      self.queue.async(execute: workItem)
     }
+
+    queue.async(execute: workItem)
   }
 
   /// Handler invoked upon the completion of a downstream sync. The `completion`
