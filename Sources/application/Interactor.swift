@@ -1,5 +1,5 @@
 /// Specifies whether debug mode is enabled for `Interactor` instances.
-public var kInteractorDebugMode = false
+nonisolated(unsafe) public var kInteractorDebugMode = false
 
 public protocol Interactor {
   /// Indicates whether debug logging is enabled.

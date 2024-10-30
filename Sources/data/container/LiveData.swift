@@ -5,7 +5,7 @@ import Foundation
 /// absence of a value.
 ///
 /// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
-/// for the mutable variant of `LiveData`.
+/// for the mutable version of `LiveData`.
 public class LiveData<T: Equatable>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Specifies if debug mode is enabled for `Repository` instances.
-public var kRepositoryDebugMode = false
+nonisolated(unsafe) public var kRepositoryDebugMode = false
 
 /// A `Repository` provides access to some data (as defined by the associated
 /// type `DataType`) that is pulled and aggregated from one or more data sources

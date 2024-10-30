@@ -10,7 +10,7 @@ import Foundation
 ///
 /// - Returns: The associated value if it exists and can be typecast to `T`,
 ///            `nil` otherwise.
-public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer<UInt8>) -> T? {
+public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPointer) -> T? {
   guard let value = objc_getAssociatedObject(object, key) as? T else { return nil }
   return value
 }
@@ -28,7 +28,7 @@ public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer
 ///
 /// - Returns: The associated value if it exists and can be typecast to `T`,
 ///            otherwise the default value.
-public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer<UInt8>, defaultValue: () -> T) -> T {
+public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPointer, defaultValue: () -> T) -> T {
   if let value = objc_getAssociatedObject(object, key) as? T {
     return value
   }
@@ -45,6 +45,6 @@ public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer
 ///   - object: Object to associate the value with.
 ///   - key: The key through which the value is associated with the object.
 ///   - value: The associated value.
-public func setAssociatedValue<T: Any>(for object: AnyObject, key: UnsafePointer<UInt8>, value: T?) {
+public func setAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPointer, value: T?) {
   objc_setAssociatedObject(object, key, value, .OBJC_ASSOCIATION_RETAIN)
 }

@@ -1,7 +1,6 @@
 import Foundation
 
-/// Associated value for storing weakly referenced observers.
-private var ptr_observers: UInt8 = 0
+nonisolated(unsafe) private var ptr_observers: UInt8 = 0
 
 /// An object conforming to the `Observable` protocol becomes observable,
 /// storing weak references of its registered observers so it can notify them
@@ -47,9 +46,6 @@ extension Observable {
   }
 
   public func notifyObservers(iteratee: (Observer) -> Void) {
-    for o in observers {
-      guard let observer = o.get() else { continue }
-      iteratee(observer)
-    }
+    observers.compactMap { $0.get() }.forEach(iteratee)
   }
 }
