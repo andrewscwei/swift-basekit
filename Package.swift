@@ -8,39 +8,25 @@ import Glibc
 import Darwin.C
 #endif
 
-enum Environment: String {
-  case local
-  case development
-  case production
-
-  static func get() -> Environment {
-    if let envPointer = getenv("SWIFT_ENV"), let environment = Environment(rawValue: String(cString: envPointer)) {
-      return environment
-    }
-    else if let envPointer = getenv("CI"), String(cString: envPointer) == "true" {
-      return .production
-    }
-    else {
-      return .local
-    }
-  }
-}
-
 let package = Package(
   name: "BaseKit",
-  platforms: [.iOS(.v15)],
+  platforms: [
+    .macOS(.v12),
+    .iOS(.v15),
+    .tvOS(.v15),
+    .watchOS(.v8)],
   products: [
     .library(
       name: "BaseKit",
       targets: ["BaseKit"]),
   ],
-  dependencies: [],
   targets: [
     .target(
       name: "BaseKit",
-      dependencies: []),
+      path: "Sources"),
     .testTarget(
       name: "BaseKitTests",
-      dependencies: ["BaseKit"]),
+      dependencies: ["BaseKit"],
+      path: "Tests"),
   ]
 )

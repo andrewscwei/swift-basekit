@@ -3,7 +3,7 @@ import Foundation
 
 /// Specifies whether zen mode is enabled for logging. In zen mode, logs are
 /// simplified to improve readability but unified logging is disabled.
-public var kZenLogging: Bool = false
+nonisolated(unsafe) public var kZenLogging: Bool = false
 
 /// Logs a message to the unified logging system.
 ///
