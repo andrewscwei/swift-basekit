@@ -2,7 +2,7 @@ import Foundation
 
 /// A data holder that wraps some value of type `T` and notifies observers
 /// whenever the value changes. The wrapped value can be `nil`, indicating the
-/// absence of a value.
+/// absence of a value, which is also the default value.
 ///
 /// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
 /// for the mutable version of `LiveData`.
@@ -29,7 +29,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Creates a new `LiveData` instance with an initial wrapped value.
+  /// Creates a new `LiveData` instance with an initial value.
   ///
   /// - Parameters:
   ///   - value: The initial wrapped value.
@@ -38,10 +38,9 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   }
 
   /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial wrapped value.
+  /// eventually yields an initial value.
   ///
-  /// Registered observers will be notified when the initial wrapped value is
-  /// assigned.
+  /// Registered observers will be notified once the initial value is assigned.
   ///
   /// - Parameters:
   ///   - getValue: The asynchronous block to execute.
@@ -52,11 +51,53 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   }
 
   /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial wrapped value represented by the success
-  /// value of a `Result` object.
+  /// eventually yields an initial value.
   ///
-  /// Registered observers will be notified when the initial wrapped value is
-  /// assigned.
+  /// Registered observers will be notified once the initial value is assigned.
+  ///
+  /// - Parameters:
+  ///   - getValue: The asynchronous block to execute.
+  public init(_ getValue: (@escaping (T) -> Void) throws -> Void) {
+    currentValue = nil
+
+    try? getValue { self.value = $0 }
+  }
+
+  /// Creates a new `LiveData` instance and executes an asynchronous method that
+  /// eventually yields an initial wrapped value.
+  ///
+  /// Registered observers will be notified once the initial value is assigned.
+  ///
+  /// - Parameters:
+  ///   - getValue: The asynchronous block to execute.
+  public init(_ getValue: @escaping () async -> T) {
+    currentValue = nil
+
+    Task.detached {
+      self.value = await getValue()
+    }
+  }
+
+  /// Creates a new `LiveData` instance and executes an asynchronous method that
+  /// eventually yields an initial wrapped value.
+  ///
+  /// Registered observers will be notified once the initial value is assigned.
+  ///
+  /// - Parameters:
+  ///   - getValue: The asynchronous block to execute.
+  public init(_ getValue: @escaping () async throws -> T) {
+    currentValue = nil
+
+    Task.detached {
+      self.value = try? await getValue()
+    }
+  }
+
+  /// Creates a new `LiveData` instance and executes an asynchronous method that
+  /// eventually yields an initial value represented by the success value of a
+  /// `Result` object.
+  ///
+  /// Registered observers will be notified once the initial value is assigned.
   ///
   /// - Parameters:
   ///   - getValue: The asynchronous block to execute.
@@ -87,8 +128,8 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     value = nil
   }
 
-  /// Registers an observer to begin listening for changes in the wrapped value.
-  /// Registering an already registered observer will replace the previous
+  /// Registers an observer to notify when changes occur in the wrapped value.
+  /// Registering an already registered observer will overwrite the previous
   /// `listener`.
   ///
   /// - Parameters:
@@ -103,9 +144,8 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Unregisters a registered observer. If the alleged observer was never
-  /// registered, nothing happens. The unregistered observer will no longer be
-  /// notified of changes in the wrapped data of this `LiveData`.
+  /// Unregisters an observer. If the observer was never registered, nothing
+  /// happens.
   ///
   /// - Parameters:
   ///   - observer: The observer to unregister.

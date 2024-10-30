@@ -5,22 +5,22 @@ public protocol Interactor {
   /// Indicates whether debug logging is enabled.
   var debugMode: Bool { get }
 
-  /// Interacts with a `UseCase` with an input type `U`.
+  /// Interacts with a `UseCase`.
   ///
   /// - Parameters:
-  ///   - useCase: The `UseCase` to interact.
+  ///   - useCase: The `UseCase` to interact with.
   ///   - params: The input parameters of the `UseCase`.
-  ///   - completion: Handler invoked upon completion, with the `Result`
-  ///                wrapping the output of the `UseCase` as its success value.
-  func interact<U: UseCase>(_ useCase: U, params: U.Input, completion: @escaping (Result<U.Output, Error>) -> Void)
+  ///
+  /// - Returns: The output of the use case.
+  func interact<U: UseCase>(_ useCase: U, params: U.Input) async throws -> U.Output
 
   /// Interacts with a `UseCase` with no input type.
   ///
   /// - Parameters:
   ///   - useCase: The `UseCase` to interact.
-  ///   - completion: Handler invoked upon completion, with the `Result`
-  ///                wrapping the output of the `UseCase` as its success value.
-  func interact<U: UseCase>(_ useCase: U, completion: @escaping (Result<U.Output, Error>) -> Void) where U.Input == Void
+  ///
+  /// - Returns: The output of the use case.
+  func interact<U: UseCase>(_ useCase: U) async throws -> U.Output where U.Input == Void
 
 
   /// Handler invoked before interacting with a use case.
@@ -40,33 +40,45 @@ public protocol Interactor {
 extension Interactor {
   public var debugMode: Bool { kInteractorDebugMode }
 
-  public func interact<U: UseCase>(_ useCase: U, params: U.Input, completion: @escaping (Result<U.Output, Error>) -> Void = { _ in }) {
+  public func interact<U: UseCase>(_ useCase: U, params: U.Input) async throws -> U.Output {
     log(.debug, isEnabled: debugMode) { "Running use case \(U.self) with params \(params)..." }
 
-    useCase.run(params: params) { result in
-      switch result {
-      case .failure(let error): log(.error, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... ERR: \(error)" }
-      case .success(let data): log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... OK: \(data)" }
-      }
+    do {
+      let result = try await useCase.run(params: params)
 
-      self.didInteractWithUseCase(useCase, result: result)
+      log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... OK: \(result)" }
 
-      completion(result)
+      self.didInteractWithUseCase(useCase, result: .success(result))
+
+      return result
+    }
+    catch {
+      log(.error, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... ERR: \(error)" }
+
+      self.didInteractWithUseCase(useCase, result: .failure(error))
+
+      throw error
     }
   }
 
-  public func interact<U: UseCase>(_ useCase: U, completion: @escaping (Result<U.Output, Error>) -> Void = { _ in }) where U.Input == Void {
+  public func interact<U: UseCase>(_ useCase: U) async throws -> U.Output where U.Input == Void {
     log(.debug, isEnabled: debugMode) { "Running use case \(U.self)..." }
 
-    useCase.run(params: ()) { result in
-      switch result {
-      case .failure(let error): log(.error, isEnabled: self.debugMode) { "Running use case \(U.self)... ERR: \(error)" }
-      case .success(let data): log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self)... OK: \(data)" }
-      }
+    do {
+      let result = try await useCase.run(params: ())
 
-      self.didInteractWithUseCase(useCase, result: result)
+      log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self)... OK: \(result)" }
 
-      completion(result)
+      didInteractWithUseCase(useCase, result: .success(result))
+
+      return result
+    }
+    catch {
+      log(.error, isEnabled: self.debugMode) { "Running use case \(U.self)... ERR: \(error)" }
+
+      didInteractWithUseCase(useCase, result: .failure(error))
+
+      throw error
     }
   }
 

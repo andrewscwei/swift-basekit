@@ -35,12 +35,14 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   /// - Parameters:
   ///   - params: Input for the use case.
   public func interact(params: U.Input) {
-    useCase.run(params: params) { result in
-      switch result {
-      case .failure:
+    Task.detached {
+      do {
+        let result = try await self.useCase.run(params: params)
+
+        self.value = self.transform(result)
+      }
+      catch {
         self.value = nil
-      case .success(let data):
-        self.value = self.transform(data)
       }
     }
   }
@@ -49,12 +51,14 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   /// output will be stored in the wrapped value. If a failure occurred, the
   /// wrapped value will be set to `nil`.
   public func interact() where U.Input == Void {
-    useCase.run(params: ()) { result in
-      switch result {
-      case .failure:
+    Task.detached {
+      do {
+        let result = try await self.useCase.run(params: ())
+
+        self.value = self.transform(result)
+      }
+      catch {
         self.value = nil
-      case .success(let data):
-        self.value = self.transform(data)
       }
     }
   }
