@@ -2,19 +2,6 @@ import Foundation
 
 /// An abstract class for a read/write/delete `Repository`.
 open class ReadWriteDeleteRepository<T: Codable & Equatable>: ReadWriteRepository<T?> {
-  override func emit() {
-    let value = getCurrent()
-
-    notifyObservers { observer in
-      switch value {
-      case .notSynced:
-        observer.repositoryDidFailToSyncData(self)
-      case .synced(let data):
-        observer.repository(self, dataDidChange: data)
-      }
-    }
-  }
-
   /// Deletes the current value from the repository and triggers a sync if
   /// `autoSync` is enabled.
   ///
