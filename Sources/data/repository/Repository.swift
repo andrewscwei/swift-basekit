@@ -112,40 +112,14 @@ open class Repository<T: Codable & Equatable>: Observable {
   ///
   /// - Parameters:
   ///   - completion: Handler invoked upon completion.
-  func syncDownstream(completion: @escaping (Result<DataType, Error>) -> Void) {
+  private func syncDownstream(completion: @escaping (Result<DataType, Error>) -> Void) {
     let identifier = generateSyncIdentifier()
 
     log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))..." }
 
     let workItem = DispatchWorkItem { [weak self] in
       self?.pull { [weak self] result in
-        switch result {
-        case .failure(let error):
-          log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pulling from data sources (id=\(identifier))... ERR: \(error)" }
-        case .success(let data):
-          log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pulling from data sources (id=\(identifier))... OK: \(data)" }
-        }
-
-        guard self?.isSyncing(for: identifier) == true else {
-          log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
-          return
-        }
-
-        self?.didSyncDownstream(identifier: identifier, result: result) { [weak self] result in
-          guard self?.isSyncing(for: identifier) == true else {
-            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
-            return
-          }
-
-          switch result {
-          case .failure(let error):
-            log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... ERR: \(error)" }
-          case .success(let data):
-            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... OK: \(data)" }
-          }
-
-          self?.dispatchSyncResult(result: result)
-        }
+        self?.didSyncDownstream(for: identifier, result: result)
       }
     }
 
@@ -158,22 +132,28 @@ open class Repository<T: Codable & Equatable>: Observable {
     queue.async(execute: workItem)
   }
 
-  /// Handler invoked upon the completion of a downstream sync. The `completion`
-  /// block must be invoked to complete the sync process.
+  /// Handler invoked when a downstream sync finishes.
   ///
   /// - Parameters:
   ///   - identifier: The sync identifier.
-  ///   - result: The synced result.
-  ///   - completion: Handler invoked upon completion.
-  func didSyncDownstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<DataType, Error>) -> Void) {
+  ///   - result: The sync result.
+  private func didSyncDownstream(for identifier: String, result: Result<DataType, Error>) {
+    guard isSyncing(for: identifier) == true else {
+      log(.debug, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
+
+      return
+    }
+
     switch result {
-    case .failure:
+    case .failure(let error):
+      log(.error, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... ERR: \(error)" }
       setCurrent(.notSynced)
     case .success(let data):
+      log(.debug, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... OK: \(data)" }
       setCurrent(.synced(data))
     }
 
-    completion(result)
+    dispatchSyncResult(result)
   }
 
   /// Gets the current value synchronously.
@@ -220,7 +200,7 @@ open class Repository<T: Codable & Equatable>: Observable {
   ///
   /// - Parameters:
   ///   - result: The `Result`.
-  func dispatchSyncResult(result: Result<DataType, Error>) {
+  func dispatchSyncResult(_ result: Result<DataType, Error>) {
     queue.sync(flags: .barrier) {
       lockQueue.sync {
         self.syncListeners.forEach { $0(result) }

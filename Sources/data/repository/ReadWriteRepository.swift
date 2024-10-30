@@ -65,7 +65,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
   ///   - completion: Handler invoked upon completion.
   public override func sync(completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
     if !getIsDirty() {
-      syncDownstream(completion: completion)
+      super.sync(completion: completion)
     }
     else {
       syncUpstream(completion: completion)
@@ -76,7 +76,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
   ///
   /// - Parameters:
   ///   - completion: Handler invoked upon completion.
-  func syncUpstream(completion: @escaping (Result<DataType, Error>) -> Void) {
+  private func syncUpstream(completion: @escaping (Result<DataType, Error>) -> Void) {
     syncJob?.cancel()
     syncListeners.append(completion)
 
@@ -90,7 +90,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
       switch current {
       case .notSynced:
         log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... ERR: Nothing to sync" }
-        self?.dispatchSyncResult(result: .failure(NSError(domain: "BaseKit.ReadWriteRepository", code: 0, userInfo: [
+        self?.dispatchSyncResult(.failure(NSError(domain: "BaseKit.ReadWriteRepository", code: 0, userInfo: [
           NSLocalizedDescriptionKey: "Repository is not synced",
           NSLocalizedFailureErrorKey: "Repository is not synced"
         ])))
@@ -113,7 +113,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
             case .success(let data): log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... OK: \(data)" }
             }
 
-            self?.dispatchSyncResult(result: result)
+            self?.dispatchSyncResult(result)
           })
         }
       }
@@ -136,30 +136,30 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
     completion(result)
   }
 
-  override func didSyncDownstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<DataType, Error>) -> Void) {
-    switch result {
-    case .failure:
-      setCurrent(.notSynced)
-      completion(result)
-    case .success(let value):
-      if setCurrent(.synced(value)) {
-        push(value) { [weak self] result in
-          switch result {
-          case .failure(let error): log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... ERR: \(error)" }
-          case .success: log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... OK" }
-          }
-
-          guard self?.isSyncing(for: identifier) == true else {
-            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier))... CANCEL: Operation cancelled, abandoning the current sync progress" }
-            return
-          }
-
-          completion(result)
-        }
-      }
-      else {
-        completion(result)
-      }
-    }
-  }
+//  override func didSyncDownstream(for identifier: String, result: Result<DataType, Error>) {
+//    switch result {
+//    case .failure:
+//      setCurrent(.notSynced)
+//      completion(result)
+//    case .success(let value):
+//      if setCurrent(.synced(value)) {
+//        push(value) { [weak self] result in
+//          switch result {
+//          case .failure(let error): log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... ERR: \(error)" }
+//          case .success: log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... OK" }
+//          }
+//
+//          guard self?.isSyncing(for: identifier) == true else {
+//            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier))... CANCEL: Operation cancelled, abandoning the current sync progress" }
+//            return
+//          }
+//
+//          completion(result)
+//        }
+//      }
+//      else {
+//        completion(result)
+//      }
+//    }
+//  }
 }
