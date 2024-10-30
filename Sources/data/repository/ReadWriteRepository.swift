@@ -76,7 +76,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
   ///
   /// - Parameters:
   ///   - completion: Handler invoked upon completion.
-  public func syncUpstream(completion: @escaping (Result<DataType, Error>) -> Void) {
+  func syncUpstream(completion: @escaping (Result<DataType, Error>) -> Void) {
     syncJob?.cancel()
     syncListeners.append(completion)
 
@@ -103,7 +103,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
           }
 
           self?.didSyncUpstream(identifier: identifier, result: result, completion: { [weak self] result in
-            guard self?.isSyncing(identifier: identifier) == true else {
+            guard self?.isSyncing(for: identifier) == true else {
               log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... CANCEL: Operation cancelled, abandoning the current sync progress" }
               return
             }
@@ -124,6 +124,18 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
     queue.async(execute: workItem)
   }
 
+  /// Handler invoked after an upstream sync. The `completion` block must be
+  /// invoked to complete the sync process.
+  ///
+  /// - Parameters:
+  ///   - identifier: The sync identifier.
+  ///   - result: The synced result.
+  ///   - completion: Handler invoked upon completion.
+  func didSyncUpstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<T, Error>) -> Void) {
+    setIsDirty(false)
+    completion(result)
+  }
+
   override func didSyncDownstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<DataType, Error>) -> Void) {
     switch result {
     case .failure:
@@ -137,7 +149,7 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
           case .success: log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... OK" }
           }
 
-          guard self?.isSyncing(identifier: identifier) == true else {
+          guard self?.isSyncing(for: identifier) == true else {
             log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier))... CANCEL: Operation cancelled, abandoning the current sync progress" }
             return
           }
@@ -149,17 +161,5 @@ open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
         completion(result)
       }
     }
-  }
-
-  /// Handler invoked after an upstream sync. The `completion` block must be
-  /// invoked to complete the sync process.
-  ///
-  /// - Parameters:
-  ///   - identifier: The sync identifier.
-  ///   - result: The synced result.
-  ///   - completion: Handler invoked upon completion.
-  func didSyncUpstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<T, Error>) -> Void) {
-    setIsDirty(false)
-    completion(result)
   }
 }
