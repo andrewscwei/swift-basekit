@@ -3,14 +3,14 @@ import XCTest
 
 class WeakReferenceTests: XCTestCase {
   func testWeakReference() {
-    var foo: NSObject? = NSObject()
-    let weakFoo = WeakReference(foo!)
+    var object: NSObject? = NSObject()
+    let weakObject = WeakReference(object!)
 
-    XCTAssertNotNil(weakFoo.get())
-    XCTAssertTrue(foo === weakFoo.get())
+    XCTAssertNotNil(weakObject.get())
+    XCTAssertTrue(object === weakObject.get())
 
-    foo = nil
+    object = nil
 
-    XCTAssertNil(weakFoo.get())
+    XCTAssertNil(weakObject.get())
   }
 }
