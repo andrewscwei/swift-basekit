@@ -6,20 +6,20 @@ class DataSourceTests: XCTestCase {
     class GoodSource: ReadOnlyDataSource {
       typealias DataType = String
 
-      func read(completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success("Hello, World!"))
-        }
+      @discardableResult func read() async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return "Hello, World!"
       }
     }
 
     class BadSource: ReadOnlyDataSource {
       typealias DataType = String
 
-      func read(completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func read() async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
     }
 
@@ -29,15 +29,19 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    goodSource.read { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "Hello, World!")
+    Task.detached {
+      let result = try await goodSource.read()
+      XCTAssertEqual(result, "Hello, World!")
       expectation1.fulfill()
     }
 
-    badSource.read { result in
-      XCTAssertTrue(result.isFailure)
-      expectation2.fulfill()
+    Task.detached {
+      do {
+        try await badSource.read()
+      }
+      catch {
+        expectation2.fulfill()
+      }
     }
 
     wait(for: [expectation1, expectation2], timeout: 5.0)
@@ -47,20 +51,20 @@ class DataSourceTests: XCTestCase {
     class GoodSource: WriteOnlyDataSource {
       typealias DataType = Int
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success(value))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return value
       }
     }
 
     class BadSource: WriteOnlyDataSource {
       typealias DataType = Int
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
     }
 
@@ -71,21 +75,25 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    goodSource.write(1) { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), 1)
+    Task.detached {
+      let result = try await goodSource.write(1)
+      XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    goodSource.write(2) { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), 2)
+    Task.detached {
+      let result = try await goodSource.write(2)
+      XCTAssertEqual(result, 2)
       expectation2.fulfill()
     }
 
-    badSource.write(1) { result in
-      XCTAssertTrue(result.isFailure)
-      expectation3.fulfill()
+    Task.detached {
+      do {
+        try await badSource.write(1)
+      }
+      catch {
+        expectation3.fulfill()
+      }
     }
 
     wait(for: [expectation1, expectation2, expectation3], timeout: 5.0)
@@ -95,32 +103,32 @@ class DataSourceTests: XCTestCase {
     class GoodSource: ReadWriteDataSource {
       typealias DataType = String
 
-      func read(completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success("Hello, World!"))
-        }
+      @discardableResult func read() async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return "Hello, World!"
       }
 
-      func write(_ value: String, completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success(value))
-        }
+      @discardableResult func write(_ value: String) async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return value
       }
     }
 
     class BadSource: ReadWriteDataSource {
       typealias DataType = String
 
-      func read(completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func read() async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
 
-      func write(_ value: String, completion: @escaping (Result<String, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func write(_ value: String) async throws -> String {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
     }
 
@@ -133,32 +141,40 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    goodSource.read { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "Hello, World!")
+    Task.detached {
+      let result = try await goodSource.read()
+      XCTAssertEqual(result, "Hello, World!")
       expectation1.fulfill()
     }
 
-    goodSource.write("foo") { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "foo")
+    Task.detached {
+      let result = try await goodSource.write("foo")
+      XCTAssertEqual(result, "foo")
       expectation2.fulfill()
     }
 
-    goodSource.write("bar") { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "bar")
+    Task.detached {
+      let result = try await goodSource.write("bar")
+      XCTAssertEqual(result, "bar")
       expectation3.fulfill()
     }
 
-    badSource.read { result in
-      XCTAssertTrue(result.isFailure)
-      expectation4.fulfill()
+    Task.detached {
+      do {
+        try await badSource.read()
+      }
+      catch {
+        expectation4.fulfill()
+      }
     }
 
-    badSource.write("bar") { result in
-      XCTAssertTrue(result.isFailure)
-      expectation5.fulfill()
+    Task.detached {
+      do {
+        try await badSource.write("bar")
+      }
+      catch {
+        expectation5.fulfill()
+      }
     }
 
     wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 5.0)
@@ -168,32 +184,30 @@ class DataSourceTests: XCTestCase {
     class GoodSource: WriteDeleteDataSource {
       typealias DataType = Int
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success(value))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return value
       }
 
-      func delete(completion: @escaping (Result<Void, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success)
-        }
+      func delete() async throws {
+        await delay(TimeInterval.random(in: 0.5...5.0))
       }
     }
 
     class BadSource: WriteDeleteDataSource {
       typealias DataType = Int
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
 
-      func delete(completion: @escaping (Result<Void, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      func delete() async throws {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
     }
 
@@ -205,25 +219,33 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    goodSource.write(1) { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), 1)
+    Task.detached {
+      let result = try await goodSource.write(1)
+      XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    goodSource.delete { result in
-      XCTAssertTrue(result.isSuccess)
+    Task.detached {
+      try await goodSource.delete()
       expectation2.fulfill()
     }
 
-    badSource.write(1) { result in
-      XCTAssertTrue(result.isFailure)
-      expectation3.fulfill()
+    Task.detached {
+      do {
+        try await badSource.write(1)
+      }
+      catch {
+        expectation3.fulfill()
+      }
     }
 
-    badSource.delete { result in
-      XCTAssertTrue(result.isFailure)
-      expectation4.fulfill()
+    Task.detached {
+      do {
+        try await badSource.delete()
+      }
+      catch {
+        expectation4.fulfill()
+      }
     }
 
     wait(for: [expectation1, expectation2, expectation3, expectation4], timeout: 5.0)
@@ -233,44 +255,42 @@ class DataSourceTests: XCTestCase {
     class GoodSource: ReadWriteDeleteDataSource {
       typealias DataType = Int
 
-      func read(completion: @escaping (Result<Int?, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success(1))
-        }
+      @discardableResult func read() async throws -> Int? {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return 1
       }
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success(value))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        return value
       }
 
-      func delete(completion: @escaping (Result<Void, Error>) -> Void) {
-        delay(1.0) {
-          completion(.success)
-        }
+      func delete() async throws {
+        await delay(TimeInterval.random(in: 0.5...5.0))
       }
     }
 
     class BadSource: ReadWriteDeleteDataSource {
       typealias DataType = Int
 
-      func read(completion: @escaping (Result<Int?, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func read() async throws -> Int? {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
 
-      func write(_ value: Int, completion: @escaping (Result<Int, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      @discardableResult func write(_ value: Int) async throws -> Int {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
 
-      func delete(completion: @escaping (Result<Void, Error>) -> Void) {
-        delay(1.0) {
-          completion(.failure(debugError))
-        }
+      func delete() async throws {
+        await delay(TimeInterval.random(in: 0.5...5.0))
+
+        throw error()
       }
     }
 
@@ -284,36 +304,48 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    goodSource.read { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), 1)
+    Task.detached {
+      let result = try await goodSource.read()
+      XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    goodSource.write(1) { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), 1)
+    Task.detached {
+      let result = try await goodSource.write(1)
+      XCTAssertEqual(result, 1)
       expectation2.fulfill()
     }
 
-    goodSource.delete { result in
-      XCTAssertTrue(result.isSuccess)
+    Task.detached {
+      try await goodSource.delete()
       expectation3.fulfill()
     }
 
-    badSource.read { result in
-      XCTAssertTrue(result.isFailure)
-      expectation4.fulfill()
+    Task.detached {
+      do {
+        try await badSource.read()
+      }
+      catch {
+        expectation4.fulfill()
+      }
     }
 
-    badSource.write(1) { result in
-      XCTAssertTrue(result.isFailure)
-      expectation5.fulfill()
+    Task.detached {
+      do {
+        try await badSource.write(1)
+      }
+      catch {
+        expectation5.fulfill()
+      }
     }
 
-    badSource.delete { result in
-      XCTAssertTrue(result.isFailure)
-      expectation6.fulfill()
+    Task.detached {
+      do {
+        try await badSource.delete()
+      }
+      catch {
+        expectation6.fulfill()
+      }
     }
 
     wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5, expectation6], timeout: 5.0)
