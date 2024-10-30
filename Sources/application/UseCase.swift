@@ -17,6 +17,7 @@ public protocol UseCase {
   ///
   /// - Parameters:
   ///   - params: The input parameters.
-  ///   - completion: The handler invoked with the `Result` upon completion.
-  func run(params: Input, completion: @escaping (Result<Output, Error>) -> Void)
+  ///
+  /// - Returns: The result of running the use case.
+  func run(params: Input) async throws -> Output
 }
