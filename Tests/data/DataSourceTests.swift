@@ -29,13 +29,13 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    Task.detached {
+    Task {
       let result = try await goodSource.read()
       XCTAssertEqual(result, "Hello, World!")
       expectation1.fulfill()
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.read()
       }
@@ -75,19 +75,19 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write(1)
       XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write(2)
       XCTAssertEqual(result, 2)
       expectation2.fulfill()
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.write(1)
       }
@@ -141,25 +141,25 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    Task.detached {
+    Task {
       let result = try await goodSource.read()
       XCTAssertEqual(result, "Hello, World!")
       expectation1.fulfill()
     }
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write("foo")
       XCTAssertEqual(result, "foo")
       expectation2.fulfill()
     }
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write("bar")
       XCTAssertEqual(result, "bar")
       expectation3.fulfill()
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.read()
       }
@@ -168,7 +168,7 @@ class DataSourceTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.write("bar")
       }
@@ -219,18 +219,18 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write(1)
       XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    Task.detached {
+    Task {
       try await goodSource.delete()
       expectation2.fulfill()
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.write(1)
       }
@@ -239,7 +239,7 @@ class DataSourceTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.delete()
       }
@@ -304,24 +304,24 @@ class DataSourceTests: XCTestCase {
     let goodSource = GoodSource()
     let badSource = BadSource()
 
-    Task.detached {
+    Task {
       let result = try await goodSource.read()
       XCTAssertEqual(result, 1)
       expectation1.fulfill()
     }
 
-    Task.detached {
+    Task {
       let result = try await goodSource.write(1)
       XCTAssertEqual(result, 1)
       expectation2.fulfill()
     }
 
-    Task.detached {
+    Task {
       try await goodSource.delete()
       expectation3.fulfill()
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.read()
       }
@@ -330,7 +330,7 @@ class DataSourceTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.write(1)
       }
@@ -339,7 +339,7 @@ class DataSourceTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       do {
         try await badSource.delete()
       }

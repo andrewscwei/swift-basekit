@@ -21,7 +21,7 @@ class MockReadOnlyRepository: ReadOnlyRepository<String> {
   let dataSource = MockReadonlyDataSource()
 
   override func pull(completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task.detached {
+    Task {
       do {
         let data = try await self.dataSource.read()
 
@@ -60,7 +60,7 @@ class MockReadWriteRepository: ReadWriteRepository<String> {
   let dataSource = MockReadWriteDataSource()
 
   override func pull(completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task.detached {
+    Task {
       do {
         let data = try await self.dataSource.read()
         completion(.success(data))
@@ -72,7 +72,7 @@ class MockReadWriteRepository: ReadWriteRepository<String> {
   }
 
   override func push(_ current: String, completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task.detached {
+    Task {
       do {
         let data = try await self.dataSource.write(current)
         completion(.success(data))
@@ -123,7 +123,7 @@ class MockReadWriteDeleteRepository: ReadWriteDeleteRepository<String> {
   let dataSource = MockReadWriteDeleteDataSource()
 
   override func pull(completion: @escaping (Result<String?, Error>) -> Void = { _ in }) {
-    Task.detached {
+    Task {
       do {
         let data = try await self.dataSource.read()
         completion(.success(data))
@@ -135,7 +135,7 @@ class MockReadWriteDeleteRepository: ReadWriteDeleteRepository<String> {
   }
 
   override func push(_ current: String?, completion: @escaping (Result<String?, Error>) -> Void = { _ in }) {
-    Task.detached {
+    Task {
       do {
         if let current = current {
           let data = try await self.dataSource.write(current)
@@ -254,7 +254,7 @@ class RepositoryTests: XCTestCase {
       expectation2.fulfill()
     }
 
-    Task.detached {
+    Task {
       await delay(2.0)
 
       repo.get { result in
@@ -263,7 +263,7 @@ class RepositoryTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       await delay(3.0)
 
       repo.delete { result in
@@ -272,7 +272,7 @@ class RepositoryTests: XCTestCase {
       }
     }
 
-    Task.detached {
+    Task {
       await delay(4.0)
 
       repo.get { result in
