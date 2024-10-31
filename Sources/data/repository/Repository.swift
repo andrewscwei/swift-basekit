@@ -43,7 +43,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
   let lockQueue: DispatchQueue
   private let synchronizer = Synchronizer()
-  private var state: RepositoryState<T> = .notSynced
+  private var state: RepositoryState<T> = .idle
 
   /// Creates a new `Repository` instance.
   public init() {
@@ -80,7 +80,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
       notifyObservers {
         switch state {
-        case .notSynced:
+        case .idle:
           $0.repositoryDidFailToSyncData(self)
         case .synced(let data):
           $0.repository(self, dataDidChange: data)

@@ -25,7 +25,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
       log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
 
       return data
-    case .notSynced:
+    case .idle:
       guard autoSync else {
         let error = error("Repository is not synced", domain: "BaseKit.Repository")
 
@@ -79,7 +79,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
 
         return data
       case .failure(let error):
-        let _ = setState(.notSynced)
+        let _ = setState(.idle)
 
         log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... ERR: \(error)"}
 

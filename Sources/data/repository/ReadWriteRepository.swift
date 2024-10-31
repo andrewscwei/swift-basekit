@@ -66,7 +66,7 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
       log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream..." }
 
       switch getState() {
-      case .notSynced:
+      case .idle:
         log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: Nothing to sync" }
 
         throw error("Repository is not synced", domain: "BaseKit.Repository")
