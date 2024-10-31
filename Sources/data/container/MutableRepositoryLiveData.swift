@@ -115,7 +115,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
           Task {
             try await repository.set(reverseTransform(newValue, nil))
           }
-        case .synced(let data):
+        case .synced(let data), .notSynced(let data):
           Task {
             try await repository.set(reverseTransform(newValue, data))
           }
@@ -134,7 +134,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
           Task {
             try await repository.set(reverseTransform(newValue, nil))
           }
-        case .synced(let data):
+        case .synced(let data), .notSynced(let data):
           Task {
             try await repository.set(reverseTransform(newValue, data))
           }

@@ -7,7 +7,7 @@ public enum RepositoryError: Error {
   case syncTaskNotFound
 
   /// An error occurred during sync.
-  case badSync(cause: Error)
+  case invalidSync(cause: Error?)
 
   /// There is an error reading from the data source.
   case invalidRead(cause: Error)
@@ -17,4 +17,6 @@ public enum RepositoryError: Error {
 
   /// There is an error deleting from the data source.
   case invalidateDelete(cause: Error)
+
+  public static let invalidSync: RepositoryError = .invalidSync(cause: nil)
 }

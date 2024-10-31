@@ -27,7 +27,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
       case .success(let data):
         return data
       case .failure(let error):
-        guard case is CancellationError = error else { throw RepositoryError.badSync(cause: error) }
+        guard case is CancellationError = error else { throw RepositoryError.invalidSync(cause: error) }
 
         return try await `await`()
       }
@@ -72,7 +72,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
     lockQueue.sync { state }
   }
 
-  func setState(_ newValue: RepositoryState<T>) -> Bool {
+  @discardableResult func setState(_ newValue: RepositoryState<T>) -> Bool {
     return lockQueue.sync {
       guard state != newValue else { return false }
 
@@ -82,7 +82,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
         switch state {
         case .idle:
           $0.repositoryDidFailToSyncData(self)
-        case .synced(let data):
+        case .synced(let data), .notSynced(let data):
           $0.repository(self, dataDidChange: data)
         }
       }

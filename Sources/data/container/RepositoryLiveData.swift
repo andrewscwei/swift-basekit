@@ -42,7 +42,7 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     repository.addObserver(self)
 
     switch repository.getState() {
-    case .synced(let value):
+    case .synced(let value), .notSynced(let value):
       currentValue = transform(value, currentValue)
     case .idle:
       currentValue = nil
