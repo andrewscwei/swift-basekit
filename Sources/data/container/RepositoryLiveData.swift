@@ -41,12 +41,13 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable>: LiveData<
 
     repository.addObserver(self)
 
-    switch repository.getCurrent() {
+    switch repository.getState() {
     case .synced(let value):
       currentValue = transform(value, currentValue)
     case .notSynced:
       currentValue = nil
-      sync()
+
+      Task { try await sync() }
     }
   }
 
@@ -69,8 +70,8 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable>: LiveData<
   ///
   /// - Parameters:
   ///   - completion: Handler invoked when the `Repository` finishes synching.
-  public func sync(completion: @escaping (Result<Void, Error>) -> Void = { _ in }) {
-    repository.sync { completion($0.map { _ in () }) }
+  public func sync() async throws {
+    try await repository.sync()
   }
 
   public func repository<DataType: Codable & Equatable>(_ repository: Repository<DataType>, dataDidChange data: DataType) {
