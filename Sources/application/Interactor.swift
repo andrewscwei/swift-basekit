@@ -1,6 +1,3 @@
-/// Specifies whether debug mode is enabled for `Interactor` instances.
-nonisolated(unsafe) public var kInteractorDebugMode = false
-
 public protocol Interactor {
   /// Indicates whether debug logging is enabled.
   var debugMode: Bool { get }
@@ -38,8 +35,6 @@ public protocol Interactor {
 }
 
 extension Interactor {
-  public var debugMode: Bool { kInteractorDebugMode }
-
   public func interact<U: UseCase>(_ useCase: U, params: U.Input) async throws -> U.Output {
     log(.debug, isEnabled: debugMode) { "Running use case \(U.self) with params \(params)..." }
 

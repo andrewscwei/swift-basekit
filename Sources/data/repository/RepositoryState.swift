@@ -1,7 +1,7 @@
 import Foundation
 
 /// A type representing the current state of a `Repository`.
-enum RepositoryState<T: Codable & Equatable>: Equatable, CustomStringConvertible {
+enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomStringConvertible {
   case synced(T)
   case notSynced
 
