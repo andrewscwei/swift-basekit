@@ -19,7 +19,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
     func getTask() -> Task<T, Error>? { task }
 
     func await() async throws -> T {
-      guard let task = getTask() else { throw CancellationError() }
+      guard let task = getTask() else { throw RepositoryError.syncTaskNotFound }
 
       let result = await task.result
 
@@ -27,7 +27,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
       case .success(let data):
         return data
       case .failure(let error):
-        guard case is CancellationError = error else { throw error }
+        guard case is CancellationError = error else { throw RepositoryError.badSync(cause: error) }
 
         return try await `await`()
       }
@@ -93,7 +93,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
   func createSyncTask() -> Task<T, Error> {
     return Task {
-      throw error()
+      throw RepositoryError.badImplementation(reason: "<\(Self.self)> Subclasses must override `createSyncTask()`")
     }
   }
 }

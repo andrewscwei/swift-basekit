@@ -8,7 +8,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
   ///
   /// - Returns: The resulting data.
   open func pull() async throws -> T {
-    fatalError("<\(Self.self)> Subclass must override `pull()` without calling `super`.")
+    throw RepositoryError.badImplementation(reason: "<\(Self.self)> Subclass must override `pull()` without calling `super`")
   }
 
   /// Returns the data in memory.
@@ -27,11 +27,11 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
       return data
     case .notSynced:
       guard autoSync else {
-        let err = error("Repository is not synced", domain: "BaseKit.Repository")
+        let error = error("Repository is not synced", domain: "BaseKit.Repository")
 
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(err)"}
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(error)"}
 
-        throw err
+        throw RepositoryError.invalidRead(cause: error)
       }
 
       log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... repository not synced, proceeding to sync"}
@@ -46,7 +46,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
       catch {
         log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(error)"}
 
-        throw error
+        throw RepositoryError.invalidRead(cause: error)
       }
     }
   }

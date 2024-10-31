@@ -5,6 +5,11 @@ open class ReadWriteDeleteRepository<T: Codable & Equatable & Sendable>: ReadWri
   /// Deletes the current value from the repository and triggers a sync if
   /// `autoSync` is `true`.
   public func delete() async throws {
-    try await set(nil)
+    do {
+      try await set(nil)
+    }
+    catch {
+      throw RepositoryError.invalidateDelete(cause: error)
+    }
   }
 }
