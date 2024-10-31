@@ -1,7 +1,7 @@
 import Foundation
 
 /// An abstract class for a read/write `Repository`.
-open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
+open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepository<T> {
   private var isDirty: Bool = false
 
   /// Pushes the data upstream.

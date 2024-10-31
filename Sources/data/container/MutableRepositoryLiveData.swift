@@ -2,7 +2,7 @@ import Foundation
 
 /// A type of `RepositoryLiveData` that permits modifying of its wrapped value
 /// from externally, subsequently modifying the value in the `Repository`.
-public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: RepositoryLiveData<T, R> {
+public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: RepositoryLiveData<T, R> {
   private let reverseTransform: (T, R?) -> R
 
   /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
