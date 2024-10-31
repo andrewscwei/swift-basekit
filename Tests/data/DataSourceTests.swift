@@ -109,7 +109,7 @@ class DataSourceTests: XCTestCase {
 
     Task {
       do {
-        try await badSource.read()
+        let _ = try await badSource.read()
       }
       catch {
         expectation4.fulfill()
@@ -118,7 +118,7 @@ class DataSourceTests: XCTestCase {
 
     Task {
       do {
-        try await badSource.write("bar")
+        let _ = try await badSource.write("bar")
       }
       catch {
         expectation5.fulfill()
@@ -200,7 +200,7 @@ class DataSourceTests: XCTestCase {
 
     Task {
       do {
-        try await badSource.read()
+        let _ = try await badSource.read()
       }
       catch {
         expectation4.fulfill()
@@ -209,7 +209,7 @@ class DataSourceTests: XCTestCase {
 
     Task {
       do {
-        try await badSource.write(1)
+        let _ = try await badSource.write(1)
       }
       catch {
         expectation5.fulfill()
