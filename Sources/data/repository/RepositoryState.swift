@@ -9,10 +9,14 @@ enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomString
   /// `Repository` is synced with data.
   case synced(T)
 
+  /// `Repository` attempted a sync but failed, storing old data.
+  case notSynced(T)
+
   var description: String {
     switch self {
     case .idle: return "idle"
     case .synced(let data): return "synced(\(data))"
+    case .notSynced(let data): return "notSynced(\(data))"
     }
   }
 
@@ -20,6 +24,7 @@ enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomString
     switch lhs {
     case .idle: if case .idle = rhs { return true }
     case .synced(let lhv): if case .synced(let rhv) = rhs, lhv == rhv { return true }
+    case .notSynced(let lhv): if case .notSynced(let rhv) = rhs, lhv == rhv { return true }
     }
 
     return false

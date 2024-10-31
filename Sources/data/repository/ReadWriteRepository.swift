@@ -69,8 +69,8 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
       case .idle:
         log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: Nothing to sync" }
 
-        throw error("Repository is not synced", domain: "BaseKit.Repository")
-      case .synced(let data):
+        throw RepositoryError.invalidSync
+      case .synced(let data), .notSynced(let data):
         let result = await Task { try await push(data) }.result
 
         do {
@@ -92,7 +92,7 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
         case .failure(let error):
           log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: \(error)" }
 
-          throw error
+          throw RepositoryError.invalidSync(cause: error)
         }
       }
     }
