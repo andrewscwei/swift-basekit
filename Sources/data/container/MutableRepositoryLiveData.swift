@@ -110,32 +110,39 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   public func setValue(_ newValue: T?) throws {
     if let repository = repository as? ReadWriteDeleteRepository<R> {
       if let newValue = newValue {
-        switch repository.getCurrent() {
+        switch repository.getState() {
         case .notSynced:
-            return repository.set(reverseTransform(newValue, nil))
+          Task {
+            try await repository.set(reverseTransform(newValue, nil))
+          }
         case .synced(let data):
-          return repository.set(reverseTransform(newValue, data))
+          Task {
+            try await repository.set(reverseTransform(newValue, data))
+          }
         }
       }
       else {
-        return repository.delete()
+        Task {
+          try await repository.delete()
+        }
       }
     }
     else if let repository = repository as? ReadWriteRepository<R> {
       if let newValue = newValue {
-        switch repository.getCurrent() {
+        switch repository.getState() {
         case .notSynced:
-            return repository.set(reverseTransform(newValue, nil))
+          Task {
+            try await repository.set(reverseTransform(newValue, nil))
+          }
         case .synced(let data):
-          return repository.set(reverseTransform(newValue, data))
+          Task {
+            try await repository.set(reverseTransform(newValue, data))
+          }
         }
       }
     }
 
-    throw NSError(domain: "BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
-      NSLocalizedDescriptionKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only",
-      NSLocalizedFailureErrorKey: "Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only"
-    ])
+    throw error("Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only", domain: "BaseKit.LiveData")
   }
 
   /// Sets the wrapped value by directly mutating the existing wrapped value
@@ -146,10 +153,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable>: Re
   ///   - mutate: The mutate block.
   public func setValue(mutate: (inout T) throws -> Void) throws {
     guard var newValue = value else {
-      throw NSError(domain: "BaseKit.MutableRepositoryLiveData", code: 0, userInfo: [
-        NSLocalizedDescriptionKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil",
-        NSLocalizedFailureErrorKey: "Attempting to mutate the value of a MutableRepositoryLiveData when it is nil"
-      ])
+      throw error("Attempting to mutate the value of a MutableRepositoryLiveData when it is nil", domain: "BaseKit.LiveData")
     }
 
     try mutate(&newValue)

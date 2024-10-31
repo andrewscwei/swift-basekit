@@ -3,226 +3,179 @@ import Foundation
 /// Specifies if debug mode is enabled for `Repository` instances.
 public var kRepositoryDebugMode = false
 
-/// A `Repository` provides access to some data (as defined by the associated
-/// type `DataType`) that is fetched and aggregated from one or more sources.
+/// A `Repository` provides access to asynchronously fetched data of type `T`
+/// and stores it in memory.
 ///
-/// A `Repository` syncs its data stored in memory with the data stored from
-/// external sources. Incomplete syncs are discarded when a new sync is
-/// requested. Consumers awaiting synced data will always receive the data from
-/// the latest sync.
+/// The in-memory data syncs with fetched data via a request-collapsing
+/// mechanism where the most recent sync satisfies all pending requests.
 open class Repository<T: Codable & Equatable>: Observable {
   public typealias Observer = RepositoryObserver
-  public typealias DataType = T
 
-  /// Specifies if this repository automatically syncs when data is unavailable,
-  /// i.e. upon instantiation or `get()`.
-  open var autoSync: Bool { true }
+  private actor Synchronizer {
+    private var task: Task<T, Error>?
+
+    func assign(_ task: Task<T, Error>) {
+      self.task?.cancel()
+      self.task = task
+    }
+
+    func getTask() -> Task<T, Error>? { task }
+
+    func await() async throws -> T {
+      guard let task = getTask() else { throw CancellationError() }
+
+      let result = await task.result
+
+      switch result {
+      case .success(let data):
+        return data
+      case .failure(let error):
+        guard case is CancellationError = error else { throw error }
+
+        return try await `await`()
+      }
+    }
+  }
 
   /// Specifies if this repository is in debug mode (generating debug logs).
   open var debugMode: Bool { kRepositoryDebugMode }
 
-  /// The current value of the data.
-  private var current: RepositoryData<DataType> = .notSynced
+  /// Specifies if this repository should automatically sync when data is
+  /// unavailable, i.e. upon instantiation or when invoking `get()`.
+  open var autoSync: Bool { true }
 
-  /// `DispatchQueue` for handling all asynchronous operations.
-  let queue: DispatchQueue
-
-  /// Serial `DispatchQueue` for accessing and modifying members synchronously,
-  /// ensuring thread- safety.
   let lockQueue: DispatchQueue
-
-  /// Identifier for the current sync job.
-  var syncIdentifier: String?
-
-  /// `DispatchWorkItem` for the sync operation.
-  var syncJob: DispatchWorkItem?
-
-  /// List of handlers to be invoked when the current running sync job is
-  /// complete.
-  var syncListeners: [(Result<DataType, Error>) -> Void] = []
+  private let synchronizer = Synchronizer()
+  private var state: RepositoryState<T> = .notSynced
 
   /// Creates a new `Repository` instance.
-  ///
-  /// - Parameters:
-  ///   - queue: The `DispatchQueue` to use for all asynchronous operations,
-  ///            defaults to a private concurrent queue with QoS `utility`.
-  public init(queue: DispatchQueue = .global(qos: .utility)) {
-    self.queue = queue
+  public init() {
     lockQueue = .init(label: "BaseKit.Repository.\(Self.self)", qos: .utility)
 
     if autoSync {
-      sync()
+      Task { try? await sync() }
     }
   }
 
-  /// Fetches the data in the repository and returns the `Result` containing the
-  /// data.
+  /// Pulls the data downstream.
   ///
-  /// If data is `nil` and `autoSync` is enabled, the repository will
-  /// attempt to sync the data from upstream sources, yielding a `Result` upon
-  /// completion.
+  /// This method implements how data is fetched from the data source(s).
   ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  public func get(completion: @escaping (Result<DataType, Error>) -> Void) {
-    switch getCurrent() {
-    case .synced(let value):
-      completion(.success(value))
+  /// - Returns: The resulting data.
+  open func pull() async throws -> T {
+    fatalError("<\(Self.self)> Subclass must override `pull()` without calling `super`.")
+  }
+
+  /// Returns the data in memory.
+  ///
+  /// If data has not been synced and `autoSync` is enabled, a sync will be
+  /// attempted and the synced data returned upon completion.
+  ///
+  /// - Throws: If data is not available.
+  public func get() async throws -> T {
+    log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data..."}
+
+    switch getState() {
+    case .synced(let data):
+      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
+
+      return data
     case .notSynced:
-      if autoSync {
-        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting stored value... SKIP: Repository not synced, proceeding to sync"}
+      guard autoSync else {
+        let err = error("Repository is not synced", domain: "BaseKit.Repository")
 
-        sync(completion: completion)
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(err)"}
+
+        throw err
       }
-      else {
-        let error = NSError(domain: "BaseKit.Repository", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "Repository is not synced",
-          NSLocalizedFailureErrorKey: "Repository is not synced"
-        ])
 
-        completion(.failure(error))
+      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... repository not synced, proceeding to sync"}
+
+      do {
+        let data = try await sync()
+
+        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
+
+        return data
+      }
+      catch {
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(error)"}
+
+        throw error
       }
     }
   }
 
-  /// Pulls data from all data sources, of which the resulting data will
-  /// overwrite the current data stored in memory and returned.
+  /// Synchronizes data across all data sources.
   ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  open func pull(completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
-    fatalError("<\(Self.self)> Subclass must override `pull(completion:)` without calling `super`.")
-  }
-
-  /// Synchronizes data across all data sources. In the case of a
-  /// `ReadOnlyRepository`, it is equivalent to a `pull`.
-  ///
-  /// Only one sync job can run at any given time. Until the running job is
+  /// Only one sync task can run at any given time. Until the running task is
   /// complete, subsequent invocations of this method will not trigger a new
-  /// job. Instead, the result of the running job will be passed to the
-  /// `completion` block when it finishes.
+  /// task. The callers of previous syncs will receive the result of the last
+  /// sync.
   ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  public func sync(completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
-    syncDownstream(completion: completion)
+  /// - Returns: The resulting data.
+  @discardableResult public func sync() async throws -> T {
+    await synchronizer.assign(createSyncTask())
+
+    return try await synchronizer.await()
   }
 
-  /// Synchronizes the data downstream.
-  ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  private func syncDownstream(completion: @escaping (Result<DataType, Error>) -> Void) {
-    let identifier = generateSyncIdentifier()
-
-    log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream (id=\(identifier))..." }
-
-    let workItem = DispatchWorkItem { [weak self] in
-      self?.pull { [weak self] result in
-        self?.didSyncDownstream(for: identifier, result: result)
-      }
-    }
-
-    lockQueue.sync {
-      self.syncListeners.append(completion)
-      self.syncJob = workItem
-      self.syncIdentifier = identifier
-    }
-
-    queue.async(execute: workItem)
+  func getState() -> RepositoryState<T> {
+    lockQueue.sync { state }
   }
 
-  /// Handler invoked when a downstream sync finishes.
-  ///
-  /// - Parameters:
-  ///   - identifier: The sync identifier.
-  ///   - result: The sync result.
-  private func didSyncDownstream(for identifier: String, result: Result<DataType, Error>) {
-    guard isSyncing(for: identifier) == true else {
-      log(.debug, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... SKIP: Operation cancelled, abandoning the current sync progress" }
-
-      return
-    }
-
-    switch result {
-    case .failure(let error):
-      log(.error, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... ERR: \(error)" }
-      setCurrent(.notSynced)
-    case .success(let data):
-      log(.debug, isEnabled: debugMode == true) { "<\(Self.self)> Syncing downstream (id=\(identifier))... OK: \(data)" }
-      setCurrent(.synced(data))
-    }
-
-    dispatchSyncResult(result)
-  }
-
-  /// Gets the current value synchronously.
-  ///
-  /// - Returns: The current value.
-  func getCurrent() -> RepositoryData<DataType> { lockQueue.sync { current } }
-
-  /// Sets the current value synchronously.
-  ///
-  /// - Parameters:
-  ///   - value: The value to set.
-  ///
-  /// - Returns: `true` if the value changed, `false` otherwise.
-  @discardableResult func setCurrent(_ value: RepositoryData<DataType>) -> Bool {
+  func setState(_ newValue: RepositoryState<T>) -> Bool {
     return lockQueue.sync {
-      guard current != value else { return false }
+      guard state != newValue else { return false }
 
-      current = value
-      emit(value)
+      state = newValue
+
+      notifyObservers {
+        switch state {
+        case .notSynced:
+          $0.repositoryDidFailToSyncData(self)
+        case .synced(let data):
+          $0.repository(self, dataDidChange: data)
+        }
+      }
 
       return true
     }
   }
 
-  /// Generates a new sync job identifier.
-  ///
-  /// - Returns: The sync identifier.
-  func generateSyncIdentifier() -> String { "\(DispatchTime.now().rawValue)" }
+  func createSyncTask() -> Task<T, Error> {
+    return Task {
+      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream..."}
 
-  /// Indicates if there exists a running sync job.
-  ///
-  /// - Returns: `true` if sync is in progress, `false` otherwise.
-  func isSyncing() -> Bool { lockQueue.sync { syncJob?.isCancelled == false } }
+      let result = await Task { try await pull() }.result
 
-  /// Indicates if there exists a running sync job for the specified identifier.
-  ///
-  /// - Parameters:
-  ///   - identifier: The sync identifier to check.
-  ///
-  /// - Returns: `true` if sync is in progress, `false` otherwise.
-  func isSyncing(for identifier: String) -> Bool { lockQueue.sync { syncJob?.isCancelled == false && syncIdentifier == identifier } }
-
-  /// Notifies listeners of a sync job result.
-  ///
-  /// - Parameters:
-  ///   - result: The `Result`.
-  func dispatchSyncResult(_ result: Result<DataType, Error>) {
-    queue.sync(flags: .barrier) {
-      lockQueue.sync {
-        self.syncListeners.forEach { $0(result) }
-
-        self.syncListeners = []
-        self.syncJob = nil
-        self.syncIdentifier = nil
+      do {
+        try Task.checkCancellation()
       }
-    }
-  }
+      catch {
+        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... CANCEL: Current sync has been overridden"}
 
-  /// Emits the current data to all observers.
-  ///
-  /// - Parameters:
-  ///   - value: The value to emit.
-  private func emit(_ value: RepositoryData<DataType>) {
-    notifyObservers { observer in
-      switch value {
-      case .notSynced:
-        observer.repositoryDidFailToSyncData(self)
-      case .synced(let data):
-        observer.repository(self, dataDidChange: data)
+        throw error
+      }
+
+      switch result {
+      case .success(let data):
+        let isDirty = setState(.synced(data))
+
+        if isDirty {
+          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... OK: \(data)" }
+        }
+        else {
+          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... SKIP: No changes" }
+        }
+
+        return data
+      case .failure(let error):
+        let _ = setState(.notSynced)
+
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... ERR: \(error)"}
+
+        throw error
       }
     }
   }

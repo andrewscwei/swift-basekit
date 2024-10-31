@@ -1,51 +1,40 @@
 import XCTest
 @testable import BaseKit
 
-class MockReadonlyDataSource: ReadOnlyDataSource {
+struct MockReadonlyDataSource: ReadOnlyDataSource {
   typealias DataType = String
 
-  private var value: DataType = "default-value"
+  private var value: DataType = "old"
 
-  func updateValue(newValue: DataType) {
+  mutating func updateValue(_ newValue: DataType) async throws {
     value = newValue
   }
 
-  @discardableResult func read() async throws -> String {
+  func read() async throws -> String {
     await delay(1.0)
 
-    return self.value
+    return value
   }
 }
 
 class MockReadOnlyRepository: ReadOnlyRepository<String> {
-  let dataSource = MockReadonlyDataSource()
+  var dataSource = MockReadonlyDataSource()
 
-  override func pull(completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task {
-      do {
-        let data = try await self.dataSource.read()
-
-        completion(.success(data))
-      }
-      catch {
-        completion(.failure(error))
-      }
-    }
-  }
+  override func pull() async throws -> String { try await dataSource.read() }
 }
 
-class MockReadWriteDataSource: ReadWriteDataSource {
+struct MockReadWriteDataSource: ReadWriteDataSource {
   typealias DataType = String
 
-  private var value: DataType = "default-value"
+  private var value: DataType = "old"
 
-  @discardableResult func read() async throws -> String {
+  func read() async throws -> String {
     await delay(1.0)
 
-    return self.value
+    return value
   }
 
-  @discardableResult func write(_ value: String) async throws -> String {
+  mutating func write(_ value: String) async throws -> String {
     await delay(1.0)
 
     self.value = value
@@ -57,101 +46,60 @@ class MockReadWriteDataSource: ReadWriteDataSource {
 class MockReadWriteRepository: ReadWriteRepository<String> {
   override var debugMode: Bool { true }
 
-  let dataSource = MockReadWriteDataSource()
+  var dataSource = MockReadWriteDataSource()
 
-  override func pull(completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task {
-      do {
-        let data = try await self.dataSource.read()
-        completion(.success(data))
-      }
-      catch {
-        completion(.failure(error))
-      }
-    }
+  override func pull() async throws -> String {
+    return try await dataSource.read()
   }
 
-  override func push(_ current: String, completion: @escaping (Result<String, Error>) -> Void = { _ in }) {
-    Task {
-      do {
-        let data = try await self.dataSource.write(current)
-        completion(.success(data))
-      }
-      catch {
-        completion(.failure(error))
-      }
-    }
+  override func push(_ data: String) async throws -> String {
+    return try await dataSource.write(data)
   }
 }
 
-class MockReadWriteDeleteDataSource: ReadWriteDeleteDataSource {
+struct MockReadWriteDeleteDataSource: ReadWriteDeleteDataSource {
   typealias DataType = String
 
-  private var value: String? = "default-value"
+  private var value: String? = "old"
 
-  @discardableResult func read() async throws -> String? {
+  func read() async throws -> String? {
     await delay(1.0)
 
-    if let value = self.value {
-      return value
-    }
-    else {
-      throw error()
-    }
+    guard let value = value else { throw error() }
+
+    return value
   }
 
-  @discardableResult func write(_ value: String) async throws -> String {
+  mutating func write(_ value: String?) async throws -> String? {
     await delay(1.0)
+
     self.value = value
 
     return value
   }
 
-  func delete() async throws {
+  mutating func delete() async throws {
     await delay(1.0)
 
-    if let _ = self.value {
-      self.value = nil
-    }
-    else {
-      throw error()
-    }
+    guard value != nil else { throw error() }
+
+    value = nil
   }
 }
 
 class MockReadWriteDeleteRepository: ReadWriteDeleteRepository<String> {
-  let dataSource = MockReadWriteDeleteDataSource()
+  var dataSource = MockReadWriteDeleteDataSource()
 
-  override func pull(completion: @escaping (Result<String?, Error>) -> Void = { _ in }) {
-    Task {
-      do {
-        let data = try await self.dataSource.read()
-        completion(.success(data))
-      }
-      catch {
-        completion(.failure(error))
-      }
+  override func pull() async throws -> String? { try await dataSource.read() }
+
+  override func push(_ data: String?) async throws -> String? {
+    if let data = data {
+      return try await dataSource.write(data)
     }
-  }
 
-  override func push(_ current: String?, completion: @escaping (Result<String?, Error>) -> Void = { _ in }) {
-    Task {
-      do {
-        if let current = current {
-          let data = try await self.dataSource.write(current)
+    try await dataSource.delete()
 
-          completion(.success(data))
-        }
-        else {
-          try await self.dataSource.delete()
-
-          completion(.success(nil))
-        }
-      }
-      catch {
-        completion(.failure(error))
-      }
-    }
+    return nil
   }
 }
 
@@ -185,23 +133,25 @@ class RepositoryTests: XCTestCase {
 
     let repo = MockReadOnlyRepository()
 
-    repo.get { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation1.fulfill()
     }
 
-    repo.get { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation2.fulfill()
     }
 
-    repo.dataSource.updateValue(newValue: "updated-value")
+    Task {
+      try await repo.dataSource.updateValue("new")
+    }
 
-    repo.get { result in
-      XCTAssertTrue(result.isSuccess)
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation3.fulfill()
     }
 
@@ -215,20 +165,23 @@ class RepositoryTests: XCTestCase {
 
     let repo = MockReadWriteRepository()
 
-    repo.get { result in
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation1.fulfill()
     }
 
-    XCTAssertEqual(repo.getCurrent(), .notSynced)
+    XCTAssertEqual(repo.getState(), .notSynced)
 
-    repo.set("updated-value") { result in
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.set("new")
+      XCTAssertEqual(result, "new")
       expectation2.fulfill()
     }
 
-    repo.get { result in
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation3.fulfill()
     }
 
@@ -244,41 +197,41 @@ class RepositoryTests: XCTestCase {
 
     let repo = MockReadWriteDeleteRepository()
 
-    repo.get { result in
-      XCTAssertEqual(try? result.get(), "updated-value")
+    XCTAssertEqual(repo.getState(), .notSynced)
+
+    Task {
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
       expectation1.fulfill()
     }
 
-    repo.set("updated-value") { result in
-      XCTAssertEqual(try? result.get(), "updated-value")
+    Task {
+      let result = try await repo.set("new")
+      XCTAssertEqual(result, "new")
       expectation2.fulfill()
     }
 
     Task {
       await delay(2.0)
 
-      repo.get { result in
-        XCTAssertEqual(try? result.get(), "updated-value")
-        expectation3.fulfill()
-      }
+      let result = try await repo.get()
+      XCTAssertEqual(result, "new")
+      expectation3.fulfill()
     }
 
     Task {
       await delay(3.0)
 
-      repo.delete { result in
-        XCTAssertTrue(result.isSuccess)
-        expectation4.fulfill()
-      }
+      try await repo.delete()
+      expectation4.fulfill()
     }
 
     Task {
       await delay(4.0)
 
-      repo.get { result in
-        XCTAssertEqual(try? result.get(), nil)
-        expectation5.fulfill()
-      }
+      let result = try await repo.get()
+      XCTAssertEqual(result, nil)
+      expectation5.fulfill()
     }
 
     wait(for: [expectation1, expectation2, expectation3, expectation4, expectation5], timeout: 5.0)
@@ -298,15 +251,21 @@ class RepositoryTests: XCTestCase {
     readWriteRepository.addObserver(observer)
     readWriteDeleteRepository.addObserver(observer)
 
-    readOnlyRepository.get { result in
+    Task {
+      let result = try await readOnlyRepository.get()
+      XCTAssertEqual(result, "old")
       expectation1.fulfill()
     }
 
-    readWriteRepository.set("rw-value") { result in
+    Task {
+      let result = try await readWriteRepository.set("new")
+      XCTAssertEqual(result, "new")
       expectation2.fulfill()
     }
 
-    readWriteDeleteRepository.set("rwd-value") { result in
+    Task {
+      let result = try await readWriteDeleteRepository.set("new")
+      XCTAssertEqual(result, "new")
       expectation3.fulfill()
     }
 

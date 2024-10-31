@@ -2,164 +2,99 @@ import Foundation
 
 /// An abstract class for a read/write `Repository`.
 open class ReadWriteRepository<T: Codable & Equatable>: Repository<T> {
-  /// Specifies if the data stored in memory has changed since the last sync.
   private var isDirty: Bool = false
 
-  /// Synchronously gets the value of `isDirty`.
+  /// Pushes the data upstream.
   ///
-  /// - Returns: The `isDirty` value.
-  func getIsDirty() -> Bool { lockQueue.sync { isDirty } }
-
-  /// Synchronously sets the value of `isDirty`.
+  /// This method implements how data is pushed to the data source(s).
   ///
   /// - Parameters:
-  ///   - value: The value.
-  func setIsDirty(_ value: Bool) {
-    lockQueue.sync {
-      isDirty = value
-    }
+  ///   - data: The data to push.
+  open func push(_ data: T) async throws -> T {
+    fatalError("<\(Self.self)> Subclass must override `push(_:)` without calling `super`.")
   }
 
-  /// Sets the data in memory, putting the repository in a dirty state. If
-  /// `autoSync` is `true`, sync will follow immediately.
+  /// Sets the data in memory. If `autoSync` is `true`, an upstream sync will
+  /// follow immediately.
   ///
   /// - Parameters:
-  ///   - value: The value to set.
-  ///   - completion: Handler invoked upon completion.
-  public func set(_ value: DataType, completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
-    setIsDirty(setCurrent(.synced(value)))
+  ///   - data: The data to set.
+  @discardableResult public func set(_ data: T) async throws -> T {
+    log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"..."}
 
-    if getIsDirty(), autoSync {
-      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting value to \"\(value)\"... OK: Proceeding to sync"}
-      self.sync { result in
-        switch result {
-        case .failure(let error): completion(.failure(error))
-        case .success: completion(.success(value))
-        }
+    let isDirty = setState(.synced(data))
+
+    setIsDirty(isDirty)
+
+    if isDirty {
+      guard autoSync else {
+        log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... OK"}
+
+        return data
+      }
+
+      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... proceeding to sync"}
+
+      do {
+        let data = try await sync()
+
+        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... OK"}
+
+        return data
+      }
+      catch {
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... ERR: \(error)"}
+
+        throw error
       }
     }
     else {
-      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting value to \"\(value)\"... SKIP: No change"}
-      completion(.success(value))
+      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... SKIP: No change"}
+
+      return data
     }
   }
 
-  /// Pushes the current data stored in memory to all data sources.
-  ///
-  /// - Parameters:
-  ///   - current: The current value of the data.
-  ///   - completion: Handler invoked upon completion.
-  open func push(_ current: DataType, completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
-    fatalError("<\(Self.self)> Subclass must override `push(_:completion:)` without calling `super`.")
-  }
+  private func setIsDirty(_ value: Bool) { lockQueue.sync { isDirty = value } }
 
-  /// Synchronizes the data across all data sources according to the following
-  /// conditions:
-  ///   1. If the repository is not dirty (meaning that the data in memory has
-  ///      not been changed externally), simply invoke a `pull`.
-  ///   2. If the repository is dirty (data in memory has been changed
-  ///      externally via `set`), invoke a `push`, consequently marking the
-  ///      repository as no longer dirty.
-  ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  public override func sync(completion: @escaping (Result<DataType, Error>) -> Void = { _ in }) {
-    if !getIsDirty() {
-      super.sync(completion: completion)
-    }
-    else {
-      syncUpstream(completion: completion)
-    }
-  }
+  private func getIsDirty() -> Bool { lockQueue.sync { isDirty } }
 
-  /// Synchronizes the data upstream (akin to a push).
-  ///
-  /// - Parameters:
-  ///   - completion: Handler invoked upon completion.
-  private func syncUpstream(completion: @escaping (Result<DataType, Error>) -> Void) {
-    syncJob?.cancel()
-    syncListeners.append(completion)
+  override func createSyncTask() -> Task<T, any Error> {
+    guard getIsDirty() else { return super.createSyncTask() }
 
-    let identifier = generateSyncIdentifier()
+    return Task {
+      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream..." }
 
-    let workItem = DispatchWorkItem { [weak self] in
-      guard let current = self?.getCurrent() else { return }
-
-      log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"..." }
-
-      switch current {
+      switch getState() {
       case .notSynced:
-        log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... ERR: Nothing to sync" }
-        self?.dispatchSyncResult(.failure(NSError(domain: "BaseKit.ReadWriteRepository", code: 0, userInfo: [
-          NSLocalizedDescriptionKey: "Repository is not synced",
-          NSLocalizedFailureErrorKey: "Repository is not synced"
-        ])))
-        return
-      case .synced(let value):
-        self?.push(value) { [weak self] result in
-          switch result {
-          case .failure(let error): log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value <\(value)> to data sources (id=\(identifier))...ERR: \(error)" }
-          case .success: log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value <\(value)> to data sources (id=\(identifier))... OK" }
-          }
+        log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: Nothing to sync" }
 
-          self?.didSyncUpstream(identifier: identifier, result: result, completion: { [weak self] result in
-            guard self?.isSyncing(for: identifier) == true else {
-              log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... CANCEL: Operation cancelled, abandoning the current sync progress" }
-              return
-            }
+        throw error("Repository is not synced", domain: "BaseKit.Repository")
+      case .synced(let data):
+        let result = await Task { try await push(data) }.result
 
-            switch result {
-            case .failure(let error): log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... ERR: \(error)" }
-            case .success(let data): log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier)) with value \"\(current)\"... OK: \(data)" }
-            }
+        do {
+          try Task.checkCancellation()
+        }
+        catch {
+          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... CANCEL: Current sync has been overridden" }
 
-            self?.dispatchSyncResult(result)
-          })
+          throw error
+        }
+
+        switch result {
+        case .success(let newData):
+          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... OK: \(newData)" }
+
+          setIsDirty(false)
+
+          return newData
+        case .failure(let error):
+          log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: \(error)" }
+
+          throw error
         }
       }
     }
-
-    syncJob = workItem
-    syncIdentifier = identifier
-    queue.async(execute: workItem)
   }
-
-  /// Handler invoked after an upstream sync. The `completion` block must be
-  /// invoked to complete the sync process.
-  ///
-  /// - Parameters:
-  ///   - identifier: The sync identifier.
-  ///   - result: The synced result.
-  ///   - completion: Handler invoked upon completion.
-  func didSyncUpstream(identifier: String, result: Result<DataType, Error>, completion: @escaping (Result<T, Error>) -> Void) {
-    setIsDirty(false)
-    completion(result)
-  }
-
-//  override func didSyncDownstream(for identifier: String, result: Result<DataType, Error>) {
-//    switch result {
-//    case .failure:
-//      setCurrent(.notSynced)
-//      completion(result)
-//    case .success(let value):
-//      if setCurrent(.synced(value)) {
-//        push(value) { [weak self] result in
-//          switch result {
-//          case .failure(let error): log(.error, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... ERR: \(error)" }
-//          case .success: log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Pushing value \"\(value)\" to data sources... OK" }
-//          }
-//
-//          guard self?.isSyncing(for: identifier) == true else {
-//            log(.debug, isEnabled: self?.debugMode == true) { "<\(Self.self)> Syncing upstream (id=\(identifier))... CANCEL: Operation cancelled, abandoning the current sync progress" }
-//            return
-//          }
-//
-//          completion(result)
-//        }
-//      }
-//      else {
-//        completion(result)
-//      }
-//    }
-//  }
 }
