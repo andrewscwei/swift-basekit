@@ -17,7 +17,8 @@ public class TemporaryFile {
   ///          period).
   public init(_ baseName: String = UUID().uuidString, extension ext: String) {
     self.url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(baseName).appendingPathExtension(ext)
-    log(.debug) { "Creating a temporary file at \(self.url.absoluteString)... OK" }
+
+    log.debug("Creating a temporary file at \(self.url.absoluteString)... OK")
   }
 
   /// Deinitializes this object, subsequently removes its associated file from
@@ -29,10 +30,10 @@ public class TemporaryFile {
     DispatchQueue.global(qos: .utility).async { [url = self.url] in
       do {
         try FileManager.default.removeItem(at: url)
-        log(.debug) { "Destroying temporary file at \(path)... OK" }
+        log.debug("Destroying temporary file at \(path)... OK")
       }
       catch let error {
-        log(.error) { "Destroying temporary file at \(path)... ERR: \(error.localizedDescription)" }
+        log.error("Destroying temporary file at \(path)... ERR: \(error.localizedDescription)")
       }
     }
   }
