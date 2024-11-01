@@ -18,11 +18,11 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
   ///
   /// - Throws: If data is not available.
   public func get() async throws -> T {
-    log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data..."}
+    _log.debug("<\(Self.self)> Getting data...")
 
     switch getState() {
     case .synced(let data):
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
+      _log.debug("<\(Self.self)> Getting data... OK: \(data)")
 
       return data
     case .notSynced(let data):
@@ -30,7 +30,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
         fallthrough
       }
       else {
-        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
+        _log.debug("<\(Self.self)> Getting data... OK: \(data)")
 
         return data
       }
@@ -38,22 +38,22 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
       guard autoSync else {
         let error = error("Repository is not synced", domain: "BaseKit.Repository")
 
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(error)"}
+        _log.error("<\(Self.self)> Getting data... ERR: \(error)")
 
         throw RepositoryError.invalidRead(cause: error)
       }
 
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... repository not synced, proceeding to sync"}
+      _log.debug("<\(Self.self)> Getting data... repository not synced, proceeding to sync")
 
       do {
         let data = try await sync()
 
-        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Getting data... OK: \(data)"}
+        _log.debug("<\(Self.self)> Getting data... OK: \(data)")
 
         return data
       }
       catch {
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Getting data... ERR: \(error)"}
+        _log.error("<\(Self.self)> Getting data... ERR: \(error)")
 
         throw RepositoryError.invalidRead(cause: error)
       }
@@ -62,7 +62,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
 
   override func createSyncTask() -> Task<T, any Error> {
     return Task {
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream..."}
+      _log.debug("<\(Self.self)> Syncing downstream...")
 
       let result = await Task { try await pull() }.result
 
@@ -70,7 +70,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
         try Task.checkCancellation()
       }
       catch {
-        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... CANCEL: Current sync has been overridden"}
+        _log.debug("<\(Self.self)> Syncing downstream... CANCEL: Current sync has been overridden")
 
         throw error
       }
@@ -80,10 +80,10 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
         let isDirty = setState(.synced(data))
 
         if isDirty {
-          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... OK: \(data)" }
+          _log.debug("<\(Self.self)> Syncing downstream... OK: \(data)")
         }
         else {
-          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... SKIP: No changes" }
+          _log.debug("<\(Self.self)> Syncing downstream... SKIP: No changes")
         }
 
         return data
@@ -92,7 +92,7 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
           setState(.notSynced(data))
         }
 
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing downstream... ERR: \(error)"}
+        _log.error("<\(Self.self)> Syncing downstream... ERR: \(error)")
 
         throw RepositoryError.invalidSync(cause: error)
       }

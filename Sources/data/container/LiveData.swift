@@ -9,8 +9,6 @@ import Foundation
 public class LiveData<T: Equatable>: CustomStringConvertible {
   public typealias Listener = (T?) -> Void
 
-  public var debug: Bool = false
-
   let lockQueue: DispatchQueue = DispatchQueue(label: "BaseKit.LiveData<\(T.self)>", qos: .utility)
   var listeners: [AnyHashable: Listener] = [:]
   var currentValue: T?
@@ -24,7 +22,9 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
       guard value != newValue else { return }
 
       lockQueue.sync { currentValue = newValue }
-      log(.debug, isEnabled: debug) { "[LiveData<\(T.self)>] Updating value... OK: \(newValue.map { "\($0)" } ?? "nil")" }
+
+      _log.debug("[LiveData<\(T.self)>] Updating value... OK: \(newValue.map { "\($0)" } ?? "nil")")
+
       emit()
     }
   }
@@ -73,7 +73,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   public init(_ getValue: @escaping () async -> T) {
     currentValue = nil
 
-    Task.detached {
+    Task {
       self.value = await getValue()
     }
   }
@@ -88,7 +88,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
   public init(_ getValue: @escaping () async throws -> T) {
     currentValue = nil
 
-    Task.detached {
+    Task {
       self.value = try? await getValue()
     }
   }

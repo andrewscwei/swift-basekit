@@ -31,10 +31,10 @@ public final class PersistentContainer {
         NSMigratePersistentStoresAutomaticallyOption: true,
       ])
 
-      log.info("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK")
+      _log.info("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK")
     }
     catch {
-      log.error("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... ERR: \(error)")
+      _log.error("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... ERR: \(error)")
     }
 
     return coordinator
@@ -53,12 +53,12 @@ public final class PersistentContainer {
   /// The `NSManagedObjectModel` for the application.
   private lazy var model: NSManagedObjectModel = {
     guard let modelURL = modelURL else {
-      log.fault("Loading Core Data model... ERR: Unable to evaluate file URL of Core Data model")
+      _log.fault("Loading Core Data model... ERR: Unable to evaluate file URL of Core Data model")
       abort()
     }
 
     guard let model = NSManagedObjectModel(contentsOf: modelURL) else {
-      log.fault("Loading Core Data model... ERR: Unable to create Core Data model at URL \(modelURL)")
+      _log.fault("Loading Core Data model... ERR: Unable to create Core Data model at URL \(modelURL)")
       abort()
     }
 
