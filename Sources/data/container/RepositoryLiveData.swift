@@ -44,7 +44,7 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     switch repository.getState() {
     case .synced(let value), .notSynced(let value):
       currentValue = transform(value, currentValue)
-    case .idle:
+    case .initial:
       currentValue = nil
 
       Task { try await sync() }

@@ -4,7 +4,7 @@ import Foundation
 enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomStringConvertible {
 
   /// `Repository` is initialzed but never synced, data is not available yet.
-  case idle
+  case initial
 
   /// `Repository` is synced with data.
   case synced(T)
@@ -14,7 +14,7 @@ enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomString
 
   var description: String {
     switch self {
-    case .idle: return "idle"
+    case .initial: return "initial"
     case .synced(let data): return "synced(\(data))"
     case .notSynced(let data): return "notSynced(\(data))"
     }
@@ -22,7 +22,7 @@ enum RepositoryState<T: Codable & Equatable & Sendable>: Equatable, CustomString
 
   static func == (lhs: RepositoryState, rhs: RepositoryState) -> Bool {
     switch lhs {
-    case .idle: if case .idle = rhs { return true }
+    case .initial: if case .initial = rhs { return true }
     case .synced(let lhv): if case .synced(let rhv) = rhs, lhv == rhv { return true }
     case .notSynced(let lhv): if case .notSynced(let rhv) = rhs, lhv == rhv { return true }
     }

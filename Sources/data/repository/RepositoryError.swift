@@ -1,11 +1,5 @@
 /// A type of `Error` thrown by `Repository` types.
 public enum RepositoryError: Error {
-  /// The repository is not implemented according to specs.
-  case badImplementation(reason: String)
-
-  /// Sync task is `nil`.
-  case syncTaskNotFound
-
   /// An error occurred during sync.
   case invalidSync(cause: Error?)
 
