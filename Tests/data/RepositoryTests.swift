@@ -44,8 +44,6 @@ struct MockReadWriteDataSource: ReadWriteDataSource {
 }
 
 class MockReadWriteRepository: ReadWriteRepository<String> {
-  override var debugMode: Bool { true }
-
   var dataSource = MockReadWriteDataSource()
 
   override func pull() async throws -> String {

@@ -34,9 +34,6 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
     }
   }
 
-  /// Specifies if this repository is in debug mode (generating debug logs).
-  open var debugMode: Bool { false }
-
   /// Specifies if this repository should automatically sync when data is
   /// unavailable, i.e. upon instantiation or when invoking `get()`.
   open var autoSync: Bool { true }

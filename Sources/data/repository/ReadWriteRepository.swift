@@ -20,7 +20,7 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
   /// - Parameters:
   ///   - data: The data to set.
   @discardableResult public func set(_ data: T) async throws -> T {
-    log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"..."}
+    _log.debug("<\(Self.self)> Setting data to \"\(data)\"...")
 
     let isDirty = setState(.synced(data))
 
@@ -28,28 +28,28 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
 
     if isDirty {
       guard autoSync else {
-        log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... OK"}
+        _log.debug("<\(Self.self)> Setting data to \"\(data)\"... OK")
 
         return data
       }
 
-      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... proceeding to sync"}
+      _log.debug("<\(Self.self)> Setting data to \"\(data)\"... proceeding to sync")
 
       do {
         let data = try await sync()
 
-        log(.debug, isEnabled: debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... OK"}
+        _log.debug("<\(Self.self)> Setting data to \"\(data)\"... OK")
 
         return data
       }
       catch {
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... ERR: \(error)"}
+        _log.error("<\(Self.self)> Setting data to \"\(data)\"... ERR: \(error)")
 
         throw RepositoryError.invalidWrite(cause: error)
       }
     }
     else {
-      log(.debug, isEnabled: self.debugMode) { "<\(Self.self)> Setting data to \"\(data)\"... SKIP: No change"}
+      _log.debug("<\(Self.self)> Setting data to \"\(data)\"... SKIP: No change")
 
       return data
     }
@@ -63,11 +63,11 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
     guard getIsDirty() else { return super.createSyncTask() }
 
     return Task {
-      log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream..." }
+      _log.debug("<\(Self.self)> Syncing upstream...")
 
       switch getState() {
       case .idle:
-        log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: Nothing to sync" }
+        _log.error("<\(Self.self)> Syncing upstream... ERR: Nothing to sync")
 
         throw RepositoryError.invalidSync
       case .synced(let data), .notSynced(let data):
@@ -77,20 +77,20 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
           try Task.checkCancellation()
         }
         catch {
-          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... CANCEL: Current sync has been overridden" }
+          _log.debug("<\(Self.self)> Syncing upstream... CANCEL: Current sync has been overridden")
 
           throw error
         }
 
         switch result {
         case .success(let newData):
-          log(.debug, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... OK: \(newData)" }
+          _log.debug("<\(Self.self)> Syncing upstream... OK: \(newData)")
 
           setIsDirty(false)
 
           return newData
         case .failure(let error):
-          log(.error, isEnabled: debugMode) { "<\(Self.self)> Syncing upstream... ERR: \(error)" }
+          _log.error("<\(Self.self)> Syncing upstream... ERR: \(error)")
 
           throw RepositoryError.invalidSync(cause: error)
         }
