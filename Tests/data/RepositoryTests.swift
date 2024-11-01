@@ -169,7 +169,7 @@ class RepositoryTests: XCTestCase {
       expectation1.fulfill()
     }
 
-    XCTAssertEqual(repo.getState(), .idle)
+    XCTAssertEqual(repo.getState(), .initial)
 
     Task {
       let result = try await repo.set("new")
@@ -195,7 +195,7 @@ class RepositoryTests: XCTestCase {
 
     let repo = MockReadWriteDeleteRepository()
 
-    XCTAssertEqual(repo.getState(), .idle)
+    XCTAssertEqual(repo.getState(), .initial)
 
     Task {
       let result = try await repo.get()

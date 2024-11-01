@@ -11,7 +11,7 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
   /// - Parameters:
   ///   - data: The data to push.
   open func push(_ data: T) async throws -> T {
-    throw RepositoryError.badImplementation(reason: "<\(Self.self)> Subclass must override `push(_:)` without calling `super`")
+    fatalError("<\(Self.self)> Subclass must override `push(_:)` without calling `super`")
   }
 
   /// Sets the data in memory. If `autoSync` is `true`, an upstream sync will
@@ -66,7 +66,7 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
       _log.debug("<\(Self.self)> Syncing upstream...")
 
       switch getState() {
-      case .idle:
+      case .initial:
         _log.error("<\(Self.self)> Syncing upstream... ERR: Nothing to sync")
 
         throw RepositoryError.invalidSync

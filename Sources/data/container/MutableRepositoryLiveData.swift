@@ -111,7 +111,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
     if let repository = repository as? ReadWriteDeleteRepository<R> {
       if let newValue = newValue {
         switch repository.getState() {
-        case .idle:
+        case .initial:
           Task {
             try await repository.set(reverseTransform(newValue, nil))
           }
@@ -130,7 +130,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
     else if let repository = repository as? ReadWriteRepository<R> {
       if let newValue = newValue {
         switch repository.getState() {
-        case .idle:
+        case .initial:
           Task {
             try await repository.set(reverseTransform(newValue, nil))
           }

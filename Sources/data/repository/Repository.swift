@@ -11,25 +11,24 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   private actor Synchronizer {
     private var task: Task<T, Error>?
 
-    func assign(_ task: Task<T, Error>) {
+    func assignTask(_ task: Task<T, Error>) {
       self.task?.cancel()
       self.task = task
     }
 
     func getTask() -> Task<T, Error>? { task }
 
-    func await() async throws -> T {
-      guard let task = getTask() else { throw RepositoryError.syncTaskNotFound }
+    func awaitTask() async throws -> T {
+      guard let task = getTask() else { throw RepositoryError.invalidSync }
 
-      let result = await task.result
-
-      switch result {
-      case .success(let data):
-        return data
-      case .failure(let error):
-        guard case is CancellationError = error else { throw RepositoryError.invalidSync(cause: error) }
-
-        return try await `await`()
+      do {
+        return try await task.value
+      }
+      catch is CancellationError {
+        return try await awaitTask()
+      }
+      catch {
+        throw RepositoryError.invalidSync(cause: error)
       }
     }
   }
@@ -40,7 +39,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
   let lockQueue: DispatchQueue
   private let synchronizer = Synchronizer()
-  private var state: RepositoryState<T> = .idle
+  private var state: RepositoryState<T> = .initial
 
   /// Creates a new `Repository` instance.
   public init() {
@@ -60,9 +59,9 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   ///
   /// - Returns: The resulting data.
   @discardableResult public func sync() async throws -> T {
-    await synchronizer.assign(createSyncTask())
+    await synchronizer.assignTask(createSyncTask())
 
-    return try await synchronizer.await()
+    return try await synchronizer.awaitTask()
   }
 
   func getState() -> RepositoryState<T> {
@@ -77,7 +76,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
       notifyObservers {
         switch state {
-        case .idle:
+        case .initial:
           $0.repositoryDidFailToSyncData(self)
         case .synced(let data), .notSynced(let data):
           $0.repository(self, dataDidChange: data)
@@ -90,7 +89,7 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
   func createSyncTask() -> Task<T, Error> {
     return Task {
-      throw RepositoryError.badImplementation(reason: "<\(Self.self)> Subclasses must override `createSyncTask()`")
+      fatalError("<\(Self.self)> Subclasses must override `createSyncTask()`")
     }
   }
 }
