@@ -9,7 +9,7 @@ open class ReadWriteDeleteRepository<T: Codable & Equatable & Sendable>: ReadWri
       try await set(nil)
     }
     catch {
-      throw RepositoryError.invalidateDelete(cause: error)
+      throw RepositoryError.invalidDelete(cause: error)
     }
   }
 }

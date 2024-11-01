@@ -110,13 +110,11 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
   public func setValue(_ newValue: T?) throws {
     if let repository = repository as? ReadWriteDeleteRepository<R> {
       if let newValue = newValue {
-        switch repository.getState() {
-        case .initial:
-          Task {
+        Task {
+          switch await repository.getState() {
+          case .initial:
             try await repository.set(reverseTransform(newValue, nil))
-          }
-        case .synced(let data), .notSynced(let data):
-          Task {
+          case .synced(let data), .notSynced(let data):
             try await repository.set(reverseTransform(newValue, data))
           }
         }
@@ -129,13 +127,11 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
     }
     else if let repository = repository as? ReadWriteRepository<R> {
       if let newValue = newValue {
-        switch repository.getState() {
-        case .initial:
-          Task {
+        Task {
+          switch await repository.getState() {
+          case .initial:
             try await repository.set(reverseTransform(newValue, nil))
-          }
-        case .synced(let data), .notSynced(let data):
-          Task {
+          case .synced(let data), .notSynced(let data):
             try await repository.set(reverseTransform(newValue, data))
           }
         }

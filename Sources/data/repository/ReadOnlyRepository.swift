@@ -18,81 +18,69 @@ open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> 
   ///
   /// - Throws: If data is not available.
   public func get() async throws -> T {
-    _log.debug("<\(Self.self)> Getting data...")
+    let identifier = "GET-\(UUID().uuidString)"
 
-    switch getState() {
-    case .synced(let data):
-      _log.debug("<\(Self.self)> Getting data... OK: \(data)")
+    _log.debug("<\(Self.self):\(identifier)> Getting data...")
+
+    switch await getState() {
+    case .synced(let data),
+        .notSynced(let data):
+      _log.debug("<\(Self.self):\(identifier)> Getting data... OK: \(data)")
 
       return data
-    case .notSynced(let data):
-      if autoSync {
-        fallthrough
-      }
-      else {
-        _log.debug("<\(Self.self)> Getting data... OK: \(data)")
-
-        return data
-      }
     case .initial:
       guard autoSync else {
         let error = error("Repository is not synced", domain: "BaseKit.Repository")
 
-        _log.error("<\(Self.self)> Getting data... ERR: \(error)")
+        _log.error("<\(Self.self):\(identifier)> Getting data... ERR: \(error)")
 
         throw RepositoryError.invalidRead(cause: error)
       }
 
-      _log.debug("<\(Self.self)> Getting data... repository not synced, proceeding to sync")
+      _log.debug("<\(Self.self):\(identifier)> Getting data... repository not synced, proceeding to auto sync")
 
       do {
-        let data = try await sync()
+        let data = try await sync(identifier: identifier)
 
-        _log.debug("<\(Self.self)> Getting data... OK: \(data)")
+        _log.debug("<\(Self.self):\(identifier)> Getting data... OK: \(data)")
 
         return data
       }
       catch {
-        _log.error("<\(Self.self)> Getting data... ERR: \(error)")
+        _log.error("<\(Self.self):\(identifier)> Getting data... ERR: \(error)")
 
         throw RepositoryError.invalidRead(cause: error)
       }
     }
   }
 
-  override func createSyncTask() -> Task<T, any Error> {
-    return Task {
-      _log.debug("<\(Self.self)> Syncing downstream...")
+  override func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, any Error> {
+    Task {
+      _log.debug("<\(Self.self):\(identifier)> Syncing downstream...")
 
-      let result = await Task { try await pull() }.result
+      let subtask = Task { try await pull() }
+      let result = await subtask.result
 
-      do {
-        try Task.checkCancellation()
-      }
-      catch {
-        _log.debug("<\(Self.self)> Syncing downstream... CANCEL: Current sync has been overridden")
+      guard !Task.isCancelled else {
+        _log.debug("<\(Self.self):\(identifier)> Syncing downstream... CANCEL: Sync task has been overridden")
 
-        throw error
+        throw CancellationError()
       }
 
       switch result {
       case .success(let data):
-        let isDirty = setState(.synced(data))
-
-        if isDirty {
-          _log.debug("<\(Self.self)> Syncing downstream... OK: \(data)")
-        }
-        else {
-          _log.debug("<\(Self.self)> Syncing downstream... SKIP: No changes")
-        }
+        _log.debug("<\(Self.self):\(identifier)> Syncing downstream... OK: \(data)")
 
         return data
       case .failure(let error):
-        if case let .synced(data) = getState() {
-          setState(.notSynced(data))
+        switch state {
+        case .synced(let data):
+          await setState(.notSynced(data))
+        default:
+          break
         }
 
-        _log.error("<\(Self.self)> Syncing downstream... ERR: \(error)")
+        _log.error("<\(Self.self):\(identifier)> Syncing downstream... ERR: \(error)")
 
         throw RepositoryError.invalidSync(cause: error)
       }

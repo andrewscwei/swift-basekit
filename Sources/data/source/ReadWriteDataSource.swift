@@ -4,6 +4,9 @@ import Foundation
 public protocol ReadWriteDataSource: ReadOnlyDataSource {
   /// Writes data to the data source.
   ///
+  /// - Parameters:
+  ///   - data: The data to write.
+  ///
   /// - Returns: The written data.
-  mutating func write(_ value: DataType) async throws -> DataType
+  mutating func write(_ data: DataType) async throws -> DataType
 }

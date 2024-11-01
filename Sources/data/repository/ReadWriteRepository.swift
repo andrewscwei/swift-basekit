@@ -19,82 +19,72 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
   ///
   /// - Parameters:
   ///   - data: The data to set.
-  @discardableResult public func set(_ data: T) async throws -> T {
-    _log.debug("<\(Self.self)> Setting data to \"\(data)\"...")
+  @discardableResult public func set(_ newValue: T) async throws -> T {
+    let identifier = "SET-\(UUID().uuidString)"
 
-    let isDirty = setState(.synced(data))
+    _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"...")
 
-    setIsDirty(isDirty)
+    if case .synced(let data) = await getState(), data == newValue {
+      _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(data)\"... SKIP: No change")
 
-    if isDirty {
-      guard autoSync else {
-        _log.debug("<\(Self.self)> Setting data to \"\(data)\"... OK")
+      return data
+    }
 
-        return data
-      }
+    await setState(.notSynced(newValue))
 
-      _log.debug("<\(Self.self)> Setting data to \"\(data)\"... proceeding to sync")
+    if autoSync {
+      _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... proceeding to auto sync")
 
       do {
-        let data = try await sync()
+        let data = try await sync(identifier: identifier)
 
-        _log.debug("<\(Self.self)> Setting data to \"\(data)\"... OK")
+        _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... OK")
 
         return data
       }
       catch {
-        _log.error("<\(Self.self)> Setting data to \"\(data)\"... ERR: \(error)")
+        _log.error("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... ERR: \(error)")
 
         throw RepositoryError.invalidWrite(cause: error)
       }
     }
     else {
-      _log.debug("<\(Self.self)> Setting data to \"\(data)\"... SKIP: No change")
+      _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... OK")
 
-      return data
+      return newValue
     }
   }
 
-  private func setIsDirty(_ value: Bool) { lockQueue.sync { isDirty = value } }
+  override func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, any Error> {
+    switch state {
+    case .notSynced(let data):
+      return Task {
+        _log.debug("<\(Self.self):\(identifier)> Syncing upstream...")
 
-  private func getIsDirty() -> Bool { lockQueue.sync { isDirty } }
+        let subtask = Task { try await push(data) }
+        let result = await subtask.result
 
-  override func createSyncTask() -> Task<T, any Error> {
-    guard getIsDirty() else { return super.createSyncTask() }
+        guard !Task.isCancelled else {
+          _log.debug("<\(Self.self):\(identifier)> Syncing upstream... CANCEL: Current sync has been overridden")
 
-    return Task {
-      _log.debug("<\(Self.self)> Syncing upstream...")
-
-      switch getState() {
-      case .initial:
-        _log.error("<\(Self.self)> Syncing upstream... ERR: Nothing to sync")
-
-        throw RepositoryError.invalidSync
-      case .synced(let data), .notSynced(let data):
-        let result = await Task { try await push(data) }.result
-
-        do {
-          try Task.checkCancellation()
-        }
-        catch {
-          _log.debug("<\(Self.self)> Syncing upstream... CANCEL: Current sync has been overridden")
-
-          throw error
+          throw CancellationError()
         }
 
         switch result {
         case .success(let newData):
-          _log.debug("<\(Self.self)> Syncing upstream... OK: \(newData)")
+          _log.debug("<\(Self.self):\(identifier)> Syncing upstream... OK: \(newData)")
 
-          setIsDirty(false)
+          await setState(.synced(newData))
 
           return newData
         case .failure(let error):
-          _log.error("<\(Self.self)> Syncing upstream... ERR: \(error)")
+          _log.error("<\(Self.self):\(identifier)> Syncing upstream... ERR: \(error)")
 
           throw RepositoryError.invalidSync(cause: error)
         }
       }
+    default:
+      return super.createSyncTask(for: state, identifier: identifier)
     }
   }
 }
