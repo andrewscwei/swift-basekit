@@ -10,7 +10,7 @@ public enum RepositoryError: Error {
   case invalidWrite(cause: Error)
 
   /// There is an error deleting from the data source.
-  case invalidateDelete(cause: Error)
+  case invalidDelete(cause: Error)
 
   public static let invalidSync: RepositoryError = .invalidSync(cause: nil)
 }

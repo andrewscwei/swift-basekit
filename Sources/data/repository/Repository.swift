@@ -10,22 +10,25 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
 
   private actor Synchronizer {
     private var task: Task<T, Error>?
+    private(set) var state: RepositoryState<T> = .initial
 
-    func assignTask(_ task: Task<T, Error>) {
-      self.task?.cancel()
-      self.task = task
+    func setState(_ newValue: RepositoryState<T>) {
+      state = newValue
     }
 
-    func getTask() -> Task<T, Error>? { task }
+    func assignTask(_ newTask: Task<T, Error>) {
+      task?.cancel()
+      task = newTask
+    }
 
-    func awaitTask() async throws -> T {
-      guard let task = getTask() else { throw RepositoryError.invalidSync }
+    func yieldTask() async throws -> T {
+      guard let task = task else { throw RepositoryError.invalidSync }
 
       do {
         return try await task.value
       }
       catch is CancellationError {
-        return try await awaitTask()
+        return try await yieldTask()
       }
       catch {
         throw RepositoryError.invalidSync(cause: error)
@@ -37,14 +40,11 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   /// unavailable, i.e. upon instantiation or when invoking `get()`.
   open var autoSync: Bool { true }
 
-  let lockQueue: DispatchQueue
   private let synchronizer = Synchronizer()
   private var state: RepositoryState<T> = .initial
 
   /// Creates a new `Repository` instance.
   public init() {
-    lockQueue = .init(label: "BaseKit.Repository.\(Self.self)", qos: .utility)
-
     if autoSync {
       Task { try? await sync() }
     }
@@ -57,37 +57,41 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   /// task. The callers of previous syncs will receive the result of the last
   /// sync.
   ///
+  /// - Parameters:
+  ///   - identifier: Optional string identifier for this sync process.
+  ///
   /// - Returns: The resulting data.
-  @discardableResult public func sync() async throws -> T {
-    await synchronizer.assignTask(createSyncTask())
+  @discardableResult
+  public func sync(identifier: String = UUID().uuidString) async throws -> T {
+    let state = await getState()
+    let task = createSyncTask(for: state, identifier: identifier)
 
-    return try await synchronizer.awaitTask()
+    await synchronizer.assignTask(task)
+
+    return try await synchronizer.yieldTask()
   }
 
-  func getState() -> RepositoryState<T> {
-    lockQueue.sync { state }
+  func getState() async -> RepositoryState<T> {
+    await synchronizer.state
   }
 
-  @discardableResult func setState(_ newValue: RepositoryState<T>) -> Bool {
-    return lockQueue.sync {
-      guard state != newValue else { return false }
+  func setState(_ state: RepositoryState<T>) async {
+    guard await synchronizer.state != state else { return }
 
-      state = newValue
+    await synchronizer.setState(state)
 
-      notifyObservers {
-        switch state {
-        case .initial:
-          $0.repositoryDidFailToSyncData(self)
-        case .synced(let data), .notSynced(let data):
-          $0.repository(self, dataDidChange: data)
-        }
+    notifyObservers {
+      switch state {
+      case .initial:
+        $0.repositoryDidFailToSyncData(self)
+      case .synced(let data),
+          .notSynced(let data):
+        $0.repository(self, dataDidChange: data)
       }
-
-      return true
     }
   }
 
-  func createSyncTask() -> Task<T, Error> {
+  func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, Error> {
     return Task {
       fatalError("<\(Self.self)> Subclasses must override `createSyncTask()`")
     }

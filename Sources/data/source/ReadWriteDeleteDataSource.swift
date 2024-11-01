@@ -10,8 +10,11 @@ public protocol ReadWriteDeleteDataSource: DataSource {
 
   /// Writes data to the data source.
   ///
+  /// - Parameters:
+  ///   - data: The data to write.
+  ///
   /// - Returns: The written data.
-  mutating func write(_ value: DataType?) async throws -> DataType?
+  mutating func write(_ data: DataType?) async throws -> DataType?
 
   /// Deletes the existing data from the data source.
   mutating func delete() async throws
