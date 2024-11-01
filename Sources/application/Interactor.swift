@@ -36,19 +36,19 @@ public protocol Interactor {
 
 extension Interactor {
   public func interact<U: UseCase>(_ useCase: U, params: U.Input) async throws -> U.Output {
-    log(.debug, isEnabled: debugMode) { "Running use case \(U.self) with params \(params)..." }
+    log.debug("Running use case \(U.self) with params \(params)...", isEnabled: debugMode)
 
     do {
       let result = try await useCase.run(params: params)
 
-      log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... OK: \(result)" }
+      log.debug("Running use case \(U.self) with params \(params)... OK: \(result)", isEnabled: debugMode)
 
       self.didInteractWithUseCase(useCase, result: .success(result))
 
       return result
     }
     catch {
-      log(.error, isEnabled: self.debugMode) { "Running use case \(U.self) with params \(params)... ERR: \(error)" }
+      log.error("Running use case \(U.self) with params \(params)... ERR: \(error)", isEnabled: debugMode)
 
       self.didInteractWithUseCase(useCase, result: .failure(error))
 
@@ -57,19 +57,19 @@ extension Interactor {
   }
 
   public func interact<U: UseCase>(_ useCase: U) async throws -> U.Output where U.Input == Void {
-    log(.debug, isEnabled: debugMode) { "Running use case \(U.self)..." }
+    log.debug("Running use case \(U.self)...", isEnabled: debugMode)
 
     do {
       let result = try await useCase.run(params: ())
 
-      log(.debug, isEnabled: self.debugMode) { "Running use case \(U.self)... OK: \(result)" }
+      log.debug("Running use case \(U.self)... OK: \(result)", isEnabled: self.debugMode)
 
       didInteractWithUseCase(useCase, result: .success(result))
 
       return result
     }
     catch {
-      log(.error, isEnabled: self.debugMode) { "Running use case \(U.self)... ERR: \(error)" }
+      log.error("Running use case \(U.self)... ERR: \(error)", isEnabled: self.debugMode)
 
       didInteractWithUseCase(useCase, result: .failure(error))
 
