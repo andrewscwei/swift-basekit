@@ -109,7 +109,6 @@ public struct Log: Sendable {
   private func log(_ message: String, level: OSLogType = .info, isPublic: Bool, fileName: String, functionName: String, lineNumber: Int) {
     guard isEnabled else { return }
 
-#if DEBUG
     if usesUnifiedLogging {
       let fileName = fileName.components(separatedBy: "/").last?.components(separatedBy: ".").first
       let subsystem = Bundle.main.bundleIdentifier ?? "app"
@@ -126,7 +125,6 @@ public struct Log: Sendable {
       guard level != .default else { return }
       print(getSymbol(for: level), message)
     }
-#endif
   }
 }
 
