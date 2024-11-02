@@ -19,7 +19,8 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
   ///
   /// - Parameters:
   ///   - data: The data to set.
-  @discardableResult public func set(_ newValue: T) async throws -> T {
+  @discardableResult
+  public func set(_ newValue: T) async throws -> T {
     let identifier = "SET-\(UUID().uuidString)"
 
     _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"...")

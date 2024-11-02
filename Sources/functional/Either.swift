@@ -34,7 +34,8 @@ public enum Either<L, R> {
   /// - Throws: Error thrown by the block.
   ///
   /// - Returns: The current `Either`.
-  @discardableResult public func ifLeft(execute: (L) throws -> Void) rethrows -> Either<L, R> {
+  @discardableResult
+  public func ifLeft(execute: (L) throws -> Void) rethrows -> Either<L, R> {
     switch self {
     case .left(let value): try execute(value)
     case .right: break
@@ -53,7 +54,8 @@ public enum Either<L, R> {
   /// - Throws: Error thrown by the block.
   ///
   /// - Returns: The current `Either`.
-  @discardableResult public func ifRight(execute: (R) throws -> Void) rethrows -> Either<L, R> {
+  @discardableResult
+  public func ifRight(execute: (R) throws -> Void) rethrows -> Either<L, R> {
     switch self {
     case .left: break
     case .right(let value): try execute(value)
@@ -71,7 +73,8 @@ public enum Either<L, R> {
   /// - Throws: Error thrown by the transform closure.
   ///
   /// - Returns: The new `Either` with the transformed `L` value.
-  public func mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
+  public func
+  mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
     switch self {
     case .left(let value): return .left(try transform(value))
     case .right(let value): return .right(value)
@@ -106,7 +109,8 @@ public enum Either<L, R> {
   /// - Throws: Error thrown by either block.
   ///
   /// - Returns: The return value of the executed block.
-  @discardableResult public func fold(left: (L) throws -> Any, right: (R) throws -> Any) rethrows -> Any {
+  @discardableResult
+  public func fold(left: (L) throws -> Any, right: (R) throws -> Any) rethrows -> Any {
     switch self {
     case .left(let value): return try left(value)
     case .right(let value): return try right(value)
