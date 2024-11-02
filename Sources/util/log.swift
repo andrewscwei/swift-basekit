@@ -4,12 +4,13 @@ import Foundation
 /// A simple logger that can log messages to the unified logging system or to
 /// the console (default).
 public struct Log: Sendable {
-  /// Specifies if this logger is enabled.
-  var isEnabled: Bool = true
+  enum Mode {
+    case none
+    case unified
+    case console
+  }
 
-  /// Specifies if messages should be logged to the unified logging system
-  /// instead of the console.
-  var usesUnifiedLogging: Bool = false
+  let mode: Mode
 
   /// Logs a message to the unified logging system in the `default` level.
   ///
@@ -107,9 +108,13 @@ public struct Log: Sendable {
   }
 
   private func log(_ message: String, level: OSLogType = .info, isPublic: Bool, fileName: String, functionName: String, lineNumber: Int) {
-    guard isEnabled else { return }
+    guard mode != .none else { return }
 
-    if usesUnifiedLogging {
+#if !DEBUG
+    guard  level != .debug else { return }
+#endif
+
+    if mode == .unified {
       let fileName = fileName.components(separatedBy: "/").last?.components(separatedBy: ".").first
       let subsystem = Bundle.main.bundleIdentifier ?? "app"
       let category = "\(fileName ?? "???"):\(lineNumber)"
@@ -126,20 +131,29 @@ public struct Log: Sendable {
       print(getSymbol(for: level), message)
     }
   }
-}
 
-/// Global logger.
-public var log = Log()
-
-/// Internal logger.
-var _log = Log()
-
-private func getSymbol(for level: OSLogType) -> String {
-  switch level {
-  case .fault: return "💀"
-  case .error: return "⚠️"
-  case .debug: return "👾"
-  case .info: return "🤖"
-  default: return ""
+  private func getSymbol(for level: OSLogType) -> String {
+    switch level {
+    case .fault: return "💀"
+    case .error: return "⚠️"
+    case .debug: return "👾"
+    case .info: return "🤖"
+    default: return ""
+    }
   }
 }
+
+#if DEBUG
+/// Global logger instance, logs to console in debug, unified logging system in
+/// release.
+public let log = Log(mode: .console)
+#else
+public let log = Log(mode: .unified)
+#endif
+
+#if BASEKIT_DEBUG
+/// Internal logger instance.
+let _log = Log(mode: .console)
+#else
+let _log = Log(mode: .none)
+#endif

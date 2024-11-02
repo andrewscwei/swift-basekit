@@ -1,4 +1,5 @@
 import XCTest
+import os.log
 @testable import BaseKit
 
 class WeakReferenceTests: XCTestCase {
