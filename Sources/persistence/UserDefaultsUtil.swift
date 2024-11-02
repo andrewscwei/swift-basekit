@@ -1,7 +1,6 @@
 import Foundation
 
 public struct UserDefaultsUtil {
-
   enum Error: Swift.Error {
     case typeMismatch(cause: Swift.Error?)
 

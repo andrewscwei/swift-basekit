@@ -1,7 +1,6 @@
 import Foundation
 
 public struct KeyChainUtil {
-
   public enum Error: Swift.Error {
     case read(status: OSStatus?)
     case write(status: OSStatus?)
