@@ -41,7 +41,6 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   open var autoSync: Bool { true }
 
   private let synchronizer = Synchronizer()
-  private var state: RepositoryState<T> = .initial
 
   /// Creates a new `Repository` instance.
   public init() {
