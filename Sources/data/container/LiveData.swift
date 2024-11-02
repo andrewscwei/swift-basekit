@@ -1,30 +1,23 @@
 import Foundation
 
-/// A data holder that wraps some value of type `T` and notifies observers
-/// whenever the value changes. The wrapped value can be `nil`, indicating the
-/// absence of a value, which is also the default value.
-///
-/// The wrapped value is read-only and cannot be modified. See `MutableLiveData`
-/// for the mutable version of `LiveData`.
-public class LiveData<T: Equatable>: CustomStringConvertible {
+/// A wrapper for a value of type `T` that notifies observers of changes. The
+/// value can be `nil` (default). The value is read-only; for a mutable version,
+/// use `MutableLiveData`.
+public class LiveData<T: Equatable>: CustomStringConvertible, @unchecked Sendable {
   public typealias Listener = (T?) -> Void
 
-  let lockQueue: DispatchQueue = DispatchQueue(label: "BaseKit.LiveData<\(T.self)>", qos: .utility)
+  let lockQueue: DispatchQueue = DispatchQueue(label: "BaseKit.LiveData", qos: .utility)
   var listeners: [AnyHashable: Listener] = [:]
   var currentValue: T?
 
   public internal(set) var value: T? {
-    get {
-      return lockQueue.sync { currentValue }
-    }
+    get { lockQueue.sync { currentValue } }
 
     set {
       guard value != newValue else { return }
 
       lockQueue.sync { currentValue = newValue }
-
       _log.debug("[LiveData<\(T.self)>] Updating value... OK: \(newValue.map { "\($0)" } ?? "nil")")
-
       emit()
     }
   }
@@ -37,40 +30,14 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     currentValue = value
   }
 
-  /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial value.
+  /// Creates a `LiveData` instance and runs an async closure to provide an
+  /// initial value.
   ///
-  /// Registered observers will be notified once the initial value is assigned.
-  ///
-  /// - Parameters:
-  ///   - getValue: The asynchronous block to execute.
-  public init(_ getValue: (@escaping (T) -> Void) -> Void) {
-    currentValue = nil
-
-    getValue { self.value = $0 }
-  }
-
-  /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial value.
-  ///
-  /// Registered observers will be notified once the initial value is assigned.
+  /// Observers are notified when the initial value is set.
   ///
   /// - Parameters:
-  ///   - getValue: The asynchronous block to execute.
-  public init(_ getValue: (@escaping (T) -> Void) throws -> Void) {
-    currentValue = nil
-
-    try? getValue { self.value = $0 }
-  }
-
-  /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial wrapped value.
-  ///
-  /// Registered observers will be notified once the initial value is assigned.
-  ///
-  /// - Parameters:
-  ///   - getValue: The asynchronous block to execute.
-  public init(_ getValue: @escaping () async -> T) {
+  ///   - getValue: The async closure.
+  public init(_ getValue: sending @escaping () async -> T) {
     currentValue = nil
 
     Task {
@@ -78,14 +45,14 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial wrapped value.
+  /// Creates a `LiveData` instance and runs a throwable async closure to
+  /// provide an initial value.
   ///
-  /// Registered observers will be notified once the initial value is assigned.
+  /// Observers are notified when the initial value is set.
   ///
   /// - Parameters:
-  ///   - getValue: The asynchronous block to execute.
-  public init(_ getValue: @escaping () async throws -> T) {
+  ///   - getValue: The async closure.
+  public init(_ getValue: sending @escaping () async throws -> T) {
     currentValue = nil
 
     Task {
@@ -93,14 +60,39 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Creates a new `LiveData` instance and executes an asynchronous method that
-  /// eventually yields an initial value represented by the success value of a
-  /// `Result` object.
+  /// Creates a `LiveData` instance and runs an async closure to provide an
+  /// initial value.
   ///
-  /// Registered observers will be notified once the initial value is assigned.
+  /// Observers are notified when the initial value is set.
   ///
   /// - Parameters:
-  ///   - getValue: The asynchronous block to execute.
+  ///   - getValue: The async closure.
+  public init(_ getValue: (@escaping (T) -> Void) -> Void) {
+    currentValue = nil
+
+    getValue { self.value = $0 }
+  }
+
+  /// Creates a `LiveData` instance and runs a throwable async closure to
+  /// provide an initial value.
+  ///
+  /// Observers are notified when the initial value is set.
+  ///
+  /// - Parameters:
+  ///   - getValue: The async closure.
+  public init(_ getValue: (@escaping (T) -> Void) throws -> Void) {
+    currentValue = nil
+
+    try? getValue { self.value = $0 }
+  }
+
+  /// Creates a `LiveData` instance and runs an async closure to provide an
+  /// initial value.
+  ///
+  /// Observers are notified when the initial value is set.
+  ///
+  /// - Parameters:
+  ///   - getValue: The aync closure to execute.
   public init(_ getValue: (@escaping (Result<T, Error>) -> Void) -> Void) {
     currentValue = nil
 
@@ -114,7 +106,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Emits the current wrapped value to all observers.
+  /// Emits the current value to observers.
   public func emit() {
     let listeners = lockQueue.sync { self.listeners }
 
@@ -123,19 +115,17 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Resets the wrapped value to `nil`.
+  /// Resets the current value to `nil`.
   public func reset() {
     value = nil
   }
 
-  /// Registers an observer to notify when changes occur in the wrapped value.
-  /// Registering an already registered observer will overwrite the previous
-  /// `listener`.
+  /// Registers an observer for value changes, overwriting any existing listener
+  /// if already registered.
   ///
   /// - Parameters:
-  ///   - observer: The object to register as an observer of this `LiveData`.
-  ///   - listener: The block to execute when the wrapped data is updated. It is
-  ///               best to use `weak self` within the block.
+  ///   - observer: The observer to register.
+  ///   - listener: The listener closure to invoke upon value changes.
   public func observe(for observer: AnyObject, listener: @escaping Listener) {
     lockQueue.sync {
       let identifier = ObjectIdentifier(observer)
@@ -144,8 +134,7 @@ public class LiveData<T: Equatable>: CustomStringConvertible {
     }
   }
 
-  /// Unregisters an observer. If the observer was never registered, nothing
-  /// happens.
+  /// Unregisters an observer; does nothing if the observer wasn’t registered.
   ///
   /// - Parameters:
   ///   - observer: The observer to unregister.
