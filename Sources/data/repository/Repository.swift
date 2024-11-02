@@ -45,7 +45,9 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   /// Creates a new `Repository` instance.
   public init() {
     if autoSync {
-      Task { try? await sync() }
+      Task {
+        try? await sync()
+      }
     }
   }
 

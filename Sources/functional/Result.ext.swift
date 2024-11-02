@@ -20,7 +20,6 @@ extension Result {
     }
   }
 
-
   /// Returns the error of this `Result` if it is a `.failure`.
   ///
   /// - Returns: The `Error` if it exists, `nil` otherwise.
