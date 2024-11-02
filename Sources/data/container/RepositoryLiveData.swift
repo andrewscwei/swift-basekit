@@ -1,41 +1,34 @@
 import Foundation
 
-/// A type of `LiveData` that wraps a value `T` as a result of a transformed
-/// `Repository` value `R`.
-public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: LiveData<T>, RepositoryObserver {
-  private let transform: (R, T?) -> T?
+/// A `LiveData` type that wraps a value `T` from a transformed `Repository`
+/// value `R`.
+public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: LiveData<T>, RepositoryObserver, @unchecked Sendable {
+  private let map: (R, T?) -> T?
 
   let repository: Repository<R>
 
-  /// Creates a new `RepositoryLiveData` instance and immediately assigns its
-  /// wrapped value to a transformed `Repository` value. If the `Repository` is
-  /// not synced, the initial wrapped value is `nil` and a sync will be invoked
-  /// on the repository.
-  ///
-  /// Observers are notified every time the `Repository` value changes.
+  /// Creates a `RepositoryLiveData` instance, assigning its value to a mapped
+  /// `Repository` value. If unsynced, the initial value is `nil`, and a sync is
+  /// triggered. Observers are notified on value changes.
   ///
   /// - Parameters:
   ///   - repository: The `Repository`.
-  ///   - transform: A block that transforms the current repository value into
-  ///                the new wrapped value.
-  public convenience init(_ repository: Repository<R>, transform: @escaping (R) -> T?) {
-    self.init(repository) { value, _ in transform(value) }
+  ///   - map: A block transforming the repository value into the new value.
+  public convenience init(_ repository: Repository<R>, map: sending @escaping (R) -> T?) {
+    self.init(repository) { value, _ in map(value) }
   }
 
-  /// Creates a new `RepositoryLiveData` instance and immediately assigns its
-  /// wrapped value to a transformed `Repository` value. If the `Repository` is
-  /// not synced, the initial wrapped value is `nil` and a sync will be invoked
-  /// on the repository.
-  ///
-  /// Observers are notified every time the `Repository` value changes.
+  /// Creates a `RepositoryLiveData` instance, assigning its value to a mapped
+  /// `Repository` value. If unsynced, the initial value is `nil`, triggering a
+  /// sync. Observers are notified on value changes.
   ///
   /// - Parameters:
   ///   - repository: The `Repository`.
-  ///   - transform: A block that transforms the current repository value and
-  ///                wrapped value into the new wrapped value.
-  public init(_ repository: Repository<R>, transform: @escaping (R, T?) -> T?) {
+  ///   - map: A block transforming the repository and current value into the
+  ///          new wrapped value.
+  public init(_ repository: Repository<R>, map: sending @escaping (R, T?) -> T?) {
     self.repository = repository
-    self.transform = transform
+    self.map = map
 
     super.init()
 
@@ -44,22 +37,20 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     Task {
       switch await repository.getState() {
       case .synced(let value), .notSynced(let value):
-        currentValue = transform(value, currentValue)
+        currentValue = map(value, currentValue)
       case .initial:
         currentValue = nil
-
-        try await sync()
+        sync()
       }
     }
   }
 
-  /// Creates a new `RepositoryLiveData` instance and immediately assigns its
-  /// wrapped value to the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked where
-  /// observers can anticipate the synced value upon the next change event.
+  /// Creates a `RepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync,
+  /// and observers will receive the synced value on the next change event.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
+  ///   - repository: The `Repository` providing the wrapped value.
   public convenience init(_ repository: Repository<R>) where R == T {
     self.init(repository) { $0 }
   }
@@ -68,19 +59,18 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     repository.removeObserver(self)
   }
 
-  /// Triggers a sync in the associated `Repository`.
-  ///
-  /// - Parameters:
-  ///   - completion: Handler invoked when the `Repository` finishes synching.
-  public func sync() async throws {
-    try await repository.sync()
+  /// Triggers a sync in the `Repository`.
+  public func sync() {
+    Task {
+      try await repository.sync()
+    }
   }
 
   public func repository<DataType: Codable & Equatable>(_ repository: Repository<DataType>, dataDidChange data: DataType) {
     var newValue: T? = nil
 
     if let data = data as? R {
-      newValue = transform(data, currentValue)
+      newValue = map(data, currentValue)
     }
 
     value = newValue

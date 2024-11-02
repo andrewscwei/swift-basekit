@@ -1,8 +1,8 @@
 import Foundation
 
-/// A type of `LiveData` that wraps the transformed value `T` of the output of a
-/// `UseCase`.
-public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
+/// A `LiveData` type that holds the transformed `T` value from a `UseCase`
+/// output.
+public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T>, @unchecked Sendable {
   private let transform: (U.Output) -> T
 
   let useCase: U
@@ -35,7 +35,7 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   /// - Parameters:
   ///   - params: Input for the use case.
   public func interact(params: U.Input) {
-    Task.detached {
+    Task {
       do {
         let result = try await self.useCase.run(params: params)
 
@@ -51,7 +51,7 @@ public class UseCaseLiveData<T: Equatable, U: UseCase>: LiveData<T> {
   /// output will be stored in the wrapped value. If a failure occurred, the
   /// wrapped value will be set to `nil`.
   public func interact() where U.Input == Void {
-    Task.detached {
+    Task {
       do {
         let result = try await self.useCase.run(params: ())
 

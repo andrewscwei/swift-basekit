@@ -1,107 +1,83 @@
 import Foundation
 
-/// A type of `RepositoryLiveData` that permits modifying of its wrapped value
-/// from externally, subsequently modifying the value in the `Repository`.
-public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: RepositoryLiveData<T, R> {
-  private let reverseTransform: (T, R?) -> R
+/// A `RepositoryLiveData` type allowing external modification of its wrapped
+/// value, which updates the `Repository` accordingly.
+public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: RepositoryLiveData<T, R>, @unchecked Sendable {
+  private let unmap: (T, R?) -> R
 
-  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
-  /// its wrapped value with the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked on the
-  /// repository.
+  /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync.
   ///
-  /// Registered observers are notified every time the value of the `Repository`
-  /// changes.
+  /// Observers are notified on every `Repository` value change.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - transform: A block that transforms the current repository value and
-  ///                wrapped value into the new wrapped value. This block is
-  ///                only called on a synced repository value.
-  ///   - reverseTransform: A block that transforms the current wrapped value
-  ///                       and repository value into the new repository value.
-  ///                       If the current repository value is not synced, `nil`
-  ///                       will be passed to the block.
-  public init(_ repository: Repository<R>, transform: @escaping (R, T?) -> T?, reverseTransform: @escaping (T, R?) -> R) {
-    self.reverseTransform = reverseTransform
-    super.init(repository, transform: transform)
+  ///   - repository: The `Repository` providing the wrapped value.
+  ///   - map: A block transforming the repository and current value into the
+  ///          new wrapped value, called only when synced.
+  ///   - unmap: A block transforming the wrapped and repository values into a
+  ///            new repository value. `nil` is passed if the repository value
+  ///            isn't synced.
+  public init(_ repository: Repository<R>, map: sending @escaping (R, T?) -> T?, unmap: sending @escaping (T, R?) -> R) {
+    self.unmap = unmap
+    super.init(repository, map: map)
   }
 
-  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
-  /// its wrapped value with the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked on the
-  /// repository.
+  /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync.
   ///
-  /// Registered observers are notified every time the value of the `Repository`
-  /// changes.
+  /// Observers are notified on each `Repository` value change.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - transform: A block that transforms the current repository value and
-  ///                wrapped value into the new wrapped value. This block is
-  ///                only called on a synced repository value.
-  ///   - reverseTransform: A block that transforms the current wrapped value
-  ///                       into the new repository value. If the current
-  ///                       repository value is not synced, `nil` will be passed
-  ///                       to the block.
-  public convenience init(_ repository: Repository<R>, transform: @escaping (R, T?) -> T?, reverseTransform: @escaping (T) -> R) {
-    self.init(repository, transform: transform, reverseTransform: { value, _ in reverseTransform(value) })
+  ///   - repository: The `Repository` providing the wrapped value.
+  ///   - map: A block transforming the repository and current value into the
+  ///          new wrapped value, called only when synced.
+  ///   - unmap: A block transforming the wrapped value into a new repository
+  ///            value. `nil` is passed if the repository isn't synced.
+  public convenience init(_ repository: Repository<R>, map: sending @escaping (R, T?) -> T?, unmap: sending @escaping (T) -> R) {
+    self.init(repository, map: map, unmap: { value, _ in unmap(value) })
   }
 
-  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
-  /// its wrapped value with the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked on the
-  /// repository.
+  /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync.
   ///
-  /// Registered observers are notified every time the value of the `Repository`
-  /// changes.
+  /// Observers are notified on each `Repository` value change.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - transform: A block that transforms the current repository value into
-  ///                the new wrapped value. This block is only called on a
-  ///                synced repository value.
-  ///   - reverseTransform: A block that transforms the current wrapped value
-  ///                       and repository value into the new repository value.
-  ///                       If the current repository value is not synced, `nil`
-  ///                       will be passed to the block.
-  public convenience init(_ repository: Repository<R>, transform: @escaping (R) -> T?, reverseTransform: @escaping (T, R?) -> R) {
-    self.init(repository, transform: { value, _ in transform(value) }, reverseTransform: reverseTransform)
+  ///   - repository: The `Repository` providing the wrapped value.
+  ///   - map: A block transforming the repository value into the new wrapped
+  ///          value, called only when synced.
+  ///   - unmap: A block transforming the wrapped and repository values into a
+  ///            new repository value. `nil` is passed if unsynced.
+  public convenience init(_ repository: Repository<R>, map: sending @escaping (R) -> T?, unmap: sending @escaping (T, R?) -> R) {
+    self.init(repository, map: { value, _ in map(value) }, unmap: unmap)
   }
 
-  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
-  /// its wrapped value with the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked on the
-  /// repository.
+  /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync.
   ///
-  /// Registered observers are notified every time the value of the `Repository`
-  /// changes.
+  /// Observers are notified on each `Repository` value change.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
-  ///   - transform: A block that transforms the current repository value into
-  ///                the new wrapped value. This block is only called on a
-  ///                synced repository value.
-  ///   - reverseTransform: A block that transforms the current wrapped value
-  ///                       into the new repository value. If the current
-  ///                       repository value is not synced, `nil` will be passed
-  ///                       to the block.
-  public convenience init(_ repository: Repository<R>, transform: @escaping (R) -> T?, reverseTransform: @escaping (T) -> R) {
-    self.init(repository, transform: { value, _ in transform(value) }, reverseTransform: { value, _ in reverseTransform(value) })
+  ///   - repository: The `Repository` providing the wrapped value.
+  ///   - map: A block transforming the repository value into the new wrapped
+  ///          value, called only when synced.
+  ///   - unmap: A block transforming the wrapped value into a new repository
+  ///            value. `nil` is passed if unsynced.
+  public convenience init(_ repository: Repository<R>, map: sending @escaping (R) -> T?, unmap: sending @escaping (T) -> R) {
+    self.init(repository, map: { value, _ in map(value) }, unmap: { value, _ in unmap(value) })
   }
 
-  /// Creates a new `MutableRepositoryLiveData` instance and immediately assigns
-  /// its wrapped value to the `Repository` value. If the `Repository` is not
-  /// synced, the wrapped value would be `nil` and a sync will be invoked where
-  /// observers can anticipate the synced value upon the next change event.
+  /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
+  /// `Repository` value. If unsynced, the value is `nil`, triggering a sync.
+  /// Observers will receive the synced value on the next change event.
   ///
   /// - Parameters:
-  ///   - repository: The `Repository` to provide the wrapped value.
+  ///   - repository: The `Repository` providing the wrapped value.
   public convenience init(_ repository: Repository<R>) where R == T {
-    self.init(repository, transform: { $0 }, reverseTransform: { $0 })
+    self.init(repository, map: { $0 }, unmap: { $0 })
   }
 
-  /// Sets the wrapped value, subsequently updating the repository value.
+  /// Sets the wrapped value, updating the repository value.
   ///
   /// - Parameters:
   ///   - newValue: The new wrapped value.
@@ -113,9 +89,9 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
         Task {
           switch await repository.getState() {
           case .initial:
-            try await repository.set(reverseTransform(newValue, nil))
+            try await repository.set(unmap(newValue, nil))
           case .synced(let data), .notSynced(let data):
-            try await repository.set(reverseTransform(newValue, data))
+            try await repository.set(unmap(newValue, data))
           }
         }
       }
@@ -130,9 +106,9 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
         Task {
           switch await repository.getState() {
           case .initial:
-            try await repository.set(reverseTransform(newValue, nil))
+            try await repository.set(unmap(newValue, nil))
           case .synced(let data), .notSynced(let data):
-            try await repository.set(reverseTransform(newValue, data))
+            try await repository.set(unmap(newValue, data))
           }
         }
       }
@@ -141,9 +117,8 @@ public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Se
     throw error("Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only", domain: "BaseKit.LiveData")
   }
 
-  /// Sets the wrapped value by directly mutating the existing wrapped value
-  /// (changes made to the wrapped value inside the `mutate` block will also be
-  /// applied outside the block).
+  /// Sets the wrapped value by directly mutating the existing value. Changes
+  /// made inside the `mutate` block will also apply outside the block.
   ///
   /// - Parameters:
   ///   - mutate: The mutate block.
