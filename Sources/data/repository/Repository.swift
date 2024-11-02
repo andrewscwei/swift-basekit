@@ -93,8 +93,6 @@ open class Repository<T: Codable & Equatable & Sendable>: Observable {
   }
 
   func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, Error> {
-    return Task {
-      fatalError("<\(Self.self)> Subclasses must override `createSyncTask()`")
-    }
+    fatalError("<\(Self.self)> Subclasses must override `createSyncTask(for:identifier:)`")
   }
 }
