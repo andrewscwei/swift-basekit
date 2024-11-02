@@ -14,13 +14,13 @@ let package = Package(
     .macOS(.v12),
     .iOS(.v15),
     .tvOS(.v15),
-    .watchOS(.v8)
+    .watchOS(.v8),
   ],
   products: [
     .library(
       name: "BaseKit",
       targets: [
-        "BaseKit"
+        "BaseKit",
       ]
     ),
   ],
@@ -32,7 +32,7 @@ let package = Package(
     .testTarget(
       name: "BaseKitTests",
       dependencies: [
-        "BaseKit"
+        "BaseKit",
       ],
       path: "Tests"
     ),
