@@ -41,7 +41,8 @@ extension Result {
   ///              success value as its argument.
   ///
   /// - Returns: The current `Result`.
-  @discardableResult public func ifSuccess(execute: (Success) -> Void) -> Result<Success, Failure> {
+  @discardableResult
+  public func ifSuccess(execute: (Success) -> Void) -> Result<Success, Failure> {
     switch self {
     case .failure(_): break
     case .success(let value):
@@ -58,7 +59,8 @@ extension Result {
   ///              as its argument.
   ///
   /// - Returns: The current `Result`.
-  @discardableResult public func ifFailure(execute: (Failure) -> Void) -> Result<Success, Failure> {
+  @discardableResult
+  public func ifFailure(execute: (Failure) -> Void) -> Result<Success, Failure> {
     switch self {
     case .failure(let error): execute(error)
     case .success(_): break
@@ -77,7 +79,8 @@ extension Result {
   ///
   /// - Returns: The new `Result` if this is a `.success` or the current
   ///            `Result` if this is a `.failure`.
-  @discardableResult public func then<R>(execute: (Success) -> Result<R, Failure>) -> Result<R, Failure> {
+  @discardableResult
+  public func then<R>(execute: (Success) -> Result<R, Failure>) -> Result<R, Failure> {
     switch self {
     case .failure(let error): return .failure(error)
     case .success(let value): return execute(value)
@@ -93,7 +96,8 @@ extension Result {
   ///
   /// - Returns: The new `Result` if this is a `.failure` or the current
   ///            `Result` if this is a `.success`.
-  @discardableResult public func handle<R: Error>(execute: (Failure) -> Result<Success, R>) -> Result<Success, R> {
+  @discardableResult
+  public func handle<R: Error>(execute: (Failure) -> Result<Success, R>) -> Result<Success, R> {
     switch self {
     case .failure(let error): return execute(error)
     case .success(let value): return .success(value)
