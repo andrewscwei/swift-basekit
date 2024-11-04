@@ -1,21 +1,21 @@
-/// Abstract class for implementing use cases. Specify `Input` and `Output`
-/// types.
+/// A protocol for defining use cases with specified `Input` and `Output` types.
 ///
-/// Associated types:
-/// - `Input`: Parameters passed to the use case upon invocation
-/// - `Output`: Return type when invocation succeeds
-///
-/// The implementation body of `run` may be suspended and executed in a dispatch
-/// queue.
+/// Use cases represent distinct, self-contained tasks or operations in your
+/// application's business logic. This protocol defines the structure for
+/// invoking such tasks asynchronously.
 public protocol UseCase {
+
+  /// The type of parameters required to invoke the use case.
   associatedtype Input
+
+  ///  The type of the result produced when the use case completes successfully.
   associatedtype Output
 
-  /// Invokes the `UseCase`.
+  /// Executes the use case with the given parameters.
   ///
   /// - Parameters:
-  ///   - params: The input parameters.
-  ///
-  /// - Returns: The result of running the use case.
+  ///   - params: The input parameters required to run the use case.
+  /// - Returns: The output produced after successfully running the use case.
+  /// - Throws: An error if the use case fails during execution.
   func run(params: Input) async throws -> Output
 }
