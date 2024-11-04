@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 class ReadWriteRepositoryTests: XCTestCase {
-  struct MockDatasource: ReadWriteDatasource {
+  actor MockDatasource: ReadWriteDatasource {
     typealias DataType = String
 
     private var data: DataType = "old"
@@ -13,7 +13,7 @@ class ReadWriteRepositoryTests: XCTestCase {
       return data
     }
 
-    mutating func write(_ data: String) async throws -> String {
+    func write(_ data: String) async throws -> String {
       await delay(1.0)
 
       self.data = data
@@ -22,16 +22,15 @@ class ReadWriteRepositoryTests: XCTestCase {
     }
   }
 
-  class MockRepository: ReadWriteRepository<String> {
-    var dataSource = MockDatasource()
+  final class MockRepository: ReadWriteRepository {
+    typealias DataType = String
 
-    override func pull() async throws -> String {
-      return try await dataSource.read()
-    }
+    let dataSource = MockDatasource()
+    let synchronizer = RepositorySynchronizer<String>()
 
-    override func push(_ data: String) async throws -> String {
-      return try await dataSource.write(data)
-    }
+    func pull() async throws -> String { try await dataSource.read() }
+
+    func push(_ data: String) async throws -> String { try await dataSource.write(data) }
   }
 
   func test() {

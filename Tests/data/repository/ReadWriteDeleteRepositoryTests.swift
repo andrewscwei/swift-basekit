@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 class ReadWriteDeleteRepositoryTests: XCTestCase {
-  struct MockDatasource: ReadWriteDeleteDatasource {
+  actor MockDatasource: ReadWriteDeleteDatasource {
     typealias DataType = String
 
     private var data: String? = "old"
@@ -15,7 +15,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
       return data
     }
 
-    mutating func write(_ data: String?) async throws -> String? {
+    func write(_ data: String?) async throws -> String? {
       await delay(1.0)
 
       self.data = data
@@ -23,7 +23,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
       return data
     }
 
-    mutating func delete() async throws {
+    func delete() async throws {
       await delay(1.0)
 
       guard data != nil else { throw error("Delete error: \(String(describing: data))") }
@@ -32,12 +32,15 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
     }
   }
 
-  class MockRepository: ReadWriteDeleteRepository<String> {
-    var dataSource = MockDatasource()
+  final class MockRepository: ReadWriteDeleteRepository {
+    typealias DataType = String?
 
-    override func pull() async throws -> String? { try await dataSource.read() }
+    let dataSource = MockDatasource()
+    let synchronizer = RepositorySynchronizer<String?>()
 
-    override func push(_ data: String?) async throws -> String? {
+    func pull() async throws -> String? { try await dataSource.read() }
+
+    func push(_ data: String?) async throws -> String? {
       if let data = data {
         return try await dataSource.write(data)
       }

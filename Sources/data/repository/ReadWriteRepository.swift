@@ -1,25 +1,18 @@
 import Foundation
 
-/// An abstract class for a read/write `Repository`.
-open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
-  private var isDirty: Bool = false
+/// A `Repository` type whose data can be read and written to.
+public protocol ReadWriteRepository: ReadonlyRepository {
+  func push(_ data: DataType) async throws -> DataType
+}
 
-  /// Pushes the data upstream.
-  ///
-  /// This method implements how data is pushed to the datasource(s).
-  ///
-  /// - Parameters:
-  ///   - data: The data to push.
-  open func push(_ data: T) async throws -> T {
-    fatalError("<\(Self.self)> Subclass must override `push(_:)` without calling `super`")
-  }
+extension ReadWriteRepository {
 
   /// Sets the data in memory followed by an upstream sync.
   ///
   /// - Parameters:
   ///   - data: The data to set.
   @discardableResult
-  public func set(_ newValue: T) async throws -> T {
+  public func set(_ newValue: DataType) async throws -> DataType {
     let identifier = "SET-\(UUID().uuidString)"
 
     _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"...")
@@ -55,7 +48,7 @@ open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
   ///
   /// - Returns: The pathced data.
   @discardableResult
-  public func patch(mutate: (inout T) -> T) async throws -> T {
+  public func patch(mutate: (inout DataType) -> DataType) async throws -> DataType {
     let state = await getState()
 
     switch state {
@@ -70,7 +63,7 @@ open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
     }
   }
 
-  override func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, any Error> {
+  public func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     switch state {
     case .notSynced(let data):
       return Task {
@@ -99,7 +92,7 @@ open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
         }
       }
     default:
-      return super.createSyncTask(for: state, identifier: identifier)
+      return createDownstreamSyncTask(for: state, identifier: identifier)
     }
   }
 }

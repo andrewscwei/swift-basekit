@@ -1,20 +1,21 @@
 import Foundation
 
-/// An abstract class for a readonly `Repository`.
-open class ReadonlyRepository<T: Syncable>: Repository<T> {
+/// A `Repository` type whos data is readonly.
+public protocol ReadonlyRepository: Repository {
 
-  /// Pulls the data downstream.
+  /// Pulls the data downstream and returns it.
   ///
   /// This method implements how data is fetched from the datasource(s).
-  ///
-  /// - Returns: The resulting data.
-  open func pull() async throws -> T {
-    fatalError("<\(Self.self)> Subclass must override `pull()` without calling `super`")
-  }
+  func pull() async throws -> DataType
+}
+
+extension ReadonlyRepository {
 
   /// Returns the data in memory. If unavailable, a sync will be performed and
   /// the resulting data returned upon completion.
-  public func get() async throws -> T {
+  ///
+  /// - Returns: The data in memory.
+  public func get() async throws -> DataType {
     let identifier = "GET-\(UUID().uuidString)"
 
     _log.debug("<\(Self.self):\(identifier)> Getting data...")
@@ -43,7 +44,11 @@ open class ReadonlyRepository<T: Syncable>: Repository<T> {
     }
   }
 
-  override func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, any Error> {
+  func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
+    createDownstreamSyncTask(for: state, identifier: identifier)
+  }
+
+  func createDownstreamSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     Task {
       _log.debug("<\(Self.self):\(identifier)> Syncing downstream...")
 

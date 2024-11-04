@@ -17,10 +17,14 @@ class ObservableTests: XCTestCase {
 
   class SomeMockObservable1: Observable {
     typealias Observer = MockObserver1
+
+    var observers: [WeakReference<any Observer>] = []
   }
 
   class SomeMockObservable2: Observable {
     typealias Observer = MockObserver2
+
+    var observers: [WeakReference<any Observer>] = []
   }
 
 
@@ -31,7 +35,13 @@ class ObservableTests: XCTestCase {
 
     observable1.addObserver(observer)
     observable2.addObserver(observer)
-    observable1.notifyObservers { XCTAssertEqual($0.foo(), "foo") }
-    observable2.notifyObservers { XCTAssertEqual($0.bar(), "bar") }
+
+    Task {
+      observable1.notifyObservers { XCTAssertEqual($0.foo(), "foo") }
+    }
+
+    Task {
+      observable2.notifyObservers { XCTAssertEqual($0.bar(), "bar") }
+    }
   }
 }

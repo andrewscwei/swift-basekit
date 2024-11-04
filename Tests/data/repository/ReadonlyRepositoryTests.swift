@@ -2,12 +2,12 @@ import XCTest
 @testable import BaseKit
 
 class ReadonlyRepositoryTests: XCTestCase {
-  struct MockDatasource: ReadonlyDatasource {
+  actor MockDatasource: ReadonlyDatasource {
     typealias DataType = String
 
     private var data: DataType = "old"
 
-    mutating func updateValue(_ newValue: DataType) async throws {
+    func updateValue(_ newValue: DataType) async throws {
       await delay(0.5)
 
       data = newValue
@@ -20,10 +20,13 @@ class ReadonlyRepositoryTests: XCTestCase {
     }
   }
 
-  class MockRepository: ReadonlyRepository<String> {
-    var dataSource = MockDatasource()
+  final class MockRepository: ReadonlyRepository {
+    typealias DataType = String
 
-    override func pull() async throws -> String { try await dataSource.read() }
+    let synchronizer: RepositorySynchronizer<String> = .init()
+    let dataSource = MockDatasource()
+
+    func pull() async throws -> String { try await dataSource.read() }
   }
 
   func test() {

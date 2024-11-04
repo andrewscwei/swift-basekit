@@ -1,7 +1,7 @@
 import XCTest
 @testable import BaseKit
 
-struct MockDatasource: ReadWriteDeleteDatasource {
+actor MockDatasource: ReadWriteDeleteDatasource {
   typealias DataType = String
 
   private var value: String? = "old"
@@ -14,7 +14,7 @@ struct MockDatasource: ReadWriteDeleteDatasource {
     return value
   }
 
-  mutating func write(_ value: String?) async throws -> String? {
+  func write(_ value: String?) async throws -> String? {
     await delay(1.0)
 
     self.value = value
@@ -22,7 +22,7 @@ struct MockDatasource: ReadWriteDeleteDatasource {
     return value
   }
 
-  mutating func delete() async throws {
+  func delete() async throws {
     await delay(1.0)
 
     guard value != nil else { throw error() }
@@ -31,12 +31,15 @@ struct MockDatasource: ReadWriteDeleteDatasource {
   }
 }
 
-class MockRepository: ReadWriteDeleteRepository<String> {
-  var dataSource = MockDatasource()
+final class MockRepository: ReadWriteDeleteRepository {
+  typealias DataType = String?
 
-  override func pull() async throws -> String? { try await dataSource.read() }
+  let dataSource = MockDatasource()
+  let synchronizer: RepositorySynchronizer<String?> = RepositorySynchronizer()
 
-  override func push(_ data: String?) async throws -> String? {
+  func pull() async throws -> String? { try await dataSource.read() }
+
+  func push(_ data: String?) async throws -> String? {
     if let data = data {
       return try await dataSource.write(data)
     }
@@ -61,12 +64,12 @@ class RepositoryObserverTests: XCTestCase, RepositoryObserver {
     wait(for: [expectation], timeout: 5.0)
   }
 
-  func repository<T>(_ repository: Repository<T>, dataDidChange data: T) where T : Decodable, T : Encodable, T : Equatable {
+  func repository<T: Repository>(_ repository: T, dataDidChange data: T.DataType) {
     XCTAssertEqual(data as? String, "new")
     expectation.fulfill()
   }
 
-  func repositoryDidFailToSyncData<T>(_ repository: Repository<T>) where T : Decodable, T : Encodable, T : Equatable {
+  func repositoryDidFailToSyncData<T: Repository>(_ repository: T) {
 
   }
 }
