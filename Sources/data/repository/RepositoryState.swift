@@ -1,7 +1,7 @@
 import Foundation
 
 /// A type representing the current state of a `Repository`.
-public enum RepositoryState<T: RepositoryData>: Equatable, CustomStringConvertible {
+public enum RepositoryState<T: RepositoryData>: Equatable, CustomStringConvertible, Sendable {
 
   /// `Repository` is initialzed but never synced, data is not available yet.
   case initial
