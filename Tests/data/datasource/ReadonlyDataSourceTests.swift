@@ -1,8 +1,8 @@
 import XCTest
 @testable import BaseKit
 
-class ReadOnlyDatasourceTests: XCTestCase {
-  struct GoodSource: ReadOnlyDatasource {
+class ReadonlyDatasourceTests: XCTestCase {
+  struct GoodSource: ReadonlyDatasource {
     typealias DataType = String
 
     func read() async throws -> String {
@@ -12,7 +12,7 @@ class ReadOnlyDatasourceTests: XCTestCase {
     }
   }
 
-  struct BadSource: ReadOnlyDatasource {
+  struct BadSource: ReadonlyDatasource {
     typealias DataType = String
 
     func read() async throws -> String {
@@ -23,8 +23,8 @@ class ReadOnlyDatasourceTests: XCTestCase {
   }
 
   func test() {
-    let expectation1 = XCTestExpectation(description: "Should result in success when reading from read-only good source")
-    let expectation2 = XCTestExpectation(description: "Should result in failure when reading from read-only bad source")
+    let expectation1 = XCTestExpectation(description: "Should result in success when reading from readonly good source")
+    let expectation2 = XCTestExpectation(description: "Should result in failure when reading from readonly bad source")
 
     let goodSource = GoodSource()
     let badSource = BadSource()
