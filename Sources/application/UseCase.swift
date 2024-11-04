@@ -3,12 +3,13 @@
 /// Use cases represent distinct, self-contained tasks or operations in your
 /// application's business logic. This protocol defines the structure for
 /// invoking such tasks asynchronously.
+///
+/// - `associatedtype`:
+///   - `Input`: The type of parameters required to invoke the use case.
+///   - `Output`: The type of the result produced when the use case completes
+///               successfully.
 public protocol UseCase {
-
-  /// The type of parameters required to invoke the use case.
   associatedtype Input
-
-  ///  The type of the result produced when the use case completes successfully.
   associatedtype Output
 
   /// Executes the use case with the given parameters.

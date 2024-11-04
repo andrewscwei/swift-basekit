@@ -6,6 +6,7 @@ public protocol Interactor {
   ///   - useCase: The use case to interact with.
   ///   - params: The input parameters of the `UseCase`.
   /// - Returns: The output of the use case.
+  /// - Throws: When interacting with the use case fails.
   func interact<T: UseCase>(_ useCase: T, params: T.Input) async throws -> T.Output
 
   /// Interacts with a `UseCase` with no input type.
@@ -13,7 +14,7 @@ public protocol Interactor {
   /// - Parameters:
   ///   - useCase: The use case to interact with.
   /// - Returns: The output of the use case.
-  /// - Throws: When running the use case fails.
+  /// - Throws: When interacting with the use case fails.
   func interact<T: UseCase>(_ useCase: T) async throws -> T.Output where T.Input == Void
 
   /// Handler invoked before interacting with a use case.
