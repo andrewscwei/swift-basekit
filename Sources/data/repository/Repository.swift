@@ -8,39 +8,11 @@ import Foundation
 open class Repository<T: Codable & Equatable & Sendable>: Observable {
   public typealias Observer = RepositoryObserver
 
-  private actor Synchronizer {
-    private var task: Task<T, Error>?
-    private(set) var state: RepositoryState<T> = .initial
-
-    func setState(_ newValue: RepositoryState<T>) {
-      state = newValue
-    }
-
-    func assignTask(_ newTask: Task<T, Error>) {
-      task?.cancel()
-      task = newTask
-    }
-
-    func yieldTask() async throws -> T {
-      guard let task = task else { throw RepositoryError.invalidSync }
-
-      do {
-        return try await task.value
-      }
-      catch is CancellationError {
-        return try await yieldTask()
-      }
-      catch {
-        throw RepositoryError.invalidSync(cause: error)
-      }
-    }
-  }
-
   /// Specifies if this repository should automatically sync when data is
   /// unavailable, i.e. upon instantiation or when invoking `get()`.
   open var autoSync: Bool { true }
 
-  private let synchronizer = Synchronizer()
+  private let synchronizer = RepositorySynchronizer<T>()
 
   /// Creates a new `Repository` instance.
   public init() {
