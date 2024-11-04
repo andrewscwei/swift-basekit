@@ -34,7 +34,6 @@ public actor RepositorySynchronizer<T: RepositoryData> {
   /// error.
   ///
   /// - Returns: The result of the completed task.
-  ///
   /// - Throws: `RepositoryError.invalidSync` if there is no active task or if
   ///           the task fails with an error.
   func yieldTask() async throws -> T {

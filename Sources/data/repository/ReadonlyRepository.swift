@@ -1,20 +1,21 @@
 import Foundation
 
-/// A `Repository` type whos data is readonly.
+/// A `Repository` type whose data is readonly.
 public protocol ReadonlyRepository: Repository {
 
-  /// Pulls the data downstream and returns it.
+  /// Pulls the data from datasource(s) and returns it.
   ///
-  /// This method implements how data is fetched from the datasource(s).
+  /// - Throws: When the operation fails.
   func pull() async throws -> DataType
 }
 
 extension ReadonlyRepository {
 
-  /// Returns the data in memory. If unavailable, a sync will be performed and
-  /// the resulting data returned upon completion.
+  /// Returns the data in memory. If unavailable, a sync will be performed with
+  /// the resulting data stored and returned on success.
   ///
   /// - Returns: The data in memory.
+  /// - Throws: When data is unavailable in-memory and the follow-up sync fails.
   public func get() async throws -> DataType {
     let identifier = "GET-\(UUID().uuidString)"
 

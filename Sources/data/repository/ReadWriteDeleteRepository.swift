@@ -1,11 +1,17 @@
-/// A `Repository` type whose data can be read, written to, and deleted.
+/// A `Repository` type whose data can be read, written, and deleted.
+///
+/// The associated `DataType` must be declared optional. `nil` indicates an
+/// absence of data from the datasource(s), i.e. when the data has been deleted.
 public protocol ReadWriteDeleteRepository: ReadWriteRepository where DataType: ExpressibleByNilLiteral {
 
 }
 
 extension ReadWriteDeleteRepository {
 
-  /// Deletes the current value from the repository, triggering a sync.
+  /// Deletes the current value from the repository and synchronizes with result
+  /// with datasource(s).
+  ///
+  /// - Throws: If synchronization fails.
   public func delete() async throws {
     do {
       try await set(nil)
