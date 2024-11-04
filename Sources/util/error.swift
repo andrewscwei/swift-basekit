@@ -11,7 +11,6 @@ import Foundation
 ///   - reason:The localized failure reason of the error, can be accessed via
 ///            the `localizedFailureReason` property of the returned `NSError`
 ///            object. Defaults to `description`.
-///
 /// - Returns:The `Error` object.
 public func error(_ description: String = "Unknown error", domain: String = NSCocoaErrorDomain, code: Int = 0, reason: String? = nil) -> Error {
   NSError(domain: domain, code: code, userInfo: [

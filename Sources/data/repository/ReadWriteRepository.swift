@@ -54,7 +54,7 @@ extension ReadWriteRepository {
   ///
   /// - Parameters:
   ///   - mutate: Closure mutating the data.
-  /// - Returns: The pathced data.
+  /// - Returns: The patched data.
   /// - Throws: If the repository has not been synced yet or if the follow-up
   ///           synchronization fails.
   @discardableResult
