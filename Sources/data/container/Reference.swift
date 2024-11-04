@@ -2,6 +2,7 @@ import Foundation
 
 /// Wraps a value for passing as an immutable reference.
 public class Reference<T> {
+
   /// The wrapped value.
   public internal(set) var value: T
 

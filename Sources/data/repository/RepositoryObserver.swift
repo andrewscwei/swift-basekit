@@ -3,6 +3,7 @@ import Foundation
 /// A type conforming to the `RepositoryObserver` protocol gets notified
 /// whenever the data in the target `Repository` changes.
 public protocol RepositoryObserver: AnyObject {
+
   /// Handler invoked when the data of the observed `Repository` is synced
   /// and/or changed.
   ///

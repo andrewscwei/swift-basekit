@@ -1,4 +1,5 @@
 public protocol Interactor {
+
   /// Interacts with a `UseCase`.
   ///
   /// - Parameters:

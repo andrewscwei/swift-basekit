@@ -1,6 +1,7 @@
 import Foundation
 
 extension NSDate {
+
   /// Returns the `Date` equivalent of this `NSDate`.
   ///
   /// - Returns: `Date`.

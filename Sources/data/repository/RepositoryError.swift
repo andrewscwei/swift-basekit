@@ -1,5 +1,6 @@
 /// A type of `Error` thrown by `Repository` types.
 public enum RepositoryError: Error {
+
   /// An error occurred during sync.
   case invalidSync(cause: Error?)
 
