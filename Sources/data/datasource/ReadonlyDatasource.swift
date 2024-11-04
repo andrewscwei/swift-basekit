@@ -1,7 +1,7 @@
 import Foundation
 
-/// Protocol for a read-only `Datasource`.
-public protocol ReadOnlyDatasource: Datasource {
+/// Protocol for a readonly `Datasource`.
+public protocol ReadonlyDatasource: Datasource {
 
   /// Reads the data from the datasource.
   ///

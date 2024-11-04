@@ -114,7 +114,7 @@ public class MutableRepositoryLiveData<T: Equatable, R: Syncable>: RepositoryLiv
       }
     }
 
-    throw error("Attempting to set the value of a MutableRepositoryLiveData when the associated repository is read-only", domain: "BaseKit.LiveData")
+    throw error("Attempting to set the value of a MutableRepositoryLiveData when the associated repository is readonly", domain: "BaseKit.LiveData")
   }
 
   /// Sets the wrapped value by directly mutating the existing value. Changes

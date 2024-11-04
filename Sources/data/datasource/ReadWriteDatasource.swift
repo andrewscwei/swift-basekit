@@ -1,7 +1,7 @@
 import Foundation
 
 /// Protocol for a read/write `Datasource`.
-public protocol ReadWriteDatasource: ReadOnlyDatasource {
+public protocol ReadWriteDatasource: ReadonlyDatasource {
 
   /// Writes data to the datasource.
   ///

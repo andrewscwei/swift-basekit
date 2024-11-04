@@ -1,7 +1,7 @@
 import Foundation
 
 /// A wrapper for a value of type `T` that notifies observers of changes. The
-/// value can be `nil` (default). The value is read-only; for a mutable version,
+/// value can be `nil` (default). The value is readonly; for a mutable version,
 /// use `MutableLiveData`.
 public class LiveData<T: Equatable>: CustomStringConvertible, @unchecked Sendable {
   public typealias Listener = (T?) -> Void
