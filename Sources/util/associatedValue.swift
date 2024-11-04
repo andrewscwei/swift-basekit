@@ -34,7 +34,7 @@ public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPoin
   }
 
   let value = defaultValue()
-  objc_setAssociatedObject(object, key, value, .OBJC_ASSOCIATION_RETAIN)
+
   return value
 }
 

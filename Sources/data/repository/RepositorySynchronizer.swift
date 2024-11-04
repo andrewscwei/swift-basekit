@@ -1,4 +1,4 @@
-actor RepositorySynchronizer<T: Syncable> {
+public actor RepositorySynchronizer<T: RepositoryData> {
   private var task: Task<T, Error>?
   private(set) var state: RepositoryState<T> = .initial
 
