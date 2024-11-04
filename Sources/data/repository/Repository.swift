@@ -14,7 +14,7 @@ public protocol Repository: Observable, Sendable where Observer == RepositoryObs
 
 extension Repository {
 
-  /// Synchronizes data across all datasources.
+  /// Synchronizes data across datasource(s).
   ///
   /// Only one sync task can run at any given time. Until the running task is
   /// complete, subsequent invocations of this method will not trigger a new

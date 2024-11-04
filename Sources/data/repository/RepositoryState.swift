@@ -1,5 +1,3 @@
-import Foundation
-
 /// A type representing the current state of a `Repository`.
 public enum RepositoryState<T: RepositoryData>: Equatable, CustomStringConvertible, Sendable {
 
@@ -9,7 +7,7 @@ public enum RepositoryState<T: RepositoryData>: Equatable, CustomStringConvertib
   /// `Repository` is synced with data.
   case synced(T)
 
-  /// `Repository` attempted a sync but failed, storing old data.
+  /// `Repository` attempted a sync but failed, previous data is retained.
   case notSynced(T)
 
   public var description: String {
