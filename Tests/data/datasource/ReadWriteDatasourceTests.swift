@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 class ReadWriteDatasourceTests: XCTestCase {
-  class GoodSource: ReadWriteDatasource {
+  struct GoodSource: ReadWriteDatasource {
     typealias DataType = String
 
     func read() async throws -> String {
@@ -18,7 +18,7 @@ class ReadWriteDatasourceTests: XCTestCase {
     }
   }
 
-  class BadSource: ReadWriteDatasource {
+  struct BadSource: ReadWriteDatasource {
     typealias DataType = String
 
     func read() async throws -> String {

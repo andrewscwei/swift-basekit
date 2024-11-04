@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 class ReadWriteDeleteDatasourceTests: XCTestCase {
-  class GoodSource: ReadWriteDeleteDatasource {
+  struct GoodSource: ReadWriteDeleteDatasource {
     typealias DataType = Int
 
     func read() async throws -> Int? {
@@ -22,7 +22,7 @@ class ReadWriteDeleteDatasourceTests: XCTestCase {
     }
   }
 
-  class BadSource: ReadWriteDeleteDatasource {
+  struct BadSource: ReadWriteDeleteDatasource {
     typealias DataType = Int
 
     func read() async throws -> Int? {
