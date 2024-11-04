@@ -4,7 +4,7 @@ import Foundation
 open class ReadOnlyRepository<T: Syncable>: Repository<T> {
   /// Pulls the data downstream.
   ///
-  /// This method implements how data is fetched from the data source(s).
+  /// This method implements how data is fetched from the datasource(s).
   ///
   /// - Returns: The resulting data.
   open func pull() async throws -> T {
