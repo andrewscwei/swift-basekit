@@ -76,10 +76,3 @@ open class ReadonlyRepository<T: Syncable>: Repository<T> {
     }
   }
 }
-
-
-protocol Foo {
-  func pull()
-
-  func create()
-}
