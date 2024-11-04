@@ -74,13 +74,12 @@ public enum Either<L, R> {
   /// - Throws: Error thrown by the transform closure.
   ///
   /// - Returns: The new `Either` with the transformed `L` value.
-  public func
-  mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
-    switch self {
-    case .left(let value): return .left(try transform(value))
-    case .right(let value): return .right(value)
-    }
+  public func mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
+  switch self {
+  case .left(let value): return .left(try transform(value))
+  case .right(let value): return .right(value)
   }
+}
 
   /// Returns a new `Either` with a new `R` value transformed by the given
   /// closure.
