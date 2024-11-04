@@ -4,10 +4,11 @@ nonisolated(unsafe) private var ptr_observers: UInt8 = 0
 /// storing weak references of its registered observers so it can notify them
 /// when certain events happen. Observers conform to the associated `Observer`
 /// type and define their own event handlers.
+///
+/// `associatedtype`:
+///   - `Observer`: A type must conform to this associated type to become a
+///                 valid observer of this `Observable`.
 public protocol Observable: AnyObject {
-
-  /// A type must conform to this associated type to become a valid observer of
-  /// this `Observable`.
   associatedtype Observer = AnyObject
 
   /// Registers a weakly referenced observer.

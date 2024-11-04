@@ -1,4 +1,4 @@
-/// Wraps a value for passing as a mutable reference.
+/// Value wrapper for passing as a mutable reference.
 public class MutableReference<T>: Reference<T> {
 
   /// Updates the wrapped value.

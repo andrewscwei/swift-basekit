@@ -1,4 +1,4 @@
-/// Wraps a value for passing as an immutable reference.
+/// Value wrapper for passing as an immutable reference.
 public class Reference<T> {
 
   /// The wrapped value.

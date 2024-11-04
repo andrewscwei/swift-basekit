@@ -65,7 +65,8 @@ public final class PersistentContainer {
 
   /// Executes the `block` in the `NSManagedObjectContext`'s private queue.
   ///
-  /// - Parameter block: The `block` to execute.
+  /// - Parameters:
+  ///   - block: The `block` to execute.
   @discardableResult
   public func perform<T>(block: @escaping (_ context: NSManagedObjectContext, _ coordinator: NSPersistentStoreCoordinator) throws -> T) async throws -> T {
     try await context.perform { [self] in

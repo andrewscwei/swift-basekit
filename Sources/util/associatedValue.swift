@@ -7,7 +7,6 @@ import Foundation
 /// - Parameters:
 ///   - object: The object of which the value is associated with.
 ///   - key: The key through which the value is associated with the object.
-///
 /// - Returns: The associated value if it exists and can be typecast to `T`,
 ///            `nil` otherwise.
 public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPointer) -> T? {
@@ -25,7 +24,6 @@ public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPoin
 ///   - object: The object of which the value is associated with.
 ///   - key: The key through which the value is associated with the object.
 ///   - defaultValue: Block that returns the default value.
-///
 /// - Returns: The associated value if it exists and can be typecast to `T`,
 ///            otherwise the default value.
 public func getAssociatedValue<T: Any>(for object: AnyObject, key: UnsafeRawPointer, defaultValue: () -> T) -> T {

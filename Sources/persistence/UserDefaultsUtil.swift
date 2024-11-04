@@ -13,10 +13,8 @@ public struct UserDefaultsUtil {
   ///
   /// - Parameters:
   ///   - key: The key to look up.
-  ///
   /// - Returns: The value stored in `UserDefaults`, `nil` if it does not exist
   ///            or cannot be typecast to `T`.
-  ///
   /// - Throws: If the retrieved value cannot be decoded to type `T`.
   public static func get<T: Codable>(_ key: String) throws -> T? {
     guard let object = UserDefaults.standard.object(forKey: key) else { return nil }
@@ -39,10 +37,8 @@ public struct UserDefaultsUtil {
   ///   - key: The key to look up.
   ///   - defaultValue: The default value to use in case a value does not exist
   ///                   or cannot be typecast to `T`.
-  ///
   /// - Returns: The value stored in `UserDefaults`, or `defaultValue` if it
   ///            does not exist or cannot be typecast to `T`.
-  ///
   /// - Throws: If there is an error setting the default value.
   public static func get<T: Codable>(_ key: String, default defaultValue: T) throws -> T {
     if let value: T = try? get(key) {
@@ -61,7 +57,6 @@ public struct UserDefaultsUtil {
   ///   - key: The key to look up.
   ///   - newValue: The new value to set. If this is `nil`, the key will be
   ///               removed from `UserDefaults`.
-  ///
   /// - Throws: If there is an error encoding the value.
   public static func set<T: Codable>(_ key: String, value: T) throws {
     if let optionalValue = value as? AnyOptional, optionalValue.isNil {

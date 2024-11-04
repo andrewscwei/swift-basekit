@@ -29,10 +29,8 @@ public enum Either<L, R> {
   ///
   /// - Parameters:
   ///   - execute: The block to execute with the left value as its argument.
-  ///
-  /// - Throws: Error thrown by the block.
-  ///
   /// - Returns: The current `Either`.
+  /// - Throws: Error thrown by the block.
   @discardableResult
   public func ifLeft(execute: (L) throws -> Void) rethrows -> Either<L, R> {
     switch self {
@@ -49,10 +47,8 @@ public enum Either<L, R> {
   ///
   /// - Parameters:
   ///   - execute: The block to execute with the right value as its argument.
-  ///
-  /// - Throws: Error thrown by the block.
-  ///
   /// - Returns: The current `Either`.
+  /// - Throws: Error thrown by the block.
   @discardableResult
   public func ifRight(execute: (R) throws -> Void) rethrows -> Either<L, R> {
     switch self {
@@ -68,10 +64,8 @@ public enum Either<L, R> {
   ///
   /// - Parameters:
   ///   - transform: The block to execute to transform the current `L` value.
-  ///
-  /// - Throws: Error thrown by the transform closure.
-  ///
   /// - Returns: The new `Either` with the transformed `L` value.
+  /// - Throws: Error thrown by the transform closure.
   public func mapLeft<T>(transform: (L) throws -> T) rethrows -> Either<T, R> {
   switch self {
   case .left(let value): return .left(try transform(value))
@@ -84,10 +78,8 @@ public enum Either<L, R> {
   ///
   /// - Parameters:
   ///   - transform: The block to execute to transform the current `R` value.
-  ///
-  /// - Throws: Error thrown by the transform closure.
-  ///
   /// - Returns: The new `Either` with the transformed `R` value.
+  /// - Throws: Error thrown by the transform closure.
   public func mapRight<T>(transform: (R) throws -> T) rethrows -> Either<L, T> {
     switch self {
     case .left(let value): return .left(value)
@@ -103,10 +95,8 @@ public enum Either<L, R> {
   ///               `.left`.
   ///   - executeR: The block to execute with the right value if this is a
   ///               `.right`.
-  ///
-  /// - Throws: Error thrown by either block.
-  ///
   /// - Returns: The return value of the executed block.
+  /// - Throws: Error thrown by either block.
   @discardableResult
   public func fold(left: (L) throws -> Any, right: (R) throws -> Any) rethrows -> Any {
     switch self {
