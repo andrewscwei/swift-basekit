@@ -8,20 +8,7 @@ import Foundation
 open class Repository<T: Syncable>: Observable {
   public typealias Observer = RepositoryObserver
 
-  /// Specifies if this repository should automatically sync when data is
-  /// unavailable, i.e. upon instantiation or when invoking `get()`.
-  open var autoSync: Bool { true }
-
   private let synchronizer = RepositorySynchronizer<T>()
-
-  /// Creates a new `Repository` instance.
-  public init() {
-    if autoSync {
-      Task {
-        try? await sync()
-      }
-    }
-  }
 
   /// Synchronizes data across all datasources.
   ///

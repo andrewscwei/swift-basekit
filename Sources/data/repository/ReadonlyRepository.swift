@@ -12,12 +12,8 @@ open class ReadonlyRepository<T: Syncable>: Repository<T> {
     fatalError("<\(Self.self)> Subclass must override `pull()` without calling `super`")
   }
 
-  /// Returns the data in memory.
-  ///
-  /// If data has not been synced and `autoSync` is enabled, a sync will be
-  /// attempted and the synced data returned upon completion.
-  ///
-  /// - Throws: If data is not available.
+  /// Returns the data in memory. If unavailable, a sync will be performed and
+  /// the resulting data returned upon completion.
   public func get() async throws -> T {
     let identifier = "GET-\(UUID().uuidString)"
 
@@ -30,14 +26,6 @@ open class ReadonlyRepository<T: Syncable>: Repository<T> {
 
       return data
     case .initial:
-      guard autoSync else {
-        let error = error("Repository is not synced", domain: "BaseKit.Repository")
-
-        _log.error("<\(Self.self):\(identifier)> Getting data... ERR: \(error)")
-
-        throw RepositoryError.invalidRead(cause: error)
-      }
-
       _log.debug("<\(Self.self):\(identifier)> Getting data... repository not synced, proceeding to auto sync")
 
       do {
