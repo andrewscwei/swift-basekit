@@ -3,7 +3,7 @@ import os.log
 @testable import BaseKit
 
 class WeakReferenceTests: XCTestCase {
-  func test() {
+  func testReference() {
     var object: NSObject? = NSObject()
     let weakObject = WeakReference(object!)
 

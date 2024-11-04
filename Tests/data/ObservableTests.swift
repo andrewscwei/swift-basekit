@@ -27,7 +27,6 @@ class ObservableTests: XCTestCase {
     var observers: [WeakReference<any Observer>] = []
   }
 
-
   func testObservables() {
     let observable1 = SomeMockObservable1()
     let observable2 = SomeMockObservable2()

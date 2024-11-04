@@ -34,7 +34,7 @@ class ReadWriteDatasourceTests: XCTestCase {
     }
   }
 
-  func test() {
+  func testReadWrite() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from read/write good source")
     let expectation2 = XCTestExpectation(description: "Should result in success when writing to read/write good source")
     let expectation3 = XCTestExpectation(description: "Should result in success when writing to read/write good source again")

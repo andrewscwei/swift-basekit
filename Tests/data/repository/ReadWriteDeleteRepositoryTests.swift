@@ -51,7 +51,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
     }
   }
 
-  func testDataRaces() {
+  func testDataRace() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockRepository")
     let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockRepository")
     let expectation3 = XCTestExpectation(description: "Should result in success when reading from MockRepository after writing")
