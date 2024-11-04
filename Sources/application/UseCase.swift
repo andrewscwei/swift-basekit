@@ -1,5 +1,3 @@
-import Foundation
-
 /// Abstract class for implementing use cases. Specify `Input` and `Output`
 /// types.
 ///

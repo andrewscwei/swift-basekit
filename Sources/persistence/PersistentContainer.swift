@@ -1,5 +1,4 @@
 import CoreData
-import Foundation
 
 public final class PersistentContainer {
   let groupIdentifier: String

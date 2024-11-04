@@ -1,5 +1,3 @@
-import Foundation
-
 /// A disjoint union enum holding a value of one of two types, `L` or `R`.
 public enum Either<L, R> {
 
