@@ -23,7 +23,7 @@ open class Repository<T: Syncable>: Observable {
     }
   }
 
-  /// Synchronizes data across all data sources.
+  /// Synchronizes data across all datasources.
   ///
   /// Only one sync task can run at any given time. Until the running task is
   /// complete, subsequent invocations of this method will not trigger a new

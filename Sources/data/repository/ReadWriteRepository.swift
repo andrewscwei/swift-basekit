@@ -6,7 +6,7 @@ open class ReadWriteRepository<T: Syncable>: ReadOnlyRepository<T> {
 
   /// Pushes the data upstream.
   ///
-  /// This method implements how data is pushed to the data source(s).
+  /// This method implements how data is pushed to the datasource(s).
   ///
   /// - Parameters:
   ///   - data: The data to push.
