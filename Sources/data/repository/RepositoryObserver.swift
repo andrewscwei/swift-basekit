@@ -1,13 +1,12 @@
-/// A type conforming to the `RepositoryObserver` protocol gets notified
-/// whenever the data in the target `Repository` changes.
+/// A type conforming to the `RepositoryObserver` protocol is notified whenever
+/// the data in the observed `Repository` changes.
 public protocol RepositoryObserver {
 
-  /// Handler invoked when the data of the observed `Repository` is synced
-  /// and/or changed.
+  /// Handler invoked when the data of the observed `Repository` changes.
   ///
   /// - Parameters:
   ///   - repository: The observed `Repository`.
-  ///   - data: The new data.
+  ///   - data: The changed data.
   func repository<T: Repository>(_ repository: T, dataDidChange data: T.DataType)
 
   /// Handler invoked when the data of the observed `Repository` fails to sync.

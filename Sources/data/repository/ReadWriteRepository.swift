@@ -63,7 +63,7 @@ extension ReadWriteRepository {
     }
   }
 
-  public func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
+  func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     switch state {
     case .notSynced(let data):
       return Task {
