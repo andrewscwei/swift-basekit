@@ -2,6 +2,7 @@ import Foundation
 
 /// Protocol for a read/write `Datasource`.
 public protocol ReadWriteDatasource: ReadOnlyDatasource {
+
   /// Writes data to the datasource.
   ///
   /// - Parameters:

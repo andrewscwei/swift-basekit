@@ -1,5 +1,6 @@
 /// Wraps a value for passing as a mutable reference.
 public class MutableReference<T>: Reference<T> {
+
   /// Updates the wrapped value.
   ///
   /// - Parameters:

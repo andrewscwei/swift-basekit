@@ -7,6 +7,7 @@ nonisolated(unsafe) private var ptr_observers: UInt8 = 0
 /// when certain events happen. Observers conform to the associated `Observer`
 /// type and define their own event handlers.
 public protocol Observable: AnyObject {
+
   /// A type must conform to this associated type to become a valid observer of
   /// this `Observable`.
   associatedtype Observer = AnyObject

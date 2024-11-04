@@ -2,6 +2,7 @@ import Foundation
 
 /// Protocol for a read/write/delete `Datasource`.
 public protocol ReadWriteDeleteDatasource: Datasource {
+
   /// Reads the data from the datasource.
   ///
   /// - Returns: The resulting data. Note that the data can be `nil`, such as

@@ -2,6 +2,7 @@ import Foundation
 
 /// An abstract class for a read-only `Repository`.
 open class ReadOnlyRepository<T: Syncable>: Repository<T> {
+
   /// Pulls the data downstream.
   ///
   /// This method implements how data is fetched from the datasource(s).
@@ -86,4 +87,11 @@ open class ReadOnlyRepository<T: Syncable>: Repository<T> {
       }
     }
   }
+}
+
+
+protocol Foo {
+  func pull()
+
+  func create()
 }
