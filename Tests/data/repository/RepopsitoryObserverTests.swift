@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 actor MockDatasource: ReadWriteDeleteDatasource {
-  typealias DataType = String
+  typealias DataType = String?
 
   private var value: String? = "old"
 

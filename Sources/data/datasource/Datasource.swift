@@ -5,5 +5,5 @@ import Foundation
 public protocol Datasource: Sendable {
 
   /// The data type associated with this datasource.
-  associatedtype DataType
+  associatedtype DataType: Sendable
 }

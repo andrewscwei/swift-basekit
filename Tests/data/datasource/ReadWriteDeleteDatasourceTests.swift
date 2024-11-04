@@ -3,7 +3,7 @@ import XCTest
 
 class ReadWriteDeleteDatasourceTests: XCTestCase {
   struct GoodSource: ReadWriteDeleteDatasource {
-    typealias DataType = Int
+    typealias DataType = Int?
 
     func read() async throws -> Int? {
       await delay(TimeInterval.random(in: 0.5...5.0))
@@ -23,7 +23,7 @@ class ReadWriteDeleteDatasourceTests: XCTestCase {
   }
 
   struct BadSource: ReadWriteDeleteDatasource {
-    typealias DataType = Int
+    typealias DataType = Int?
 
     func read() async throws -> Int? {
       await delay(TimeInterval.random(in: 0.5...5.0))
