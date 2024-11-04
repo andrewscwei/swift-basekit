@@ -1,5 +1,3 @@
-import Foundation
-
 /// Protocol for a read/write `Datasource`.
 public protocol ReadWriteDatasource: ReadonlyDatasource {
 

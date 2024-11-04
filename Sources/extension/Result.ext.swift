@@ -1,5 +1,3 @@
-import Foundation
-
 extension Result {
 
   /// A successful `Result` with `Void` as its success value.

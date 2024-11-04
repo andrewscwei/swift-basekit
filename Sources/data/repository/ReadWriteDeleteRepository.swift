@@ -1,5 +1,3 @@
-import Foundation
-
 /// A `Repository` type whose data can be read, written to, and deleted.
 public protocol ReadWriteDeleteRepository: ReadWriteRepository where DataType: ExpressibleByNilLiteral {
 

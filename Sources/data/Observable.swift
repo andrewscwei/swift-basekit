@@ -1,5 +1,3 @@
-import Foundation
-
 nonisolated(unsafe) private var ptr_observers: UInt8 = 0
 
 /// An object conforming to the `Observable` protocol becomes observable,

@@ -1,5 +1,3 @@
-import Foundation
-
 /// Property wrapper for setting/getting a value of type `T` to/from
 /// `UserDefaults`. Optional values are supported.
 @propertyWrapper

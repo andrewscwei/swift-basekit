@@ -1,5 +1,3 @@
-import Foundation
-
 /// Protocol for a read/write/delete `Datasource`.
 public protocol ReadWriteDeleteDatasource: ReadWriteDatasource where DataType: ExpressibleByNilLiteral {
 
