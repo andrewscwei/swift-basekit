@@ -5,7 +5,7 @@ import Foundation
 ///
 /// The in-memory data syncs with fetched data via a request-collapsing
 /// mechanism where the most recent sync satisfies all pending requests.
-open class Repository<T: Codable & Equatable & Sendable>: Observable {
+open class Repository<T: Syncable>: Observable {
   public typealias Observer = RepositoryObserver
 
   /// Specifies if this repository should automatically sync when data is

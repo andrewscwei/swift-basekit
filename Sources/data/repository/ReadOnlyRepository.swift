@@ -1,7 +1,7 @@
 import Foundation
 
 /// An abstract class for a read-only `Repository`.
-open class ReadOnlyRepository<T: Codable & Equatable & Sendable>: Repository<T> {
+open class ReadOnlyRepository<T: Syncable>: Repository<T> {
   /// Pulls the data downstream.
   ///
   /// This method implements how data is fetched from the data source(s).

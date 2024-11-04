@@ -2,7 +2,7 @@ import Foundation
 
 /// A `RepositoryLiveData` type allowing external modification of its wrapped
 /// value, which updates the `Repository` accordingly.
-public class MutableRepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: RepositoryLiveData<T, R>, @unchecked Sendable {
+public class MutableRepositoryLiveData<T: Equatable, R: Syncable>: RepositoryLiveData<T, R>, @unchecked Sendable {
   private let unmap: (T, R?) -> R
 
   /// Creates a `MutableRepositoryLiveData` instance, assigning its value to the
