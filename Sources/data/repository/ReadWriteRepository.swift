@@ -56,6 +56,28 @@ open class ReadWriteRepository<T: Codable & Equatable & Sendable>: ReadOnlyRepos
     }
   }
 
+
+  /// Sets the data by patching the existing in memory.
+  ///
+  /// - Parameter mutate: Closure mutating the data.
+  ///
+  /// - Returns: The pathced data.
+  @discardableResult
+  public func patch(mutate: (inout T) -> T) async throws -> T {
+    let state = await getState()
+
+    switch state {
+    case .initial:
+      throw RepositoryError.invalidWrite(cause: error("Unable to patch an unsynced repository"))
+    case .notSynced(let data),
+        .synced(let data):
+      var mutableData = data
+      let mutatedData = mutate(&mutableData)
+
+      return try await set(mutatedData)
+    }
+  }
+
   override func createSyncTask(for state: RepositoryState<T>, identifier: String) -> Task<T, any Error> {
     switch state {
     case .notSynced(let data):
