@@ -3,14 +3,14 @@ import XCTest
 
 class ReadWriteDeleteRepositoryTests: XCTestCase {
   actor MockDatasource: ReadWriteDeleteDatasource {
-    typealias DataType = String
+    typealias DataType = String?
 
     private var data: String? = "old"
 
     func read() async throws -> String? {
       await delay(1.0)
 
-      guard let data = data else { throw error("Read error: \(String(describing: data))") }
+      guard let data = data else { throw error() }
 
       return data
     }
@@ -26,7 +26,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
     func delete() async throws {
       await delay(1.0)
 
-      guard data != nil else { throw error("Delete error: \(String(describing: data))") }
+      guard data != nil else { throw error() }
 
       data = nil
     }
@@ -51,7 +51,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
     }
   }
 
-  func test() {
+  func testDataRaces() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockRepository")
     let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockRepository")
     let expectation3 = XCTestExpectation(description: "Should result in success when reading from MockRepository after writing")
