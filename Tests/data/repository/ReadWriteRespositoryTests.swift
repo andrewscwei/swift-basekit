@@ -33,7 +33,7 @@ class ReadWriteRepositoryTests: XCTestCase {
     func push(_ data: String) async throws -> String { try await dataSource.write(data) }
   }
 
-  func test() {
+  func testDataRace() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from MockRepository")
     let expectation2 = XCTestExpectation(description: "Should result in success when writing to MockRepository")
     let expectation3 = XCTestExpectation(description: "Should result in success when reading from MockRepository after writing")

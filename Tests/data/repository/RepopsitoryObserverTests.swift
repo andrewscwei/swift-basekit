@@ -53,7 +53,7 @@ final class MockRepository: ReadWriteDeleteRepository {
 class RepositoryObserverTests: XCTestCase, RepositoryObserver {
   let expectation = XCTestExpectation(description: "Should observe repository successfully with the correct data")
 
-  func test() {
+  func testDataChange() {
     let repository = MockRepository()
     repository.addObserver(self)
 

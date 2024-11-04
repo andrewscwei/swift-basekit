@@ -44,7 +44,7 @@ class ReadWriteDeleteDatasourceTests: XCTestCase {
     }
   }
 
-  func test() {
+  func testReadWriteDelete() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from read/write/delete good source")
     let expectation2 = XCTestExpectation(description: "Should result in success when writing to read/write/delete good source")
     let expectation3 = XCTestExpectation(description: "Should result in success when deleting from read/write/delete good source")

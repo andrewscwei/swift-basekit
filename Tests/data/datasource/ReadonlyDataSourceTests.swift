@@ -22,7 +22,7 @@ class ReadonlyDatasourceTests: XCTestCase {
     }
   }
 
-  func test() {
+  func testRead() {
     let expectation1 = XCTestExpectation(description: "Should result in success when reading from readonly good source")
     let expectation2 = XCTestExpectation(description: "Should result in failure when reading from readonly bad source")
 
