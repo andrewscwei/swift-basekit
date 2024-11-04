@@ -1,14 +1,29 @@
 import Foundation
 
-/// Provides access to fetched data of type `T`, stored in memory.
+/// Provides access to data of type `T` retrieved from datasource(s). Data is
+/// stored in memory and updates whenever synchronization happens.
 ///
-/// Syncs in-memory data with fetched data using request-collapsing. The latest
-/// sync satisfies all pending requests.
+/// In-memory data is synchronized with fetched data via request-collapsing—the
+/// latest sync satisfies all pending requests.
+///
+/// Repositories are observable by explicitly adding observers conforming to
+/// `RepositoryObserver` to it.
+///
+/// `associatedtype`:
+///   - `DataType`: Type of the repository data.
 public protocol Repository: Observable, Sendable where Observer == RepositoryObserver {
   associatedtype DataType: RepositoryData
 
+  /// An actor ensuring thread-safety during data synchronization and state
+  /// changes.
   var synchronizer: RepositorySynchronizer<DataType> { get }
 
+  /// Creates the synchronization task.
+  ///
+  /// - Parameters:
+  ///   - state: The current state of the repository.
+  ///   - identifier: A custom unique identifier for the task, useful in debug.
+  /// - Returns: The task.
   func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error>
 }
 
@@ -17,14 +32,14 @@ extension Repository {
   /// Synchronizes data across datasource(s).
   ///
   /// Only one sync task can run at any given time. Until the running task is
-  /// complete, subsequent invocations of this method will not trigger a new
+  /// complete, subsequent invocations of this method will not initiate a new
   /// task. The callers of previous syncs will receive the result of the last
   /// sync.
   ///
   /// - Parameters:
-  ///   - identifier: Optional string identifier for this sync process.
-  ///
+  ///   - identifier: Optional unique identifier for this sync task.
   /// - Returns: The resulting data.
+  /// - Throws: If sync fails.
   @discardableResult
   public func sync(identifier: String = UUID().uuidString) async throws -> DataType {
     let state = await getState()
@@ -35,7 +50,10 @@ extension Repository {
     return try await synchronizer.yieldTask()
   }
 
-  func getState() async -> RepositoryState<DataType> {
+  /// Gets the current state of the repository.
+  ///
+  /// - Returns: The current state.
+  public func getState() async -> RepositoryState<DataType> {
     await synchronizer.state
   }
 

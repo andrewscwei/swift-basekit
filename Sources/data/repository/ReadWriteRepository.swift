@@ -1,16 +1,25 @@
 import Foundation
 
-/// A `Repository` type whose data can be read and written to.
+/// A `Repository` type whose data can be read and written.
 public protocol ReadWriteRepository: ReadonlyRepository {
+
+  /// Pushes the data to any datasource(s).
+  ///
+  /// - Parameters:
+  ///   - data: The data to push.
+  /// - Returns: The pushed data.
+  /// - Throws: If push fails.
   func push(_ data: DataType) async throws -> DataType
 }
 
 extension ReadWriteRepository {
 
-  /// Sets the data in memory followed by an upstream sync.
+  /// Sets the data in memory and synchronizes the result with datasource(s).
   ///
   /// - Parameters:
   ///   - data: The data to set.
+  /// - Returns: The data set.
+  /// - Throws: When synchronization fails.
   @discardableResult
   public func set(_ newValue: DataType) async throws -> DataType {
     let identifier = "SET-\(UUID().uuidString)"
@@ -41,12 +50,13 @@ extension ReadWriteRepository {
     }
   }
 
-
-  /// Sets the data by patching the existing in memory.
+  /// Patches the data in memory and synchronizes the result with datasource(s).
   ///
-  /// - Parameter mutate: Closure mutating the data.
-  ///
+  /// - Parameters:
+  ///   - mutate: Closure mutating the data.
   /// - Returns: The pathced data.
+  /// - Throws: If the repository has not been synced yet or if the follow-up
+  ///           synchronization fails.
   @discardableResult
   public func patch(mutate: (inout DataType) -> DataType) async throws -> DataType {
     let state = await getState()
