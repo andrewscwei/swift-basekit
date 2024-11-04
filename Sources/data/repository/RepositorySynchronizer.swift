@@ -1,4 +1,4 @@
-actor RepositorySynchronizer<T: Codable & Equatable & Sendable> {
+actor RepositorySynchronizer<T: Syncable> {
   private var task: Task<T, Error>?
   private(set) var state: RepositoryState<T> = .initial
 

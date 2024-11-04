@@ -2,7 +2,7 @@ import Foundation
 
 /// A `LiveData` type that wraps a value `T` from a transformed `Repository`
 /// value `R`.
-public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>: LiveData<T>, RepositoryObserver, @unchecked Sendable {
+public class RepositoryLiveData<T: Equatable, R: Syncable>: LiveData<T>, RepositoryObserver, @unchecked Sendable {
   private let map: (R, T?) -> T?
 
   let repository: Repository<R>
@@ -66,7 +66,7 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     }
   }
 
-  public func repository<DataType: Codable & Equatable>(_ repository: Repository<DataType>, dataDidChange data: DataType) {
+  public func repository<DataType: Syncable>(_ repository: Repository<DataType>, dataDidChange data: DataType) {
     var newValue: T? = nil
 
     if let data = data as? R {
@@ -76,7 +76,7 @@ public class RepositoryLiveData<T: Equatable, R: Codable & Equatable & Sendable>
     value = newValue
   }
 
-  public func repositoryDidFailToSyncData<DataType: Codable & Equatable>(_ repository: Repository<DataType>) {
+  public func repositoryDidFailToSyncData<DataType: Syncable>(_ repository: Repository<DataType>) {
     value = nil
   }
 }
