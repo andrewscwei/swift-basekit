@@ -28,7 +28,7 @@ class ObservableTests: XCTestCase {
   }
 
 
-  func test() {
+  func testObservables() {
     let observable1 = SomeMockObservable1()
     let observable2 = SomeMockObservable2()
     let observer = SomeMockObserver()
@@ -36,12 +36,7 @@ class ObservableTests: XCTestCase {
     observable1.addObserver(observer)
     observable2.addObserver(observer)
 
-    Task {
-      observable1.notifyObservers { XCTAssertEqual($0.foo(), "foo") }
-    }
-
-    Task {
-      observable2.notifyObservers { XCTAssertEqual($0.bar(), "bar") }
-    }
+    observable1.notifyObservers { XCTAssertEqual($0.foo(), "foo") }
+    observable2.notifyObservers { XCTAssertEqual($0.bar(), "bar") }
   }
 }
