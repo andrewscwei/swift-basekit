@@ -14,8 +14,7 @@ open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
     fatalError("<\(Self.self)> Subclass must override `push(_:)` without calling `super`")
   }
 
-  /// Sets the data in memory. If `autoSync` is `true`, an upstream sync will
-  /// follow immediately.
+  /// Sets the data in memory followed by an upstream sync.
   ///
   /// - Parameters:
   ///   - data: The data to set.
@@ -33,26 +32,19 @@ open class ReadWriteRepository<T: Syncable>: ReadonlyRepository<T> {
 
     await setState(.notSynced(newValue))
 
-    if autoSync {
-      _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... proceeding to auto sync")
+    _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... proceeding to auto sync")
 
-      do {
-        let data = try await sync(identifier: identifier)
+    do {
+      let data = try await sync(identifier: identifier)
 
-        _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... OK")
-
-        return data
-      }
-      catch {
-        _log.error("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... ERR: \(error)")
-
-        throw RepositoryError.invalidWrite(cause: error)
-      }
-    }
-    else {
       _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... OK")
 
-      return newValue
+      return data
+    }
+    catch {
+      _log.error("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... ERR: \(error)")
+
+      throw RepositoryError.invalidWrite(cause: error)
     }
   }
 
