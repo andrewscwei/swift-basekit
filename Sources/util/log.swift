@@ -11,6 +11,12 @@ public struct Log: Sendable {
   }
 
   let mode: Mode
+  let symbol: String?
+
+  init(mode: Mode) {
+    self.mode = mode
+    self.symbol = nil
+  }
 
   /// Logs a message to the unified logging system in the `default` level.
   ///
@@ -133,11 +139,13 @@ public struct Log: Sendable {
   }
 
   private func getSymbol(for level: OSLogType) -> String {
+    if let symbol = symbol { return symbol }
+
     switch level {
     case .fault: return "💀"
     case .error: return "⚠️"
     case .debug: return "👾"
-    case .info: return "🤖"
+    case .info: return "ℹ️"
     default: return ""
     }
   }
@@ -153,7 +161,7 @@ public let log = Log(mode: .unified)
 
 #if BASEKIT_DEBUG
 /// Internal logger instance.
-let _log = Log(mode: .console)
+let _log = Log(mode: .console, prefix: "🤖")
 #else
 let _log = Log(mode: .none)
 #endif
