@@ -22,7 +22,7 @@ class ReadWriteRepositoryTests: XCTestCase {
     }
   }
 
-  final class MockRepository: ReadWriteRepository {
+  actor MockRepository: ReadWriteRepository {
     typealias DataType = String
 
     let dataSource = MockDatasource()

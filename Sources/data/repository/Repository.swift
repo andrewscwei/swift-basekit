@@ -11,7 +11,7 @@ import Foundation
 ///
 /// `associatedtype`:
 ///   - `DataType`: Type of the repository data.
-public protocol Repository: Observable, Sendable where Observer == RepositoryObserver {
+public protocol Repository where Self: Actor {
   associatedtype DataType: RepositoryData
 
   /// An actor ensuring thread-safety during data synchronization and state
@@ -47,7 +47,38 @@ extension Repository {
 
     await synchronizer.assignTask(task)
 
-    return try await synchronizer.yieldTask()
+    do {
+      let data = try await synchronizer.yieldTask()
+
+      await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: data) }
+
+      return data
+    }
+    catch {
+      await synchronizer.notifyObservers { $0.repository(self, didFailToSyncWithError: error) }
+
+      throw error
+    }
+  }
+
+  /// Registers a weakly referenced observer.
+  ///
+  /// - Parameters:
+  ///   - observer: The observer to add.
+  public func addObserver(_ observer: RepositoryObserver) {
+    Task {
+      await synchronizer.addObserver(observer)
+    }
+  }
+
+  /// Unregisters an existing observer.
+  ///
+  /// - Parameters:
+  ///   - observer: The observer to remove.
+  public func removeObserver(_ observer: any RepositoryObserver) {
+    Task {
+      await synchronizer.removeObserver(observer)
+    }
   }
 
   /// Gets the current state of the repository.
@@ -61,15 +92,5 @@ extension Repository {
     guard await synchronizer.state != state else { return }
 
     await synchronizer.setState(state)
-
-    notifyObservers {
-      switch state {
-      case .initial:
-        $0.repositoryDidFailToSyncData(self)
-      case .synced(let data),
-          .notSynced(let data):
-        $0.repository(self, dataDidChange: data)
-      }
-    }
   }
 }

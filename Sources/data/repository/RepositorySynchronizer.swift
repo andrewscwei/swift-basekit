@@ -3,8 +3,7 @@
 /// `Repository`.
 public actor RepositorySynchronizer<T: RepositoryData> {
 
-  /// The currently active task that performs data synchronization. If a new
-  /// task is assigned, the previous task is canceled.
+  private var observers: [WeakReference<RepositoryObserver>] = []
   private var task: Task<T, Error>?
 
   /// The current state of the `Repository`. This property is readonly from
@@ -48,5 +47,17 @@ public actor RepositorySynchronizer<T: RepositoryData> {
     catch {
       throw RepositoryError.invalidSync(cause: error)
     }
+  }
+
+  func addObserver(_ observer: any RepositoryObserver) {
+    observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject } + [WeakReference(observer)]
+  }
+
+  func removeObserver(_ observer: any RepositoryObserver) {
+    observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject }
+  }
+
+  func notifyObservers(iteratee: @escaping @Sendable (any RepositoryObserver) -> Void) {
+    observers.compactMap { $0.get() }.forEach(iteratee)
   }
 }

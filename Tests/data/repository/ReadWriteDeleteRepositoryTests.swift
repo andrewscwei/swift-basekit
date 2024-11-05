@@ -32,7 +32,7 @@ class ReadWriteDeleteRepositoryTests: XCTestCase {
     }
   }
 
-  final class MockRepository: ReadWriteDeleteRepository {
+  actor MockRepository: ReadWriteDeleteRepository {
     typealias DataType = String?
 
     let dataSource = MockDatasource()
