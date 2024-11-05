@@ -18,13 +18,13 @@ class ObservableTests: XCTestCase {
   class SomeMockObservable1: Observable {
     typealias Observer = MockObserver1
 
-    var observers: [WeakReference<any Observer>] = []
+    var observers: [WeakReference<Observer>] = []
   }
 
   class SomeMockObservable2: Observable {
     typealias Observer = MockObserver2
 
-    var observers: [WeakReference<any Observer>] = []
+    var observers: [WeakReference<Observer>] = []
   }
 
   func testObservables() {
