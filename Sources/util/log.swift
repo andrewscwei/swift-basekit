@@ -133,14 +133,16 @@ public struct Log: Sendable {
       }
     }
     else {
-      guard level != .default else { return }
-      print(getSymbol(for: level), message)
+      if let symbol = symbol {
+        print(symbol, getSymbol(for: level), message)
+      }
+      else {
+        print(getSymbol(for: level), message)
+      }
     }
   }
 
   private func getSymbol(for level: OSLogType) -> String {
-    if let symbol = symbol { return symbol }
-
     switch level {
     case .fault: return "💀"
     case .error: return "⚠️"
@@ -161,7 +163,7 @@ public let log = Log(mode: .unified)
 
 #if BASEKIT_DEBUG
 /// Internal logger instance.
-let _log = Log(mode: .console, prefix: "🤖")
+let _log = Log(mode: .console, prefix: "[🤖]")
 #else
 let _log = Log(mode: .none)
 #endif
