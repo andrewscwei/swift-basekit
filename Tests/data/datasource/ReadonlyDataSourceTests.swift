@@ -6,7 +6,7 @@ class ReadonlyDatasourceTests: XCTestCase {
     typealias DataType = String
 
     func read() async throws -> String {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       return "Hello, World!"
     }
@@ -16,7 +16,7 @@ class ReadonlyDatasourceTests: XCTestCase {
     typealias DataType = String
 
     func read() async throws -> String {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       throw error()
     }

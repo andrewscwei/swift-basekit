@@ -6,19 +6,19 @@ class ReadWriteDeleteDatasourceTests: XCTestCase {
     typealias DataType = Int?
 
     func read() async throws -> Int? {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       return 1
     }
 
     func write(_ value: Int?) async throws -> Int? {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       return value
     }
 
     func delete() async throws {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
     }
   }
 
@@ -26,19 +26,19 @@ class ReadWriteDeleteDatasourceTests: XCTestCase {
     typealias DataType = Int?
 
     func read() async throws -> Int? {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       throw error()
     }
 
     func write(_ value: Int?) async throws -> Int? {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       throw error()
     }
 
     func delete() async throws {
-      await delay(TimeInterval.random(in: 0.5...5.0))
+      await delay(TimeInterval.random(in: 0.5...4.0))
 
       throw error()
     }
