@@ -1,5 +1,3 @@
-nonisolated(unsafe) private var ptr_observers: UInt8 = 0
-
 /// An object conforming to the `Observable` protocol becomes observable,
 /// storing weak references of its registered observers so it can notify them
 /// when certain events happen. Observers conform to the associated `Observer`
@@ -10,6 +8,9 @@ nonisolated(unsafe) private var ptr_observers: UInt8 = 0
 ///                 valid observer of this `Observable`.
 public protocol Observable: AnyObject {
   associatedtype Observer = AnyObject
+
+  /// A collection of weakly referenced observers.
+  var observers: [WeakReference<Observer>] { get set }
 
   /// Registers a weakly referenced observer.
   ///
@@ -32,11 +33,6 @@ public protocol Observable: AnyObject {
 }
 
 extension Observable {
-  private var observers: [WeakReference<Observer>] {
-    get { return getAssociatedValue(for: self, key: &ptr_observers, defaultValue: { [] }) }
-    set { return setAssociatedValue(for: self, key: &ptr_observers, value: newValue) }
-  }
-
   public func addObserver(_ observer: Observer) {
     observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject } + [WeakReference(observer)]
   }
