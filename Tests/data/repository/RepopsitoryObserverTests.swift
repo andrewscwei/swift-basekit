@@ -31,7 +31,7 @@ actor MockDatasource: ReadWriteDeleteDatasource {
   }
 }
 
-final class MockRepository: ReadWriteDeleteRepository {
+actor MockRepository: ReadWriteDeleteRepository {
   typealias DataType = String?
 
   let dataSource = MockDatasource()
@@ -50,26 +50,32 @@ final class MockRepository: ReadWriteDeleteRepository {
   }
 }
 
-class RepositoryObserverTests: XCTestCase, RepositoryObserver {
-  let expectation = XCTestExpectation(description: "Should observe repository successfully with the correct data")
+final class MockObserver: RepositoryObserver, Sendable {
+  let expectation: XCTestExpectation
 
-  func testDataChange() {
-    let repository = MockRepository()
-    repository.addObserver(self)
-
-    Task {
-      try await repository.set("new")
-    }
-
-    wait(for: [expectation], timeout: 5.0)
-  }
-
-  func repository<T: Repository>(_ repository: T, dataDidChange data: T.DataType) {
+  func repository<T: Repository>(_ repository: T, didSyncWithData data: T.DataType) {
     XCTAssertEqual(data as? String, "new")
     expectation.fulfill()
   }
 
-  func repositoryDidFailToSyncData<T: Repository>(_ repository: T) {
+  init(expectation: XCTestExpectation) {
+    self.expectation = expectation
+  }
+}
 
+class RepositoryObserverTests: XCTestCase {
+  let expectation = XCTestExpectation(description: "Should observe repository successfully with the correct data")
+
+  func testDataChange() {
+    let observer = MockObserver(expectation: expectation)
+    let repository = MockRepository()
+
+    Task {
+      await repository.addObserver(observer)
+      await repository.addObserver(observer)
+      try await repository.set("new")
+    }
+
+    wait(for: [expectation], timeout: 5.0)
   }
 }

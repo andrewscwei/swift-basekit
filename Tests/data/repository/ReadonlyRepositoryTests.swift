@@ -20,11 +20,15 @@ class ReadonlyRepositoryTests: XCTestCase {
     }
   }
 
-  final class MockRepository: ReadonlyRepository {
+  actor MockRepository: ReadonlyRepository {
     typealias DataType = String
 
     let synchronizer: RepositorySynchronizer<String> = .init()
-    let dataSource = MockDatasource()
+    var dataSource = MockDatasource()
+
+    func updateData(_ newValue: String) async {
+      try? await dataSource.updateValue(newValue)
+    }
 
     func pull() async throws -> String { try await dataSource.read() }
   }
