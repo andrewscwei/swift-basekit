@@ -10,6 +10,8 @@ public actor RepositorySynchronizer<T: RepositoryData> {
   /// outside the actor and can be updated only within the actor.
   public private(set) var state: RepositoryState<T> = .initial
 
+  public init() {}
+
   /// Updates the state of the `Repository`.
   ///
   /// - Parameters:

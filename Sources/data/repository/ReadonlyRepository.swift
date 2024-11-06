@@ -45,7 +45,7 @@ extension ReadonlyRepository {
     }
   }
 
-  func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
+  public func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     createDownstreamSyncTask(for: state, identifier: identifier)
   }
 
