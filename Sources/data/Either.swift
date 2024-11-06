@@ -133,3 +133,7 @@ extension Either: Codable where L: Codable, R: Codable {
     }
   }
 }
+
+extension Either: Sendable where L: Sendable, R: Sendable {
+
+}
