@@ -32,6 +32,7 @@ public protocol Interactor {
 }
 
 extension Interactor {
+  @discardableResult
   public func interact<T: UseCase>(_ useCase: T, params: T.Input) async throws -> T.Output {
     _log.debug("Running use case \(T.self) with params \(params)...")
 
