@@ -1,6 +1,6 @@
 import Foundation
 
-/// Provides access to data of type `T` retrieved from datasource(s). Data is
+/// Provides access to data of type `T` retrieved from data source(s). Data is
 /// stored in memory and updates whenever synchronization happens.
 ///
 /// In-memory data is synchronized with fetched data via request-collapsing—the
@@ -29,7 +29,7 @@ public protocol Repository where Self: Actor {
 
 extension Repository {
 
-  /// Synchronizes data across datasource(s).
+  /// Synchronizes data across data source(s).
   ///
   /// Only one sync task can run at any given time. Until the running task is
   /// complete, subsequent invocations of this method will not initiate a new

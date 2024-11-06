@@ -2,7 +2,7 @@ import XCTest
 @testable import BaseKit
 
 class ReadWriteRepositoryTests: XCTestCase {
-  actor MockDatasource: ReadWriteDatasource {
+  actor MockDataSource: ReadWriteDataSource {
     typealias DataType = String
 
     private var data: DataType = "old"
@@ -25,7 +25,7 @@ class ReadWriteRepositoryTests: XCTestCase {
   actor MockRepository: ReadWriteRepository {
     typealias DataType = String
 
-    let dataSource = MockDatasource()
+    let dataSource = MockDataSource()
     let synchronizer = RepositorySynchronizer<String>()
 
     func pull() async throws -> String { try await dataSource.read() }

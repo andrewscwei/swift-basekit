@@ -1,7 +1,7 @@
-/// Protocol for a read/write `Datasource`.
-public protocol ReadWriteDatasource: ReadonlyDatasource {
+/// Protocol for a read/write `DataSource`.
+public protocol ReadWriteDataSource: ReadOnlyDataSource {
 
-  /// Writes data to the datasource.
+  /// Writes data to the data source.
   ///
   /// - Parameters:
   ///   - data: The data to write.

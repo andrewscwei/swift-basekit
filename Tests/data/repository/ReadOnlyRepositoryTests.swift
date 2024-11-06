@@ -1,8 +1,8 @@
 import XCTest
 @testable import BaseKit
 
-class ReadonlyRepositoryTests: XCTestCase {
-  actor MockDatasource: ReadonlyDatasource {
+class ReadOnlyRepositoryTests: XCTestCase {
+  actor MockDataSource: ReadOnlyDataSource {
     typealias DataType = String
 
     private var data: DataType = "old"
@@ -20,11 +20,11 @@ class ReadonlyRepositoryTests: XCTestCase {
     }
   }
 
-  actor MockRepository: ReadonlyRepository {
+  actor MockRepository: ReadOnlyRepository {
     typealias DataType = String
 
     let synchronizer: RepositorySynchronizer<String> = .init()
-    var dataSource = MockDatasource()
+    var dataSource = MockDataSource()
 
     func updateData(_ newValue: String) async {
       try? await dataSource.updateValue(newValue)

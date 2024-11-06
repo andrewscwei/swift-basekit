@@ -1,9 +1,9 @@
 import Foundation
 
 /// A `Repository` type whose data can be read and written.
-public protocol ReadWriteRepository: ReadonlyRepository {
+public protocol ReadWriteRepository: ReadOnlyRepository {
 
-  /// Pushes the data to any datasource(s).
+  /// Pushes the data to any data source(s).
   ///
   /// - Parameters:
   ///   - data: The data to push.
@@ -14,7 +14,7 @@ public protocol ReadWriteRepository: ReadonlyRepository {
 
 extension ReadWriteRepository {
 
-  /// Sets the data in memory and synchronizes the result with datasource(s).
+  /// Sets the data in memory and synchronizes the result with data source(s).
   ///
   /// - Parameters:
   ///   - data: The data to set.
@@ -50,7 +50,8 @@ extension ReadWriteRepository {
     }
   }
 
-  /// Patches the data in memory and synchronizes the result with datasource(s).
+  /// Patches the data in memory and synchronizes the result with data
+  /// source(s).
   ///
   /// - Parameters:
   ///   - mutate: Closure mutating the data.

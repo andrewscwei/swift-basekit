@@ -6,7 +6,7 @@ public actor RepositorySynchronizer<T: RepositoryData> {
   private var observers: [WeakReference<RepositoryObserver>] = []
   private var task: Task<T, Error>?
 
-  /// The current state of the `Repository`. This property is readonly from
+  /// The current state of the `Repository`. This property is read-only from
   /// outside the actor and can be updated only within the actor.
   public private(set) var state: RepositoryState<T> = .initial
 
