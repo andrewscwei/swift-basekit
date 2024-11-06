@@ -54,6 +54,7 @@ extension Interactor {
     }
   }
 
+  @discardableResult
   public func interact<T: UseCase>(_ useCase: T) async throws -> T.Output where T.Input == Void {
     _log.debug("Running use case \(T.self)...")
 
