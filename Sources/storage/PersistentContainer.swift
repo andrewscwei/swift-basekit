@@ -1,6 +1,6 @@
 import CoreData
 
-public struct PersistentContainer: @unchecked Sendable {
+public final class PersistentContainer: @unchecked Sendable {
   public enum Error: Swift.Error {
     case noStoreCoordinator
   }
