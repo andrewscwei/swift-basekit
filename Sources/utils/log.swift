@@ -4,18 +4,18 @@ import Foundation
 /// A simple logger that can log messages to the unified logging system or to
 /// the console (default).
 public struct Log: Sendable {
-  enum Mode {
+  public enum Mode: Sendable {
     case none
     case unified
     case console
   }
 
-  let mode: Mode
-  let symbol: String?
+  public let mode: Mode
+  let prefix: String?
 
-  init(mode: Mode) {
+  public init(mode: Mode) {
     self.mode = mode
-    self.symbol = nil
+    self.prefix = nil
   }
 
   /// Logs a message to the unified logging system in the `default` level.
@@ -33,7 +33,7 @@ public struct Log: Sendable {
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func `default`(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
+  public func callAsFunction(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
     log(message, level: .default, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
   }
 
@@ -133,11 +133,18 @@ public struct Log: Sendable {
       }
     }
     else {
-      if let symbol = symbol {
-        print(symbol, getSymbol(for: level), message)
+      if let prefix = prefix {
+        print(prefix, getSymbol(for: level), message)
       }
       else {
-        print(getSymbol(for: level), message)
+        let symbol = getSymbol(for: level)
+
+        if symbol == "" {
+          print(message)
+        }
+        else {
+          print(symbol, message)
+        }
       }
     }
   }
