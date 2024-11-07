@@ -10,12 +10,17 @@ public struct Log: Sendable {
     case console
   }
 
-  public let mode: Mode
+  let mode: Mode
   let prefix: String?
 
   public init(mode: Mode) {
     self.mode = mode
     self.prefix = nil
+  }
+
+  public init(mode: Mode, prefix: String) {
+    self.mode = mode
+    self.prefix = prefix
   }
 
   /// Logs a message to the unified logging system in the `default` level.
@@ -120,6 +125,8 @@ public struct Log: Sendable {
     guard  level != .debug else { return }
 #endif
 
+    let message = [prefix, getSymbol(for: level), message].compactMap { $0 }.joined(separator: " ")
+
     if mode == .unified {
       let fileName = fileName.components(separatedBy: "/").last?.components(separatedBy: ".").first
       let subsystem = Bundle.main.bundleIdentifier ?? "app"
@@ -133,40 +140,20 @@ public struct Log: Sendable {
       }
     }
     else {
-      if let prefix = prefix {
-        print(prefix, getSymbol(for: level), message)
-      }
-      else {
-        let symbol = getSymbol(for: level)
-
-        if symbol == "" {
-          print(message)
-        }
-        else {
-          print(symbol, message)
-        }
-      }
+      print(message)
     }
   }
 
-  private func getSymbol(for level: OSLogType) -> String {
+  private func getSymbol(for level: OSLogType) -> String? {
     switch level {
     case .fault: return "💀"
     case .error: return "⚠️"
     case .debug: return "👾"
     case .info: return "ℹ️"
-    default: return ""
+    default: return nil
     }
   }
 }
-
-#if DEBUG
-/// Global logger instance, logs to console in debug, unified logging system in
-/// release.
-public let log = Log(mode: .console)
-#else
-public let log = Log(mode: .unified)
-#endif
 
 #if BASEKIT_DEBUG
 /// Internal logger instance.
