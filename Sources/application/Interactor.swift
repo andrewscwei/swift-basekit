@@ -34,19 +34,19 @@ public protocol Interactor {
 extension Interactor {
   @discardableResult
   public func interact<T: UseCase>(_ useCase: T, params: T.Input) async throws -> T.Output {
-    _log.debug("Running use case \(T.self) with params \(params)...")
+    _log.debug { "Running use case \(T.self) with params \(params)..." }
 
     do {
       let result = try await useCase.run(params: params)
 
-      _log.debug("Running use case \(T.self) with params \(params)... OK: \(result)")
+      _log.debug { "Running use case \(T.self) with params \(params)... OK: \(result)" }
 
       self.didInteractWithUseCase(useCase, result: .success(result))
 
       return result
     }
     catch {
-      _log.error("Running use case \(T.self) with params \(params)... ERR: \(error)")
+      _log.error { "Running use case \(T.self) with params \(params)... ERR: \(error)" }
 
       self.didInteractWithUseCase(useCase, result: .failure(error))
 
@@ -56,19 +56,19 @@ extension Interactor {
 
   @discardableResult
   public func interact<T: UseCase>(_ useCase: T) async throws -> T.Output where T.Input == Void {
-    _log.debug("Running use case \(T.self)...")
+    _log.debug { "Running use case \(T.self)..." }
 
     do {
       let result = try await useCase.run(params: ())
 
-      _log.debug("Running use case \(T.self)... OK: \(result)")
+      _log.debug { "Running use case \(T.self)... OK: \(result)" }
 
       didInteractWithUseCase(useCase, result: .success(result))
 
       return result
     }
     catch {
-      _log.error("Running use case \(T.self)... ERR: \(error)")
+      _log.error { "Running use case \(T.self)... ERR: \(error)" }
 
       didInteractWithUseCase(useCase, result: .failure(error))
 

@@ -33,13 +33,13 @@ public struct Log: Sendable {
   ///   5. `default`
   ///
   /// - Parameters:
-  ///   - message: The message.
   ///   - isPublic: Specifies if the log is publicly accessible.
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func callAsFunction(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
-    log(message, level: .default, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
+  ///   - messge: The closure producing the message.
+  public func callAsFunction(isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, _ message: () -> String) {
+    log(level: .default, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber, message)
   }
 
   /// Logs a message to the unified logging system in the `info` level.
@@ -52,13 +52,13 @@ public struct Log: Sendable {
   ///   5. `default`
   ///
   /// - Parameters:
-  ///   - message: The message.
   ///   - isPublic: Specifies if the log is publicly accessible.
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func info(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
-    log(message, level: .info, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
+  ///   - messge: The closure producing the message.
+  public func info(isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, _ message: () -> String) {
+    log(level: .info, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber, message)
   }
 
   /// Logs a message to the unified logging system in the `debug` level.
@@ -71,13 +71,13 @@ public struct Log: Sendable {
   ///   5. `default`
   ///
   /// - Parameters:
-  ///   - message: The message.
   ///   - isPublic: Specifies if the log is publicly accessible.
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func debug(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
-    log(message, level: .debug, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
+  ///   - messge: The closure producing the message.
+  public func debug(isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, _ message: () -> String) {
+    log(level: .debug, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber, message)
   }
 
   /// Logs a message to the unified logging system in the `error` level.
@@ -90,13 +90,13 @@ public struct Log: Sendable {
   ///   5. `default`
   ///
   /// - Parameters:
-  ///   - message: The message.
   ///   - isPublic: Specifies if the log is publicly accessible.
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func error(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
-    log(message, level: .error, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
+  ///   - messge: The closure producing the message.
+  public func error(isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, _ message: () -> String) {
+    log(level: .error, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber, message)
   }
 
   /// Logs a message to the unified logging system in the `fault` level.
@@ -109,23 +109,23 @@ public struct Log: Sendable {
   ///   5. `default`
   ///
   /// - Parameters:
-  ///   - message: The message.
   ///   - isPublic: Specifies if the log is publicly accessible.
   ///   - fileName: Name of the file where this function was called.
   ///   - functionName: Name of the function where this function was called.
   ///   - lineNumber: Line number where this function was called.
-  public func fault(_ message: String, isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line) {
-    log(message, level: .fault, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber)
+  ///   - messge: The closure producing the message.
+  public func fault(isPublic: Bool = true, fileName: String = #file, functionName: String = #function, lineNumber: Int = #line, _ message: () -> String) {
+    log(level: .fault, isPublic: isPublic, fileName: fileName, functionName: functionName, lineNumber: lineNumber, message)
   }
 
-  private func log(_ message: String, level: OSLogType = .info, isPublic: Bool, fileName: String, functionName: String, lineNumber: Int) {
+  private func log(level: OSLogType = .info, isPublic: Bool, fileName: String, functionName: String, lineNumber: Int, _ message: () -> String) {
     guard mode != .none else { return }
 
 #if !DEBUG
     guard  level != .debug else { return }
 #endif
 
-    let message = [prefix, getSymbol(for: level), message].compactMap { $0 }.joined(separator: " ")
+    let message = [prefix, getSymbol(for: level), message()].compactMap { $0 }.joined(separator: " ")
 
     if mode == .unified {
       let fileName = fileName.components(separatedBy: "/").last?.components(separatedBy: ".").first

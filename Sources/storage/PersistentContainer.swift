@@ -38,7 +38,7 @@ public final class PersistentContainer: @unchecked Sendable {
 
   private static func createCoordinator(modelName: String, groupIdentifier: String) -> NSPersistentStoreCoordinator? {
     guard let modelURL = Bundle.main.url(forResource: modelName, withExtension: "momd"), let model = NSManagedObjectModel(contentsOf: modelURL) else {
-      _log.fault("Loading Core Data model with name \(modelName)... ERR: Unable to create Core Data model at URL")
+      _log.fault { "Loading Core Data model with name \(modelName)... ERR: Unable to create Core Data model at URL" }
 
       return nil
     }
@@ -52,10 +52,10 @@ public final class PersistentContainer: @unchecked Sendable {
           NSMigratePersistentStoresAutomaticallyOption: true,
         ])
 
-        _log.info("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK")
+        _log.info { "Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK" }
       }
       catch {
-        _log.error("Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... ERR: \(error)")
+        _log.error { "Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... ERR: \(error)" }
       }
     }
 

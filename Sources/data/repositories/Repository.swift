@@ -51,11 +51,11 @@ extension Repository {
       let data = try await synchronizer.yieldTask()
 
       if case .synced(let oldData) = state, oldData == data {
-        _log.debug("<\(Self.self):\(identifier)> Syncing... SKIP: state=\(await getState()), no change to data, \(await synchronizer.countObservers()) observer(s) will not be notified")
+        _log.debug { "<\(Self.self):\(identifier)> Syncing... SKIP: No change to data, observer(s) will not be notified" }
 
       }
       else {
-        _log.debug("<\(Self.self):\(identifier)> Syncing... OK: state=\(await getState()), notifying \(await synchronizer.countObservers()) observer(s)")
+        _log.debug { "<\(Self.self):\(identifier)> Syncing... OK: Notifying observer(s)" }
 
         await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: data) }
       }
@@ -63,7 +63,7 @@ extension Repository {
       return data
     }
     catch {
-      _log.error("<\(Self.self):\(identifier)> Syncing... ERR: state=\(await getState()), notifying \(await synchronizer.countObservers()) observer(s) of error")
+      _log.error { "<\(Self.self):\(identifier)> Syncing... ERR: Notifying observer(s) of error" }
 
       await synchronizer.notifyObservers { $0.repository(self, didFailToSyncWithError: error) }
 
