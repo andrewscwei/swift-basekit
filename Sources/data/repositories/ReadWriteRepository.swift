@@ -99,7 +99,7 @@ extension ReadWriteRepository {
         case .failure(let error):
           _log.error("<\(Self.self):\(identifier)> Syncing upstream... ERR: \(error)")
 
-          throw RepositoryError.invalidSync(cause: error)
+          throw error
         }
       }
     default:

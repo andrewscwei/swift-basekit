@@ -77,7 +77,7 @@ extension ReadOnlyRepository {
 
         _log.error("<\(Self.self):\(identifier)> Syncing downstream... ERR: \(error)")
 
-        throw RepositoryError.invalidSync(cause: error)
+        throw error
       }
     }
   }
