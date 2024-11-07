@@ -19,8 +19,6 @@ extension ReadOnlyRepository {
   public func get() async throws -> DataType {
     let identifier = "GET-\(UUID().uuidString)"
 
-    _log.debug("<\(Self.self):\(identifier)> Getting data...")
-
     switch await getState() {
     case .synced(let data),
         .notSynced(let data):
@@ -65,6 +63,8 @@ extension ReadOnlyRepository {
       switch result {
       case .success(let data):
         _log.debug("<\(Self.self):\(identifier)> Syncing downstream... OK: \(data)")
+
+        await setState(.synced(data))
 
         return data
       case .failure(let error):

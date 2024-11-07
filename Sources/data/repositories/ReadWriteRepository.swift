@@ -24,8 +24,6 @@ extension ReadWriteRepository {
   public func set(_ newValue: DataType) async throws -> DataType {
     let identifier = "SET-\(UUID().uuidString)"
 
-    _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"...")
-
     if case .synced(let data) = await getState(), data == newValue {
       _log.debug("<\(Self.self):\(identifier)> Setting data to \"\(data)\"... SKIP: No change")
 

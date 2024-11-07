@@ -156,8 +156,7 @@ public struct Log: Sendable {
 }
 
 #if BASEKIT_DEBUG
-/// Internal logger instance.
-let _log = Log(mode: .console, prefix: "[🤖]")
+let _log = Log(mode: .unified, prefix: "[🤖]")
 #else
 let _log = Log(mode: .none)
 #endif

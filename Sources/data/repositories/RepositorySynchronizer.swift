@@ -52,11 +52,17 @@ public actor RepositorySynchronizer<T: RepositoryData> {
   }
 
   func addObserver(_ observer: any RepositoryObserver) {
-    observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject } + [WeakReference(observer)]
+    guard !observers.contains(where: { $0.get() as AnyObject === observer as AnyObject }) else { return }
+
+    observers += [WeakReference(observer)]
   }
 
   func removeObserver(_ observer: any RepositoryObserver) {
     observers = observers.filter { $0.get() as AnyObject !== observer as AnyObject }
+  }
+
+  func countObservers() -> Int {
+    observers.count
   }
 
   func notifyObservers(iteratee: @escaping @Sendable (any RepositoryObserver) -> Void) {
