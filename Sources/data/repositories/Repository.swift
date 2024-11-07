@@ -50,7 +50,9 @@ extension Repository {
     do {
       let data = try await synchronizer.yieldTask()
 
-      await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: data) }
+      if case .synced(let oldData) = state, oldData != data {
+        await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: data) }
+      }
 
       return data
     }
