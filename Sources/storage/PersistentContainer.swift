@@ -52,7 +52,7 @@ public final class PersistentContainer: @unchecked Sendable {
           NSMigratePersistentStoresAutomaticallyOption: true,
         ])
 
-        _log.info { "Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK" }
+        _log.debug { "Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... OK" }
       }
       catch {
         _log.error { "Initializing Core Data for group identifier <\(groupIdentifier)> and model name <\(modelName)>... ERR: \(error)" }
