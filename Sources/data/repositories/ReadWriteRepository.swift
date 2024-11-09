@@ -73,33 +73,37 @@ extension ReadWriteRepository {
   public func createSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     switch state {
     case .notSynced(let data):
-      return Task {
-        _log.debug { "[\(Self.self):\(identifier)] Syncing upstream..." }
-
-        let subtask = Task { try await push(data) }
-        let result = await subtask.result
-
-        guard !Task.isCancelled else {
-          _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... CANCEL: Sync task has been overridden" }
-
-          throw CancellationError()
-        }
-
-        switch result {
-        case .success(let newData):
-          _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... OK\n↘︎ data=\(newData)" }
-
-          await setState(.synced(newData))
-
-          return newData
-        case .failure(let error):
-          _log.error { "[\(Self.self):\(identifier)] Syncing upstream... ERR\n↘︎ error=\(error)" }
-
-          throw error
-        }
-      }
+      return createUpstreamSyncTask(data: data, for: state, identifier: identifier)
     default:
       return createDownstreamSyncTask(for: state, identifier: identifier)
+    }
+  }
+
+  func createUpstreamSyncTask(data: DataType, for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
+    Task {
+      _log.debug { "[\(Self.self):\(identifier)] Syncing upstream..." }
+
+      let subtask = Task { try await push(data) }
+      let result = await subtask.result
+
+      guard !Task.isCancelled else {
+        _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... CANCEL: Sync task has been overridden" }
+
+        throw CancellationError()
+      }
+
+      switch result {
+      case .success(let newData):
+        _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... OK\n↘︎ data=\(newData)" }
+
+        await setState(.synced(newData))
+
+        return newData
+      case .failure(let error):
+        _log.error { "[\(Self.self):\(identifier)] Syncing upstream... ERR\n↘︎ error=\(error)" }
+
+        throw error
+      }
     }
   }
 }
