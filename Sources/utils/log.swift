@@ -155,8 +155,4 @@ public struct Log: Sendable {
   }
 }
 
-#if BASEKIT_DEBUG
-let _log = Log(mode: .unified, prefix: "[🤖]")
-#else
-let _log = Log(mode: .none)
-#endif
+let _log = Log(mode: getenv("BASEKIT_DEBUG") != nil ? .unified : .none, prefix: "[🤖]")

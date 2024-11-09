@@ -60,3 +60,11 @@ dependencies: [
 ```sh
 $ bundle exec fastlane test
 ```
+
+## Debugging
+
+Internal logging can be enabled by setting the `BASEKIT_DEBUG` environment variable:
+
+1. From Xcode > **Edit Scheme...**
+2. Go to **Run** > **Arguments** tab
+3. Define `BASEKIT_DEBUG` under **Environment Variables**, set it to any value or simply leave it blank
