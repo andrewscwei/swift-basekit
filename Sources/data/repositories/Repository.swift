@@ -42,27 +42,30 @@ extension Repository {
   /// - Throws: If sync fails.
   @discardableResult
   public func sync(identifier: String = UUID().uuidString) async throws -> DataType {
-    let state = await getState()
-    let task = createSyncTask(for: state, identifier: identifier)
+    let task = createSyncTask(for: await getState(), identifier: identifier)
 
     await synchronizer.assignTask(task)
 
     do {
-      let data = try await synchronizer.yieldTask()
+      let newData = try await synchronizer.yieldTask()
 
-      if case .synced(let oldData) = state, oldData == data {
-        _log.debug { "[\(Self.self):\(identifier)] Syncing... SKIP: No change to data, observer(s) will not be notified" }
+      if case .synced(let data) = await getState(), data == newData {
+
       }
       else {
-        _log.debug { "[\(Self.self):\(identifier)] Syncing... OK: Notifying observer(s)" }
-
-        await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: data) }
+        await setState(.synced(newData))
+        await synchronizer.notifyObservers { $0.repository(self, didSyncWithData: newData) }
       }
 
-      return data
+      return newData
     }
     catch {
-      _log.error { "[\(Self.self):\(identifier)] Syncing... ERR: Notifying observer(s) of error" }
+      switch await getState() {
+      case .synced(let data):
+        await setState(.notSynced(data))
+      default:
+        break
+      }
 
       await synchronizer.notifyObservers { $0.repository(self, didFailToSyncWithError: error) }
 

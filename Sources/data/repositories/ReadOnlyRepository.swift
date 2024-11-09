@@ -64,17 +64,8 @@ extension ReadOnlyRepository {
       case .success(let data):
         _log.debug { "[\(Self.self):\(identifier)] Syncing downstream... OK\n↘︎ data=\(data)" }
 
-        await setState(.synced(data))
-
         return data
       case .failure(let error):
-        switch state {
-        case .synced(let data):
-          await setState(.notSynced(data))
-        default:
-          break
-        }
-
         _log.error { "[\(Self.self):\(identifier)] Syncing downstream... ERR\n↘︎ error=\(error)" }
 
         throw error

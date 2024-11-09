@@ -21,29 +21,19 @@ extension ReadWriteRepository {
   /// - Returns: The data set.
   /// - Throws: When synchronization fails.
   @discardableResult
-  public func set(_ newValue: DataType) async throws -> DataType {
+  public func set(_ newData: DataType) async throws -> DataType {
     let identifier = "SET-\(UUID().uuidString)"
+    let state = await getState()
 
-    if case .synced(let data) = await getState(), data == newValue {
+    if case .synced(let data) = state, data == newData {
       return data
     }
 
-    await setState(.notSynced(newValue))
+    await setState(.notSynced(newData))
 
-    _log.debug { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... proceeding to auto sync" }
+    _log.debug { "[\(Self.self):\(identifier)] Setting data... OK: Proceeding to auto sync\n↘︎ data=\(newData)" }
 
-    do {
-      let data = try await sync(identifier: identifier)
-
-      _log.debug { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... OK" }
-
-      return data
-    }
-    catch {
-      _log.error { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... ERR\n↘︎ error=\(error)" }
-
-      throw RepositoryError.invalidWrite(cause: error)
-    }
+    return try await sync(identifier: identifier)
   }
 
   /// Patches the data in memory and synchronizes the result with data
@@ -96,7 +86,7 @@ extension ReadWriteRepository {
       case .success(let newData):
         _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... OK\n↘︎ data=\(newData)" }
 
-        await setState(.synced(newData))
+//        await setState(.synced(newData))
 
         return newData
       case .failure(let error):
