@@ -34,7 +34,7 @@ public class TemporaryFile {
         _log.debug { "Destroying temporary file at \(path)... OK" }
       }
       catch let error {
-        _log.error { "Destroying temporary file at \(path)... ERR: \(error.localizedDescription)" }
+        _log.error { "Destroying temporary file at \(path)... ERR:\n↘︎ error=\(error)" }
       }
     }
   }

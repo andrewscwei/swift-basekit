@@ -25,24 +25,22 @@ extension ReadWriteRepository {
     let identifier = "SET-\(UUID().uuidString)"
 
     if case .synced(let data) = await getState(), data == newValue {
-      _log.debug { "<\(Self.self):\(identifier)> Setting data to \"\(data)\"... SKIP: No change" }
-
       return data
     }
 
     await setState(.notSynced(newValue))
 
-    _log.debug { "<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... proceeding to auto sync" }
+    _log.debug { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... proceeding to auto sync" }
 
     do {
       let data = try await sync(identifier: identifier)
 
-      _log.debug { "<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... OK" }
+      _log.debug { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... OK" }
 
       return data
     }
     catch {
-      _log.error { "<\(Self.self):\(identifier)> Setting data to \"\(newValue)\"... ERR: \(error)" }
+      _log.error { "[\(Self.self):\(identifier)] Setting data to \"\(newValue)\"... ERR\n↘︎ error=\(error)" }
 
       throw RepositoryError.invalidWrite(cause: error)
     }
@@ -76,26 +74,26 @@ extension ReadWriteRepository {
     switch state {
     case .notSynced(let data):
       return Task {
-        _log.debug { "<\(Self.self):\(identifier)> Syncing upstream..." }
+        _log.debug { "[\(Self.self):\(identifier)] Syncing upstream..." }
 
         let subtask = Task { try await push(data) }
         let result = await subtask.result
 
         guard !Task.isCancelled else {
-          _log.debug { "<\(Self.self):\(identifier)> Syncing upstream... CANCEL: Current sync has been overridden" }
+          _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... CANCEL: Sync task has been overridden" }
 
           throw CancellationError()
         }
 
         switch result {
         case .success(let newData):
-          _log.debug { "<\(Self.self):\(identifier)> Syncing upstream... OK: \(newData)" }
+          _log.debug { "[\(Self.self):\(identifier)] Syncing upstream... OK\n↘︎ data=\(newData)" }
 
           await setState(.synced(newData))
 
           return newData
         case .failure(let error):
-          _log.error { "<\(Self.self):\(identifier)> Syncing upstream... ERR: \(error)" }
+          _log.error { "[\(Self.self):\(identifier)] Syncing upstream... ERR\n↘︎ error=\(error)" }
 
           throw error
         }

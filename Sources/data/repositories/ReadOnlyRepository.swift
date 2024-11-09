@@ -22,21 +22,21 @@ extension ReadOnlyRepository {
     switch await getState() {
     case .synced(let data),
         .notSynced(let data):
-      _log.debug { "<\(Self.self):\(identifier)> Getting data... OK: \(data)" }
+      _log.debug { "[\(Self.self):\(identifier)] Getting data... OK\n↘︎ data=\(data)" }
 
       return data
     case .initial:
-      _log.debug { "<\(Self.self):\(identifier)> Getting data... repository not synced, proceeding to auto sync" }
+      _log.debug { "[\(Self.self):\(identifier)] Getting data... repository not synced, proceeding to auto sync" }
 
       do {
         let data = try await sync(identifier: identifier)
 
-        _log.debug { "<\(Self.self):\(identifier)> Getting data... OK: \(data)" }
+        _log.debug { "[\(Self.self):\(identifier)] Getting data... OK\n↘︎ data=\(data)" }
 
         return data
       }
       catch {
-        _log.error { "<\(Self.self):\(identifier)> Getting data... ERR: \(error)" }
+        _log.error { "[\(Self.self):\(identifier)] Getting data... ERR\n↘︎ error=\(error)" }
 
         throw RepositoryError.invalidRead(cause: error)
       }
@@ -49,20 +49,20 @@ extension ReadOnlyRepository {
 
   func createDownstreamSyncTask(for state: RepositoryState<DataType>, identifier: String) -> Task<DataType, any Error> {
     Task {
-      _log.debug { "<\(Self.self):\(identifier)> Syncing downstream..." }
+      _log.debug { "[\(Self.self):\(identifier)] Syncing downstream..." }
 
       let subtask = Task { try await pull() }
       let result = await subtask.result
 
       guard !Task.isCancelled else {
-        _log.debug { "<\(Self.self):\(identifier)> Syncing downstream... CANCEL: Sync task has been overridden" }
+        _log.debug { "[\(Self.self):\(identifier)] Syncing downstream... CANCEL: Sync task has been overridden" }
 
         throw CancellationError()
       }
 
       switch result {
       case .success(let data):
-        _log.debug { "<\(Self.self):\(identifier)> Syncing downstream... OK: \(data)" }
+        _log.debug { "[\(Self.self):\(identifier)] Syncing downstream... OK\n↘︎ data=\(data)" }
 
         await setState(.synced(data))
 
@@ -75,7 +75,7 @@ extension ReadOnlyRepository {
           break
         }
 
-        _log.error { "<\(Self.self):\(identifier)> Syncing downstream... ERR: \(error)" }
+        _log.error { "[\(Self.self):\(identifier)] Syncing downstream... ERR\n↘︎ error=\(error)" }
 
         throw error
       }
