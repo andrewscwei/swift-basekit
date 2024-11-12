@@ -100,7 +100,12 @@ extension Repository {
     await synchronizer.state
   }
 
-  func setState(_ state: RepositoryState<DataType>) async {
+
+  /// Sets the current state of the repository.
+  ///
+  /// - Parameters:
+  ///   -  state: The state to set.
+  public func setState(_ state: RepositoryState<DataType>) async {
     guard await synchronizer.state != state else { return }
 
     await synchronizer.setState(state)
