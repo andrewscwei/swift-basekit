@@ -7,7 +7,7 @@ BaseKit is a lightweight Swift library consisting of low level classes, protocol
 - Classes and protocols for implementing the repository pattern, i.e. `Repository`, `DataSource`
 - Data containers, i.e. `Reference` and `WeakReference`
 - Better data representation via `Either` and `Result` extension
-- Protocols for implementing application use cases, i.e. `UseCase` and `Interactor`
+- Protocols for implementing application use cases, i.e. `UseCase` and `Interactable`
 - Utility class for accessing `UserDefaults` and `KeyChain`
 - Debug tools
 

@@ -3,7 +3,7 @@ import Foundation
 
 /// A simple logger that can log messages to the unified logging system or to
 /// the console (default).
-public struct Log: Sendable {
+public struct Logger: Sendable {
   public enum Mode: Sendable {
     case none
     case unified
@@ -155,4 +155,4 @@ public struct Log: Sendable {
   }
 }
 
-let _log = Log(mode: getenv("BASEKIT_DEBUG") != nil ? .unified : .none, prefix: "[🤖]")
+let _log = Logger(mode: getenv("BASEKIT_DEBUG") != nil ? .unified : .none, prefix: "[🤖]")
